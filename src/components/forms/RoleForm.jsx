@@ -15,16 +15,7 @@ const RoleForm = ({
     name: "",
     ...initialData,
   });
-
-  useEffect(() => {
-    if (initialData) {
-      setFormData({
-        ...formData,
-        ...initialData,
-      });
-    }
-  }, [initialData]);
-
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });

@@ -1,4 +1,3 @@
-// src/pages/users/UserList.jsx
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { userService } from "../../api/users";
