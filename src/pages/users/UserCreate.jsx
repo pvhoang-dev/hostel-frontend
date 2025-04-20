@@ -1,4 +1,3 @@
-// src/pages/users/UserCreate.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { userService } from "../../api/users";
