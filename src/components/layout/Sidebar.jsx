@@ -14,6 +14,7 @@ const Sidebar = ({ isMobile = false, isOpen = true, onClose }) => {
     { path: "/users", label: "Users", roles: ["admin"] },
     { path: "/roles", label: "Roles", roles: ["admin"] },
     { path: "/equipments", label: "Equipments", roles: ["admin", "manager"] },
+    { path: "/services", label: "Services", roles: ["admin", "manager"] },
     { path: "/houses", label: "Houses", roles: ["admin", "manager"] },
     { path: "/rooms", label: "Rooms", roles: ["admin", "manager"] },
     { path: "/contracts", label: "Contracts", roles: ["admin", "manager"] },

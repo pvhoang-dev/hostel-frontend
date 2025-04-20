@@ -1,4 +1,3 @@
-// src/api/users.js
 import api from "./axios";
 
 export const userService = {

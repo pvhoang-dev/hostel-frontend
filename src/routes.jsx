@@ -16,6 +16,10 @@ import EquipmentCreate from "./pages/equipments/EquipmentCreate";
 import EquipmentEdit from "./pages/equipments/EquipmentEdit";
 import EquipmentDetail from "./pages/equipments/EquipmentDetail";
 import { useAuth } from "./hooks/useAuth";
+import ServiceList from "./pages/services/ServiceList.jsx";
+import ServiceCreate from "./pages/services/ServiceCreate.jsx";
+import ServiceDetail from "./pages/services/ServiceDetail.jsx";
+import ServiceEdit from "./pages/services/ServiceEdit.jsx";
 
 // Protected route wrapper component
 const ProtectedRoute = ({ element, allowedRoles = [] }) => {
@@ -145,6 +149,24 @@ const Routes = () => {
               <ProtectedRoute element={<EquipmentEdit/>} allowedRoles={["admin"]}/>
           ),
         },
+        // Service routes
+        {
+          path: "services",
+          element: <ProtectedRoute element={<ServiceList />} allowedRoles={["admin", "manager"]} />,
+        },
+        {
+          path: "services/create",
+          element: <ProtectedRoute element={<ServiceCreate />} allowedRoles={["admin", "manager"]} />,
+        },
+        {
+          path: "services/:id",
+          element: <ProtectedRoute element={<ServiceDetail />} allowedRoles={["admin", "manager"]} />,
+        },
+        {
+          path: "services/:id/edit",
+          element: <ProtectedRoute element={<ServiceEdit />} allowedRoles={["admin", "manager"]} />,
+        },
+
       ],
     },
     {
