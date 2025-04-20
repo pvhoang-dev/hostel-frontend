@@ -16,10 +16,14 @@ import EquipmentCreate from "./pages/equipments/EquipmentCreate";
 import EquipmentEdit from "./pages/equipments/EquipmentEdit";
 import EquipmentDetail from "./pages/equipments/EquipmentDetail";
 import { useAuth } from "./hooks/useAuth";
-import ServiceList from "./pages/services/ServiceList.jsx";
-import ServiceCreate from "./pages/services/ServiceCreate.jsx";
-import ServiceDetail from "./pages/services/ServiceDetail.jsx";
-import ServiceEdit from "./pages/services/ServiceEdit.jsx";
+import ServiceList from "./pages/services/ServiceList";
+import ServiceCreate from "./pages/services/ServiceCreate";
+import ServiceDetail from "./pages/services/ServiceDetail";
+import ServiceEdit from "./pages/services/ServiceEdit";
+import PaymentMethodList from "./pages/payment-methods/PaymentMethodList";
+import PaymentMethodCreate from "./pages/payment-methods/PaymentMethodCreate";
+import PaymentMethodDetail from "./pages/payment-methods/PaymentMethodDetail";
+import PaymentMethodEdit from "./pages/payment-methods/PaymentMethodEdit";
 
 // Protected route wrapper component
 const ProtectedRoute = ({ element, allowedRoles = [] }) => {
@@ -166,7 +170,30 @@ const Routes = () => {
           path: "services/:id/edit",
           element: <ProtectedRoute element={<ServiceEdit />} allowedRoles={["admin", "manager"]} />,
         },
-
+        {
+          path: "payment-methods",
+          element: (
+              <ProtectedRoute element={<PaymentMethodList />} allowedRoles={["admin"]} />
+          ),
+        },
+        {
+          path: "payment-methods/create",
+          element: (
+              <ProtectedRoute element={<PaymentMethodCreate />} allowedRoles={["admin"]} />
+          ),
+        },
+        {
+          path: "payment-methods/:id",
+          element: (
+              <ProtectedRoute element={<PaymentMethodDetail />} allowedRoles={["admin"]} />
+          ),
+        },
+        {
+          path: "payment-methods/:id/edit",
+          element: (
+              <ProtectedRoute element={<PaymentMethodEdit/>} allowedRoles={["admin"]}/>
+          ),
+        },
       ],
     },
     {

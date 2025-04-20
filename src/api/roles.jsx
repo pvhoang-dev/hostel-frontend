@@ -1,4 +1,3 @@
-// src/api/roles.js
 import api from "./axios";
 
 export const roleService = {
