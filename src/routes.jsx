@@ -24,6 +24,7 @@ import PaymentMethodList from "./pages/payment-methods/PaymentMethodList";
 import PaymentMethodCreate from "./pages/payment-methods/PaymentMethodCreate";
 import PaymentMethodDetail from "./pages/payment-methods/PaymentMethodDetail";
 import PaymentMethodEdit from "./pages/payment-methods/PaymentMethodEdit";
+import NotFound from "./pages/errors/NotFound.jsx";
 
 // Protected route wrapper component
 const ProtectedRoute = ({ element, allowedRoles = [] }) => {
@@ -242,7 +243,7 @@ const Routes = () => {
     },
     {
       path: "*",
-      element: <div>404 Not Found</div>,
+      element: <NotFound />,
     },
   ]);
 
