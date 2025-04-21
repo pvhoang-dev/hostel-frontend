@@ -42,7 +42,7 @@ const ServiceForm = ({
         <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Input
-                    label="Service Name"
+                    label="Tên dịch vụ"
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
@@ -51,9 +51,9 @@ const ServiceForm = ({
                 />
 
                 <Input
-                    label="Default Price"
+                    label="Giá mặc định"
                     name="default_price"
-                    type="number" // Use number type for price
+                    type="number"
                     value={formData.default_price}
                     onChange={handleChange}
                     error={errors.default_price}
@@ -61,7 +61,7 @@ const ServiceForm = ({
                 />
 
                 <Input
-                    label="Unit"
+                    label="Đơn vị"
                     name="unit"
                     value={formData.unit}
                     onChange={handleChange}
@@ -79,7 +79,7 @@ const ServiceForm = ({
                         className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                     />
                     <label htmlFor="is_metered" className="text-sm font-medium text-gray-700">
-                        Is Metered? (e.g., Electricity, Water)
+                        Được đo? (e.g., Điện, Nước)
                     </label>
                     {errors.is_metered && <p className="text-red-500 text-xs mt-1">{errors.is_metered}</p>}
                 </div>
@@ -93,14 +93,14 @@ const ServiceForm = ({
                     onClick={() => window.history.back()}
                     className="mr-2"
                 >
-                    Cancel
+                    Hủy
                 </Button>
                 <Button type="submit" disabled={isSubmitting}>
                     {isSubmitting
-                        ? `${mode === "create" ? "Creating" : "Updating"}...`
+                        ? `${mode === "create" ? "Đang tạo" : "Đang cập nhật"}...`
                         : mode === "create"
-                            ? "Create Service"
-                            : "Update Service"}
+                            ? "Tạo"
+                            : "Cập nhật"}
                 </Button>
             </div>
         </form>

@@ -21,22 +21,22 @@ const ServiceCreate = () => {
     const response = await createServiceApi(formData);
 
     if (response.success) {
-      showSuccess("Service created successfully");
+      showSuccess("Tạo dịch vụ thành công");
       navigate("/services");
     } else {
       if (response.data && typeof response.data === "object") {
         setErrors(response.data); // Set validation errors from API
       }
-      showError(response.message || "Failed to create service");
+      showError(response.message || "Lỗi khi tạo dịch vụ");
     }
   };
 
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">Create Service</h1>
+        <h1 className="text-2xl font-semibold">Tạo dịch vụ</h1>
         <Button variant="secondary" onClick={() => navigate("/services")}>
-          Back to Services
+          Back
         </Button>
       </div>
 

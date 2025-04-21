@@ -39,7 +39,7 @@ const UserEdit = () => {
 
       setUserData(user);
     } else {
-      showError("Failed to load user");
+      showError("Lỗi khi tải người dùng");
       navigate("/users");
     }
     setLoading(false);
@@ -56,13 +56,13 @@ const UserEdit = () => {
     const response = await updateUser(id, dataToSubmit);
 
     if (response.success) {
-      showSuccess("User updated successfully");
+      showSuccess("Cập nhật người dùng thành công");
       navigate("/users");
     } else {
       if (response.data && typeof response.data === "object") {
         setErrors(response.data);
       } else {
-        showError(response.message || "Failed to update user");
+        showError(response.message || "Có lỗi xảy ra khi cập nhật người dùng");
       }
     }
   };
@@ -74,12 +74,12 @@ const UserEdit = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">Edit User</h1>
+        <h1 className="text-2xl font-semibold">Chỉnh sửa người dùng</h1>
         <button
           onClick={() => navigate("/users")}
           className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded"
         >
-          Back to Users
+          Back
         </button>
       </div>
 

@@ -17,19 +17,19 @@ const ActionButtons = ({ service, onDelete }) => (
       to={`/services/${service.id}`}
       className="text-blue-600 hover:underline"
     >
-      View
+      Xem
     </Link>
     <Link
       to={`/services/${service.id}/edit`}
       className="text-green-600 hover:underline"
     >
-      Edit
+      Sửa
     </Link>
     <button
       onClick={() => onDelete(service.id)}
       className="text-red-600 hover:underline"
     >
-      Delete
+      Xóa
     </button>
   </div>
 );
@@ -41,29 +41,28 @@ const FilterSection = ({
   onClearFilters,
   onApplyFilters,
 }) => (
-  <Card title="Filters" className="mb-6">
+  <Card title="Bộ lọc" className="mb-6">
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       <Input
-        label="Name"
+        label="Tên"
         name="name"
         value={filters.name}
         onChange={onFilterChange}
       />
       <Input
-        label="Unit"
+        label="Đơn vị"
         name="unit"
         value={filters.unit}
         onChange={onFilterChange}
       />
       <Select
-        label="Is Metered?"
+        label="Được đo?"
         name="is_metered"
         value={filters.is_metered}
         onChange={onFilterChange}
         options={[
-          { value: "", label: "All" },
-          { value: "1", label: "Yes" },
-          { value: "0", label: "No" },
+          { value: "1", label: "Có" },
+          { value: "0", label: "Không" },
         ]}
       />
       {/* Add price range filters if needed */}
@@ -75,9 +74,9 @@ const FilterSection = ({
 
     <div className="mt-4 flex justify-end">
       <Button variant="secondary" onClick={onClearFilters} className="mr-2">
-        Clear Filters
+        Xóa bộ lọc
       </Button>
-      <Button onClick={onApplyFilters}>Apply Filters</Button>
+      <Button onClick={onApplyFilters}>Tìm</Button>
     </div>
   </Card>
 );
@@ -120,29 +119,23 @@ const ServiceList = () => {
   // Table columns definition
   const columns = [
     { accessorKey: "id", header: "ID", enableSorting: true },
-    { accessorKey: "name", header: "Name", enableSorting: true },
+    { accessorKey: "name", header: "Tên", enableSorting: true },
     {
       accessorKey: "default_price",
-      header: "Default Price",
+      header: "Giá mặc định",
       cell: ({ row }) => row.original.default_price?.toLocaleString(),
       enableSorting: true,
     },
-    { accessorKey: "unit", header: "Unit", enableSorting: true },
+    { accessorKey: "unit", header: "Đơn vị", enableSorting: true },
     {
       accessorKey: "is_metered",
-      header: "Metered",
-      cell: ({ row }) => (row.original.is_metered ? "Yes" : "No"),
-      enableSorting: true,
-    },
-    {
-      accessorKey: "created_at",
-      header: "Created At",
-      cell: ({ row }) => new Date(row.original.created_at).toLocaleDateString(),
+      header: "Được đo?",
+      cell: ({ row }) => (row.original.is_metered ? "Có" : "Không"),
       enableSorting: true,
     },
     {
       accessorKey: "actions",
-      header: "Actions",
+      header: "Hành động",
       cell: ({ row }) => (
         <ActionButtons service={row.original} onDelete={handleDeleteService} />
       ),
@@ -171,15 +164,15 @@ const ServiceList = () => {
 
     const response = await fetchServices(params);
     if (!response.success) {
-      showError(response.message || "Failed to load services");
+      showError(response.message || "Lỗi khi tải danh sách dịch vụ");
     }
   };
 
   const handleDeleteService = async (id) => {
-    if (window.confirm("Are you sure you want to delete this service?")) {
+    if (window.confirm("Bạn có chắc chắn muốn xóa dịch vụ này?")) {
       const response = await deleteServiceApi(id);
       if (response.success) {
-        showSuccess("Service deleted successfully");
+        showSuccess("Xóa dịch vụ thành công");
         // Reload data, potentially checking if current page becomes empty
         const newTotal = pagination.total - 1;
         const newLastPage = Math.ceil(newTotal / perPage);
@@ -189,7 +182,7 @@ const ServiceList = () => {
           loadServices(); // Reload current page
         }
       } else {
-        showError(response.message || "Failed to delete service");
+        showError(response.message || "Có lỗi xảy ra khi xóa dịch vụ");
       }
     }
   };
@@ -250,9 +243,9 @@ const ServiceList = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">Services</h1>
+        <h1 className="text-2xl font-semibold">Dịch vụ</h1>
         <Button as={Link} to="/services/create">
-          Add Service
+          Tạo
         </Button>
       </div>
 
@@ -260,7 +253,7 @@ const ServiceList = () => {
         filters={{ name, unit, is_metered: isMetered }}
         onFilterChange={handleFilterChange}
         onClearFilters={clearFilters}
-        onApplyFilters={loadServices} // Apply filters triggers reload
+        onApplyFilters={loadServices}
       />
 
       <Card>

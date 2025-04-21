@@ -31,7 +31,7 @@ const PaymentMethodForm = ({
         <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Input
-                    label="Name"
+                    label="Tên phương thức"
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
@@ -40,7 +40,7 @@ const PaymentMethodForm = ({
                 />
 
                 <Select
-                    label="Status"
+                    label="Trạng thái"
                     name="status"
                     value={formData.status}
                     onChange={handleChange}
@@ -53,7 +53,7 @@ const PaymentMethodForm = ({
 
                 <div className="md:col-span-2">
                     <Input
-                        label="Description"
+                        label="Mô tả"
                         name="description"
                         value={formData.description}
                         onChange={handleChange}
@@ -71,14 +71,14 @@ const PaymentMethodForm = ({
                     onClick={() => window.history.back()}
                     className="mr-2"
                 >
-                    Cancel
+                    Hủy
                 </Button>
                 <Button type="submit" disabled={isSubmitting}>
                     {isSubmitting
-                        ? `${mode === "create" ? "Creating" : "Updating"}...`
+                        ? `${mode === "create" ? "Đang tạo" : "Đang cập nhật"}...`
                         : mode === "create"
-                            ? "Create Payment Method"
-                            : "Update Payment Method"}
+                            ? "Tạo"
+                            : "Cập nhật"}
                 </Button>
             </div>
         </form>

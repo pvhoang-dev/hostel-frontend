@@ -8,42 +8,37 @@ const Sidebar = ({ isMobile = false, isOpen = true, onClose }) => {
   const menuItems = [
     {
       path: "/dashboard",
-      label: "Dashboard",
+      label: "Trang chủ",
       roles: ["admin", "manager", "tenant"],
     },
     { path: "/users", label: "Users", roles: ["admin"] },
-    { path: "/roles", label: "Roles", roles: ["admin"] },
-    { path: "/equipments", label: "Equipments", roles: ["admin", "manager"] },
-    { path: "/services", label: "Services", roles: ["admin", "manager"] },
+    { path: "/roles", label: "Vai trò", roles: ["admin"] },
+    { path: "/equipments", label: "Thiết bị", roles: ["admin", "manager"] },
+    { path: "/services", label: "Dịch vụ", roles: ["admin", "manager"] },
     {
       path: "/payment-methods",
-      label: "Payment Method",
+      label: "Phương thức thanh toán",
       roles: ["admin", "manager"],
     },
-    { path: "/houses", label: "Houses", roles: ["admin", "manager"] },
-    { path: "/rooms", label: "Rooms", roles: ["admin", "manager"] },
-    { path: "/contracts", label: "Contracts", roles: ["admin", "manager"] },
+    { path: "/houses", label: "Nhà trọ", roles: ["admin", "manager"] },
+    { path: "/rooms", label: "Phòng", roles: ["admin", "manager"] },
+    { path: "/contracts", label: "Hợp đồng", roles: ["admin", "manager"] },
     {
       path: "/invoices",
-      label: "Invoices",
-      roles: ["admin", "manager", "tenant"],
-    },
-    {
-      path: "/payments",
-      label: "Payments",
+      label: "Hóa đơn",
       roles: ["admin", "manager", "tenant"],
     },
     {
       path: "/requests",
-      label: "Requests",
+      label: "Yêu cầu",
       roles: ["admin", "manager", "tenant"],
     },
     {
       path: "/notifications",
-      label: "Notifications",
+      label: "Thông báo",
       roles: ["admin", "manager", "tenant"],
     },
-    { path: "/settings", label: "Settings", roles: ["admin"] },
+    { path: "/settings", label: "Nội quy chung", roles: ["admin"] },
   ];
 
   const filteredMenuItems = menuItems.filter((item) => {
@@ -75,7 +70,7 @@ const Sidebar = ({ isMobile = false, isOpen = true, onClose }) => {
           </button>
 
           <div className="p-4 mt-12">
-            <h2 className="text-2xl font-semibold mb-8">Management</h2>
+            <h2 className="text-2xl font-semibold mb-8">H-Hostel</h2>
             <ul>
               {filteredMenuItems.map((item) => (
                 <li key={item.path} className="mb-2">

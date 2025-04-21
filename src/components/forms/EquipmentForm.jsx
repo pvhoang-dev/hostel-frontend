@@ -28,7 +28,7 @@ const EquipmentForm = ({
         <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 gap-6">
                 <Input
-                    label="Name"
+                    label="Tên thiết bị"
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
@@ -44,14 +44,14 @@ const EquipmentForm = ({
                     onClick={() => window.history.back()}
                     className="mr-2"
                 >
-                    Cancel
+                    Hủy
                 </Button>
                 <Button type="submit" disabled={isSubmitting}>
                     {isSubmitting
-                        ? `${mode === "create" ? "Creating" : "Updating"}...`
+                        ? `${mode === "create" ? "Đang tạo" : "Đang chỉnh sửa"}...`
                         : mode === "create"
-                            ? "Create Equipment"
-                            : "Update Equipment"}
+                            ? "Tạo"
+                            : "Cập nhật"}
                 </Button>
             </div>
         </form>

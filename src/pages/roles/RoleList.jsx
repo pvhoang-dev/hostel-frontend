@@ -13,19 +13,19 @@ import useApi from "../../hooks/useApi";
 const ActionButtons = ({ role, onDelete }) => (
   <div className="flex space-x-2">
     <Link to={`/roles/${role.id}`} className="text-blue-600 hover:underline">
-      View
+      Xem
     </Link>
     <Link
       to={`/roles/${role.id}/edit`}
       className="text-green-600 hover:underline"
     >
-      Edit
+      Sửa
     </Link>
     <button
       onClick={() => onDelete(role.id)}
       className="text-red-600 hover:underline"
     >
-      Delete
+      Xóa
     </button>
   </div>
 );
@@ -37,17 +37,17 @@ const FilterSection = ({
   onClearFilters,
   onApplyFilters,
 }) => (
-  <Card title="Filters" className="mb-6">
+  <Card title="Bộ lọc" className="mb-6">
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <Input
-        label="Role Code"
+        label="Mã vai trò"
         name="code"
         value={filters.code}
         onChange={onFilterChange}
       />
 
       <Input
-        label="Role Name"
+        label="Tên vai trò"
         name="name"
         value={filters.name}
         onChange={onFilterChange}
@@ -56,9 +56,9 @@ const FilterSection = ({
 
     <div className="mt-4 flex justify-end">
       <Button variant="secondary" onClick={onClearFilters} className="mr-2">
-        Clear Filters
+        Xóa bộ lọc
       </Button>
-      <Button onClick={onApplyFilters}>Apply Filters</Button>
+      <Button onClick={onApplyFilters}>Tìm</Button>
     </div>
   </Card>
 );
@@ -104,15 +104,15 @@ const RoleList = () => {
     },
     {
       accessorKey: "code",
-      header: "Code",
+      header: "Mã",
     },
     {
       accessorKey: "name",
-      header: "Name",
+      header: "Tên",
     },
     {
       accessorKey: "actions",
-      header: "Actions",
+      header: "Hành động",
       cell: ({ row }) => (
         <ActionButtons role={row.original} onDelete={handleDeleteRole} />
       ),
@@ -138,19 +138,19 @@ const RoleList = () => {
     const response = await fetchRoles(params);
 
     if (!response.success) {
-      showError("Failed to load roles");
+      showError("Lỗi khi tải danh sách vai trò");
     }
   };
 
   const handleDeleteRole = async (id) => {
-    if (window.confirm("Are you sure you want to delete this role?")) {
+    if (window.confirm("Bạn có chắc chắn muốn xóa vai trò này?")) {
       const response = await deleteRole(id);
 
       if (response.success) {
-        showSuccess("Role deleted successfully");
+        showSuccess("Xóa vai trò thành công");
         loadRoles();
       } else {
-        showError(response.message || "Failed to delete role");
+        showError(response.message || "Có lỗi xảy ra khi xóa vai trò");
       }
     }
   };
@@ -196,9 +196,9 @@ const RoleList = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">Roles</h1>
+        <h1 className="text-2xl font-semibold">Vai trò</h1>
         <Button as={Link} to="/roles/create">
-          Add Role
+          Thêm
         </Button>
       </div>
 

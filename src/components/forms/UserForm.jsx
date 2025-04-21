@@ -73,7 +73,7 @@ const UserForm = ({
         />
 
         <Input
-          label="Name"
+          label="Tên người dùng"
           name="name"
           value={formData.name}
           onChange={handleChange}
@@ -94,7 +94,7 @@ const UserForm = ({
         {mode === "create" && (
           <>
             <Input
-              label="Password"
+              label="Mật khẩu"
               type="password"
               name="password"
               value={formData.password}
@@ -104,7 +104,7 @@ const UserForm = ({
             />
 
             <Input
-              label="Confirm Password"
+              label="Xác nhận mật khẩu"
               type="password"
               name="password_confirmation"
               value={formData.password_confirmation}
@@ -116,7 +116,7 @@ const UserForm = ({
         )}
 
         <Input
-          label="Phone Number"
+          label="Số điện thoại"
           name="phone_number"
           value={formData.phone_number}
           onChange={handleChange}
@@ -124,7 +124,7 @@ const UserForm = ({
         />
 
         <Input
-          label="Hometown"
+          label="Quê quán"
           name="hometown"
           value={formData.hometown}
           onChange={handleChange}
@@ -132,7 +132,7 @@ const UserForm = ({
         />
 
         <Input
-          label="Identity Card"
+          label="Số CMND/CCCD"
           name="identity_card"
           value={formData.identity_card}
           onChange={handleChange}
@@ -140,7 +140,7 @@ const UserForm = ({
         />
 
         <Input
-          label="Vehicle Plate"
+          label="Biển số xe"
           name="vehicle_plate"
           value={formData.vehicle_plate}
           onChange={handleChange}
@@ -148,7 +148,7 @@ const UserForm = ({
         />
 
         <Select
-          label="Status"
+          label="Trạng thái"
           name="status"
           value={formData.status}
           onChange={handleChange}
@@ -160,7 +160,7 @@ const UserForm = ({
         />
 
         <Select
-          label="Role"
+          label="Vai trò"
           name="role_id"
           value={formData.role?.id}
           onChange={handleChange}
@@ -185,14 +185,14 @@ const UserForm = ({
           onClick={() => window.history.back()}
           className="mr-2"
         >
-          Cancel
+          Hủy
         </Button>
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting
-            ? `${mode === "create" ? "Creating" : "Updating"}...`
+            ? `${mode === "create" ? "Đang tạo" : "Đang cập nhật"}...`
             : mode === "create"
-            ? "Create User"
-            : "Update User"}
+            ? "Tạo"
+            : "Cập nhật"}
         </Button>
       </div>
     </form>

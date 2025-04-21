@@ -16,19 +16,19 @@ const ActionButtons = ({ equipment, onDelete }) => (
       to={`/equipments/${equipment.id}`}
       className="text-blue-600 hover:underline"
     >
-      View
+      Xem
     </Link>
     <Link
       to={`/equipments/${equipment.id}/edit`}
       className="text-green-600 hover:underline"
     >
-      Edit
+      Sửa
     </Link>
     <button
       onClick={() => onDelete(equipment.id)}
       className="text-red-600 hover:underline"
     >
-      Delete
+      Xóa
     </button>
   </div>
 );
@@ -40,10 +40,10 @@ const FilterSection = ({
   onClearFilters,
   onApplyFilters,
 }) => (
-  <Card title="Filters" className="mb-6">
+  <Card title="Bộ lọc" className="mb-6">
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       <Input
-        label="Name"
+        label="Tên"
         name="name"
         value={filters.name}
         onChange={onFilterChange}
@@ -52,9 +52,9 @@ const FilterSection = ({
 
     <div className="mt-4 flex justify-end">
       <Button variant="secondary" onClick={onClearFilters} className="mr-2">
-        Clear Filters
+        Xóa bộ lọc
       </Button>
-      <Button onClick={onApplyFilters}>Apply Filters</Button>
+      <Button onClick={onApplyFilters}>Tìm</Button>
     </div>
   </Card>
 );
@@ -99,11 +99,11 @@ const EquipmentList = () => {
     },
     {
       accessorKey: "name",
-      header: "Name",
+      header: "Tên",
     },
     {
       accessorKey: "actions",
-      header: "Actions",
+      header: "Hành động",
       cell: ({ row }) => (
         <ActionButtons
           equipment={row.original}
@@ -137,19 +137,19 @@ const EquipmentList = () => {
     const response = await fetchEquipments(params);
 
     if (!response.success) {
-      showError("Failed to load equipments");
+      showError("Lỗi khi tải danh sách thiết bị");
     }
   };
 
   const handleDeleteEquipment = async (id) => {
-    if (window.confirm("Are you sure you want to delete this equipment?")) {
+    if (window.confirm("Bạn có chắc chắn muốn xóa thiết bị này?")) {
       const response = await deleteEquipment(id);
 
       if (response.success) {
-        showSuccess("Equipment deleted successfully");
+        showSuccess("Xóa thiết bị thành công");
         loadEquipments();
       } else {
-        showError(response.message || "Failed to delete equipment");
+        showError(response.message || "Có lỗi xảy ra khi xóa thiết bị");
       }
     }
   };
@@ -195,9 +195,9 @@ const EquipmentList = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">Equipments</h1>
+        <h1 className="text-2xl font-semibold">Thiết bị</h1>
         <Button as={Link} to="/equipments/create">
-          Add Equipment
+          Thêm
         </Button>
       </div>
 

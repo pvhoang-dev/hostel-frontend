@@ -25,7 +25,7 @@ const ServiceDetail = () => {
   const loadService = async () => {
     const response = await fetchServiceApi(id);
     if (!response.success) {
-      showError(response.message || "Failed to load service details");
+      showError(response.message || "Lỗi khi tải dịch vụ");
       navigate("/services");
     }
   };
@@ -37,17 +37,17 @@ const ServiceDetail = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">Service Details</h1>
+        <h1 className="text-2xl font-semibold">Thông tin dịch vụ</h1>
         <div className="flex space-x-2">
           <Button variant="secondary" onClick={() => navigate("/services")}>
-            Back to Services
+            Back
           </Button>
           <Button
             as={Link}
             to={`/services/${id}/edit`}
             variant="primary" // Assuming Button has variant prop
           >
-            Edit Service
+            Sửa
           </Button>
         </div>
       </div>
@@ -59,40 +59,40 @@ const ServiceDetail = () => {
             <p className="mt-1 text-lg text-gray-900">{service.id}</p>
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-500">Name</p>
+            <p className="text-sm font-medium text-gray-500">Tên</p>
             <p className="mt-1 text-lg text-gray-900">{service.name}</p>
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-500">Default Price</p>
+            <p className="text-sm font-medium text-gray-500">Giá mặc định</p>
             <p className="mt-1 text-lg text-gray-900">
               {service.default_price?.toLocaleString()} VND
             </p>{" "}
             {/* Format price */}
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-500">Unit</p>
+            <p className="text-sm font-medium text-gray-500">Đơn vị</p>
             <p className="mt-1 text-lg text-gray-900">{service.unit}</p>
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-500">Is Metered?</p>
+            <p className="text-sm font-medium text-gray-500">Được đo?</p>
             <p
               className={`mt-1 text-lg ${
                 service.is_metered ? "text-green-600" : "text-red-600"
               }`}
             >
-              {service.is_metered ? "Yes" : "No"}
+              {service.is_metered ? "Có" : "Không"}
             </p>
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-500">Created At</p>
-            <p className="mt-1 text-sm text-gray-900">
-              {new Date(service.created_at).toLocaleString()}
+            <p className="text-sm font-medium text-gray-500">Tạo</p>
+            <p className="mt-1 text-lg text-gray-900">
+              {service.created_at}
             </p>
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-500">Last Updated At</p>
-            <p className="mt-1 text-sm text-gray-900">
-              {new Date(service.updated_at).toLocaleString()}
+            <p className="text-sm font-medium text-gray-500">Cập nhật lần cuối</p>
+            <p className="mt-1 text-lg text-gray-900">
+              {service.updated_at}
             </p>
           </div>
         </div>

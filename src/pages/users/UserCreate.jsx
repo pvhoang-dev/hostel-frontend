@@ -19,13 +19,13 @@ const UserCreate = () => {
     const response = await createUser(formData);
 
     if (response.success) {
-      showSuccess("User created successfully");
+      showSuccess("Tạo người dùng thành công");
       navigate("/users");
     } else {
       if (response.data && typeof response.data === "object") {
         setErrors(response.data);
       } else {
-        showError(response.message || "Failed to create user");
+        showError(response.message || "Có lỗi xảy ra khi tạo người dùng");
       }
     }
   };

@@ -30,23 +30,21 @@ const RoleForm = ({
     <form onSubmit={handleSubmit}>
       <div className="grid grid-cols-1 gap-6">
         <Input
-          label="Role Code"
+          label="Mã vai trò"
           name="code"
           value={formData.code}
           onChange={handleChange}
           error={errors.code}
           required
-          placeholder="e.g., admin, manager, tenant"
         />
 
         <Input
-          label="Role Name"
+          label="Tên vai trò"
           name="name"
           value={formData.name}
           onChange={handleChange}
           error={errors.name}
           required
-          placeholder="e.g., Admin, House Manager, Tenant"
         />
       </div>
 
@@ -57,14 +55,14 @@ const RoleForm = ({
           onClick={() => window.history.back()}
           className="mr-2"
         >
-          Cancel
+          Hủy
         </Button>
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting
-            ? `${mode === "create" ? "Creating" : "Updating"}...`
+            ? `${mode === "create" ? "Đang tạo" : "Đang cập nhật"}...`
             : mode === "create"
-            ? "Create Role"
-            : "Update Role"}
+            ? "Tạo"
+            : "Cập nhật"}
         </Button>
       </div>
     </form>

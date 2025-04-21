@@ -20,13 +20,13 @@ const RoleCreate = () => {
     const response = await createRole(formData);
 
     if (response.success) {
-      showSuccess("Role created successfully");
+      showSuccess("Tạo vai trò thành công");
       navigate("/roles");
     } else {
       if (response.data && typeof response.data === "object") {
         setErrors(response.data);
       } else {
-        showError(response.message || "Failed to create role");
+        showError(response.message || "Lỗi khi tạo vai trò");
       }
     }
   };
@@ -34,12 +34,12 @@ const RoleCreate = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">Create Role</h1>
+        <h1 className="text-2xl font-semibold">Tạo vai trò</h1>
         <button
           onClick={() => navigate("/roles")}
           className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded"
         >
-          Back to Roles
+          Back
         </button>
       </div>
 

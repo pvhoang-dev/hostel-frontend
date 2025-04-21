@@ -33,7 +33,7 @@ const RoleEdit = () => {
     if (response.success) {
       setRoleData(response.data);
     } else {
-      showError("Failed to load role");
+      showError("Lỗi khi tải vai trò");
       navigate("/roles");
     }
     setLoading(false);
@@ -43,13 +43,13 @@ const RoleEdit = () => {
     const response = await updateRole(id, formData);
 
     if (response.success) {
-      showSuccess("Role updated successfully");
+      showSuccess("Cập nhật vai trò thành công");
       navigate("/roles");
     } else {
       if (response.data && typeof response.data === "object") {
         setErrors(response.data);
       } else {
-        showError(response.message || "Failed to update role");
+        showError(response.message || "Cập nhật vai trò thất bại");
       }
     }
   };
@@ -61,12 +61,12 @@ const RoleEdit = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">Edit Role</h1>
+        <h1 className="text-2xl font-semibold">Chỉnh sửa vai trò</h1>
         <button
           onClick={() => navigate("/roles")}
           className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded"
         >
-          Back to Roles
+          Back
         </button>
       </div>
 

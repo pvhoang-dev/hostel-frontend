@@ -20,13 +20,13 @@ const EquipmentCreate = () => {
     const response = await createEquipment(formData);
 
     if (response.success) {
-      showSuccess("Equipment created successfully");
+      showSuccess("Tạo thiết bị thành công");
       navigate("/equipments");
     } else {
       if (response.data && typeof response.data === "object") {
         setErrors(response.data);
       } else {
-        showError(response.message || "Failed to create equipment");
+        showError(response.message || "Lỗi khi tạo thiết bị");
       }
     }
   };
@@ -34,12 +34,12 @@ const EquipmentCreate = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">Create Equipment</h1>
+        <h1 className="text-2xl font-semibold">Tạo thiết bị</h1>
         <button
           onClick={() => navigate("/equipments")}
           className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded"
         >
-          Back to Equipments
+          Back
         </button>
       </div>
 

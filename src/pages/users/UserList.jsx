@@ -16,19 +16,19 @@ import { STATUS_OPTIONS } from "../../utils/constants";
 const ActionButtons = ({ user, onDelete }) => (
   <div className="flex space-x-2">
     <Link to={`/users/${user.id}`} className="text-blue-600 hover:underline">
-      View
+      Xem
     </Link>
     <Link
       to={`/users/${user.id}/edit`}
       className="text-green-600 hover:underline"
     >
-      Edit
+      Sửa
     </Link>
     <button
       onClick={() => onDelete(user.id)}
       className="text-red-600 hover:underline"
     >
-      Delete
+      Xóa
     </button>
   </div>
 );
@@ -41,7 +41,7 @@ const FilterSection = ({
   onClearFilters,
   onApplyFilters,
 }) => (
-  <Card title="Filters" className="mb-6">
+  <Card title="Bộ lọc" className="mb-6">
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       <Input
         label="Username"
@@ -51,7 +51,7 @@ const FilterSection = ({
       />
 
       <Input
-        label="Name"
+        label="Tên"
         name="name"
         value={filters.name}
         onChange={onFilterChange}
@@ -65,23 +65,23 @@ const FilterSection = ({
       />
 
       <Select
-        label="Role"
+        label="Vai trò"
         name="role_id"
         value={filters.roleId}
         onChange={onFilterChange}
         options={[
-          { value: "", label: "All Roles" },
+          { value: "", label: "Tất cả" },
           ...roles.map((role) => ({ value: role.id, label: role.name })),
         ]}
       />
 
       <Select
-        label="Status"
+        label="Trạng thái"
         name="status"
         value={filters.status}
         onChange={onFilterChange}
         options={[
-          { value: "", label: "All Statuses" },
+          { value: "", label: "Tất cả" },
           { value: "active", label: "Active" },
           { value: "inactive", label: "Inactive" },
         ]}
@@ -90,9 +90,9 @@ const FilterSection = ({
 
     <div className="mt-4 flex justify-end">
       <Button variant="secondary" onClick={onClearFilters} className="mr-2">
-        Clear Filters
+        Xóa bộ lọc
       </Button>
-      <Button onClick={onApplyFilters}>Apply Filters</Button>
+      <Button onClick={onApplyFilters}>Tìm</Button>
     </div>
   </Card>
 );
@@ -153,7 +153,7 @@ const UserList = () => {
     },
     {
       accessorKey: "name",
-      header: "Name",
+      header: "Tên",
     },
     {
       accessorKey: "email",
@@ -161,25 +161,25 @@ const UserList = () => {
     },
     {
       accessorKey: "role.name",
-      header: "Role",
-      cell: ({ row }) => row.original.role?.name || "No Role",
+      header: "Vai trò",
+      cell: ({ row }) => row.original.role?.name || "None",
     },
     {
       accessorKey: "status",
-      header: "Status",
+      header: "T.Thái",
       cell: ({ row }) => (
         <span
           className={
             row.original.status === "active" ? "text-green-600" : "text-red-600"
           }
         >
-          {row.original.status || "Unknown"}
+          {row.original.status || "None"}
         </span>
       ),
     },
     {
       accessorKey: "actions",
-      header: "Actions",
+      header: "Hành động",
       cell: ({ row }) => (
         <ActionButtons user={row.original} onDelete={handleDeleteUser} />
       ),
@@ -225,7 +225,7 @@ const UserList = () => {
     const response = await fetchUsers(params);
 
     if (!response.success) {
-      showError("Failed to load users");
+      showError("Lỗi khi tải danh sách người dùng");
     }
   };
 
@@ -234,14 +234,14 @@ const UserList = () => {
   };
 
   const handleDeleteUser = async (id) => {
-    if (window.confirm("Are you sure you want to delete this user?")) {
+    if (window.confirm("Bạn có chắc chắn muốn xóa người dùng này?")) {
       const response = await deleteUser(id);
 
       if (response.success) {
-        showSuccess("User deleted successfully");
+        showSuccess("Xóa người dùng thành công");
         loadUsers();
       } else {
-        showError(response.message || "Failed to delete user");
+        showError(response.message || "Có lỗi xảy ra khi xóa người dùng");
       }
     }
   };
@@ -291,7 +291,7 @@ const UserList = () => {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-semibold">Users</h1>
         <Button as={Link} to="/users/create">
-          Add User
+          Thêm
         </Button>
       </div>
 

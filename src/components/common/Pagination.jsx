@@ -17,7 +17,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
   return (
       <div className="flex flex-col sm:flex-row justify-between items-center my-4 space-y-2 sm:space-y-0">
       <span className="text-sm text-gray-600">
-        Page {currentPage} of {totalPages}
+        Trang {currentPage} / {totalPages}
       </span>
         <div className="flex flex-wrap justify-center items-center space-x-1">
           {/* First and Previous buttons for mobile and desktop */}
@@ -28,7 +28,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
                      disabled:opacity-50 disabled:cursor-not-allowed
                      hover:bg-gray-100 transition-colors"
           >
-            First
+            Đầu
           </button>
           <button
               onClick={() => onPageChange(currentPage - 1)}
@@ -37,7 +37,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
                      disabled:opacity-50 disabled:cursor-not-allowed
                      hover:bg-gray-100 transition-colors"
           >
-            Prev
+            Trước
           </button>
 
           {/* Page numbers with responsive design */}
@@ -64,7 +64,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
                      disabled:opacity-50 disabled:cursor-not-allowed
                      hover:bg-gray-100 transition-colors"
           >
-            Next
+            Sau
           </button>
           <button
               onClick={() => onPageChange(totalPages)}
@@ -73,7 +73,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
                      disabled:opacity-50 disabled:cursor-not-allowed
                      hover:bg-gray-100 transition-colors"
           >
-            Last
+            Cuối
           </button>
         </div>
       </div>

@@ -10,7 +10,7 @@ const Select = forwardRef(
       onChange,
       onBlur,
       options = [],
-      placeholder = "Select an option",
+      placeholder = "Chọn 1 giá trị",
       error,
       required = false,
       className = "",

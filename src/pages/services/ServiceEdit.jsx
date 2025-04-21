@@ -32,7 +32,7 @@ const ServiceEdit = () => {
     if (response.success) {
       setServiceData(response.data);
     } else {
-      showError(response.message || "Failed to load service");
+      showError(response.message || "Lỗi khi tải dịch vụ");
       navigate("/services");
     }
   };
@@ -42,13 +42,13 @@ const ServiceEdit = () => {
     const response = await updateServiceApi(id, formData);
 
     if (response.success) {
-      showSuccess("Service updated successfully");
+      showSuccess("Cập nhật dịch vụ thành công");
       navigate("/services");
     } else {
       if (response.data && typeof response.data === "object") {
         setErrors(response.data); // Set validation errors from API
       }
-      showError(response.message || "Failed to update service");
+      showError(response.message || "Lỗi khi cập nhật dịch vụ");
     }
   };
 
@@ -59,9 +59,9 @@ const ServiceEdit = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">Edit Service</h1>
+        <h1 className="text-2xl font-semibold">Sửa dịch vụ</h1>
         <Button variant="secondary" onClick={() => navigate("/services")}>
-          Back to Services
+          Back
         </Button>
       </div>
 

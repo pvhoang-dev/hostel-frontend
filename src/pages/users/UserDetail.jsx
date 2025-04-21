@@ -24,11 +24,11 @@ const UserDetail = () => {
       if (response.success) {
         setUser(response.data);
       } else {
-        showError("Failed to load user");
+        showError("Lỗi khi tải người dùng");
         navigate("/users");
       }
     } catch (error) {
-      showError("An error occurred while loading the user");
+      showError("Có lỗi xảy ra khi tải người dùng");
       console.error("Error loading user:", error);
       navigate("/users");
     } finally {
@@ -47,19 +47,19 @@ const UserDetail = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">User Details</h1>
+        <h1 className="text-2xl font-semibold">Chi tiết người dùng</h1>
         <div className="flex space-x-2">
           <button
             onClick={() => navigate("/users")}
             className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded"
           >
-            Back to Users
+            Back
           </button>
           <Link
             to={`/users/${id}/edit`}
             className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
           >
-            Edit User
+            Chỉnh sửa
           </Link>
         </div>
       </div>
@@ -106,36 +106,36 @@ const UserDetail = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <h3 className="text-lg font-medium mb-2">Contact Information</h3>
+            <h3 className="text-lg font-medium mb-2">Thông tin liên hệ</h3>
             <div className="space-y-2">
               <div>
                 <span className="text-gray-600">Email:</span>
                 <span className="ml-2">{user.email || "Not provided"}</span>
               </div>
               <div>
-                <span className="text-gray-600">Phone:</span>
+                <span className="text-gray-600">Số điện thoại:</span>
                 <span className="ml-2">
                   {user.phone_number || "Not provided"}
                 </span>
               </div>
               <div>
-                <span className="text-gray-600">Hometown:</span>
+                <span className="text-gray-600">Quê quán:</span>
                 <span className="ml-2">{user.hometown || "Not provided"}</span>
               </div>
             </div>
           </div>
 
           <div>
-            <h3 className="text-lg font-medium mb-2">Personal Information</h3>
+            <h3 className="text-lg font-medium mb-2">Thông tin cá nhân</h3>
             <div className="space-y-2">
               <div>
-                <span className="text-gray-600">Identity Card:</span>
+                <span className="text-gray-600">Số CMND/CCCD</span>
                 <span className="ml-2">
                   {user.identity_card || "Not provided"}
                 </span>
               </div>
               <div>
-                <span className="text-gray-600">Vehicle Plate:</span>
+                <span className="text-gray-600">Biển số xe:</span>
                 <span className="ml-2">
                   {user.vehicle_plate || "Not provided"}
                 </span>
@@ -145,18 +145,18 @@ const UserDetail = () => {
         </div>
 
         <div className="mt-6">
-          <h3 className="text-lg font-medium mb-2">System Information</h3>
+          <h3 className="text-lg font-medium mb-2">Thông tin hệ thống</h3>
           <div className="space-y-2">
             <div>
               <span className="text-gray-600">User ID:</span>
               <span className="ml-2">{user.id}</span>
             </div>
             <div>
-              <span className="text-gray-600">Created:</span>
+              <span className="text-gray-600">Tạo:</span>
               <span className="ml-2">{user.created_at}</span>
             </div>
             <div>
-              <span className="text-gray-600">Last Updated:</span>
+              <span className="text-gray-600">Lần cuối cập nhật:</span>
               <span className="ml-2">{user.updated_at}</span>
             </div>
           </div>
@@ -167,7 +167,7 @@ const UserDetail = () => {
             onClick={() => navigate(`/users/${id}/change-password`)}
             className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded mr-2"
           >
-            Change Password
+            Đổi mật khẩu
           </button>
         </div>
       </div>
