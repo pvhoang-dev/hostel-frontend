@@ -32,6 +32,10 @@ import HouseList from "./pages/houses/HouseList";
 import HouseCreate from "./pages/houses/HouseCreate";
 import HouseDetail from "./pages/houses/HouseDetail";
 import HouseEdit from "./pages/houses/HouseEdit";
+import RoomList from "./pages/rooms/RoomList";
+import RoomCreate from "./pages/rooms/RoomCreate";
+import RoomDetail from "./pages/rooms/RoomDetail";
+import RoomEdit from "./pages/rooms/RoomEdit";
 
 // Protected route wrapper component
 const ProtectedRoute = ({ element, allowedRoles = [] }) => {
@@ -169,6 +173,52 @@ const Routes = () => {
           element: (
             <ProtectedRoute 
               element={<HouseEdit />} 
+              allowedRoles={["admin", "manager"]} 
+            />
+          ),
+        },
+        // Room routes
+        {
+          path: "rooms",
+          element: (
+            <ProtectedRoute 
+              element={<RoomList />} 
+              allowedRoles={["admin", "manager"]} 
+            />
+          ),
+        },
+        {
+          path: "rooms/create",
+          element: (
+            <ProtectedRoute 
+              element={<RoomCreate />} 
+              allowedRoles={["admin", "manager"]} 
+            />
+          ),
+        },
+        {
+          path: "houses/:houseId/rooms/create",
+          element: (
+            <ProtectedRoute 
+              element={<RoomCreate />} 
+              allowedRoles={["admin", "manager"]} 
+            />
+          ),
+        },
+        {
+          path: "rooms/:id",
+          element: (
+            <ProtectedRoute 
+              element={<RoomDetail />} 
+              allowedRoles={["admin", "manager"]} 
+            />
+          ),
+        },
+        {
+          path: "rooms/:id/edit",
+          element: (
+            <ProtectedRoute 
+              element={<RoomEdit />} 
               allowedRoles={["admin", "manager"]} 
             />
           ),
