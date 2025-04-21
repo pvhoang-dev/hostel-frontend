@@ -2,9 +2,9 @@
 export const API_URL = "http://localhost:8080/api";
 
 export const USER_ROLES = {
-  ADMIN: "admin",
-  MANAGER: "manager",
-  TENANT: "tenant",
+  ADMIN: 1,
+  MANAGER: 2,
+  TENANT: 3,
 };
 
 export const STATUS_OPTIONS = [

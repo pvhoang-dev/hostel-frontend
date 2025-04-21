@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { houseService } from "../../api/houses";
 import { userService } from "../../api/users";
@@ -96,7 +96,6 @@ const FilterSection = ({
 const HouseList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { showSuccess, showError } = useAlert();
-  const navigate = useNavigate();
 
   // Get current filters from URL
   const currentPage = Number(searchParams.get("page")) || 1;

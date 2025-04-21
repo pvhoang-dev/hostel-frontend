@@ -36,6 +36,10 @@ import RoomList from "./pages/rooms/RoomList";
 import RoomCreate from "./pages/rooms/RoomCreate";
 import RoomDetail from "./pages/rooms/RoomDetail";
 import RoomEdit from "./pages/rooms/RoomEdit";
+import ContractList from "./pages/contracts/ContractList";
+import ContractCreate from "./pages/contracts/ContractCreate";
+import ContractDetail from "./pages/contracts/ContractDetail";
+import ContractEdit from "./pages/contracts/ContractEdit";
 
 // Protected route wrapper component
 const ProtectedRoute = ({ element, allowedRoles = [] }) => {
@@ -219,6 +223,61 @@ const Routes = () => {
           element: (
             <ProtectedRoute 
               element={<RoomEdit />} 
+              allowedRoles={["admin", "manager"]} 
+            />
+          ),
+        },
+        // Contract routes
+        {
+          path: "contracts",
+          element: (
+            <ProtectedRoute 
+              element={<ContractList />} 
+              allowedRoles={["admin", "manager", "tenant"]} 
+            />
+          ),
+        },
+        {
+          path: "contracts/create",
+          element: (
+            <ProtectedRoute 
+              element={<ContractCreate />} 
+              allowedRoles={["admin", "manager"]} 
+            />
+          ),
+        },
+        {
+          path: "houses/:houseId/contracts/create",
+          element: (
+            <ProtectedRoute 
+              element={<ContractCreate />} 
+              allowedRoles={["admin", "manager"]} 
+            />
+          ),
+        },
+        {
+          path: "rooms/:roomId/contracts/create",
+          element: (
+            <ProtectedRoute 
+              element={<ContractCreate />} 
+              allowedRoles={["admin", "manager"]} 
+            />
+          ),
+        },
+        {
+          path: "contracts/:id",
+          element: (
+            <ProtectedRoute 
+              element={<ContractDetail />} 
+              allowedRoles={["admin", "manager", "tenant"]} 
+            />
+          ),
+        },
+        {
+          path: "contracts/:id/edit",
+          element: (
+            <ProtectedRoute 
+              element={<ContractEdit />} 
               allowedRoles={["admin", "manager"]} 
             />
           ),
