@@ -25,6 +25,10 @@ import PaymentMethodCreate from "./pages/payment-methods/PaymentMethodCreate";
 import PaymentMethodDetail from "./pages/payment-methods/PaymentMethodDetail";
 import PaymentMethodEdit from "./pages/payment-methods/PaymentMethodEdit";
 import NotFound from "./pages/errors/NotFound.jsx";
+import SettingList from "./pages/settings/SettingList.jsx";
+import SettingCreate from "./pages/settings/SettingCreate.jsx";
+import SettingDetail from "./pages/settings/SettingDetail.jsx";
+import SettingEdit from "./pages/settings/SettingEdit.jsx";
 
 // Protected route wrapper component
 const ProtectedRoute = ({ element, allowedRoles = [] }) => {
@@ -238,6 +242,23 @@ const Routes = () => {
               allowedRoles={["admin"]}
             />
           ),
+        },
+        // Setting routes
+        {
+          path: "settings",
+          element: <SettingList />,
+        },
+        {
+          path: "settings/create",
+          element: <SettingCreate />,
+        },
+        {
+          path: "settings/:id",
+          element: <SettingDetail />,
+        },
+        {
+          path: "settings/:id/edit",
+          element: <SettingEdit />,
         },
       ],
     },

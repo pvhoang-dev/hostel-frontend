@@ -18,7 +18,7 @@ const Login = () => {
     e.preventDefault();
 
     if (!username || !password) {
-      showError("Please enter username and password.");
+      showError("Vui lòng nhập tên đăng nhập và mật khẩu.");
       return;
     }
 
@@ -29,12 +29,10 @@ const Login = () => {
       if (result.success) {
         navigate("/dashboard");
       } else {
-        showError(
-          result.message || "Login failed. Please check your credentials."
-        );
+        showError(result.message || "Tên đăng nhập hoặc mật khẩu không đúng.");
       }
     } catch (error) {
-      showError("An error occurred during login. Please try again.");
+      showError("Đã xảy ra lỗi khi đăng nhập. Vui lòng thử lại.");
       console.error("Login error:", error);
     } finally {
       setLoading(false);
@@ -45,7 +43,7 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="max-w-md w-full p-6 bg-white rounded-lg shadow-md">
         <h1 className="text-2xl font-semibold text-center mb-6">
-          Login to H-Hostel
+          Đăng nhập vào H-Hostel
         </h1>
 
         <form onSubmit={handleSubmit}>

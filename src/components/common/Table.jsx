@@ -1,4 +1,3 @@
-// src/components/common/Table.jsx
 import { useState } from "react";
 import {
   flexRender,

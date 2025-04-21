@@ -20,6 +20,7 @@ const Sidebar = ({ isMobile = false, isOpen = true, onClose }) => {
       label: "Phương thức thanh toán",
       roles: ["admin", "manager"],
     },
+    { path: "/settings", label: "Nội quy chung", roles: ["admin"] },
     { path: "/houses", label: "Nhà trọ", roles: ["admin", "manager"] },
     { path: "/rooms", label: "Phòng", roles: ["admin", "manager"] },
     { path: "/contracts", label: "Hợp đồng", roles: ["admin", "manager"] },
@@ -38,7 +39,6 @@ const Sidebar = ({ isMobile = false, isOpen = true, onClose }) => {
       label: "Thông báo",
       roles: ["admin", "manager", "tenant"],
     },
-    { path: "/settings", label: "Nội quy chung", roles: ["admin"] },
   ];
 
   const filteredMenuItems = menuItems.filter((item) => {
@@ -97,7 +97,7 @@ const Sidebar = ({ isMobile = false, isOpen = true, onClose }) => {
       {/* Desktop Sidebar */}
       <div className="hidden md:block bg-gray-800 text-white w-64 min-h-screen p-4">
         <div className="mb-8">
-          <h2 className="text-2xl font-semibold">Management</h2>
+          <h2 className="text-2xl font-semibold">H-Hostel</h2>
         </div>
 
         <ul>
