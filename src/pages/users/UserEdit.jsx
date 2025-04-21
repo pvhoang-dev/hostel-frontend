@@ -31,7 +31,13 @@ const UserEdit = () => {
     const response = await fetchUser(id);
 
     if (response.success) {
-      setUserData(response.data);
+      const user = response.data;
+
+      if (user.role?.id) {
+        user.role.id = String(user.role?.id);
+      }
+
+      setUserData(user);
     } else {
       showError("Failed to load user");
       navigate("/users");
@@ -40,7 +46,14 @@ const UserEdit = () => {
   };
 
   const handleSubmit = async (formData) => {
-    const response = await updateUser(id, formData);
+    // Đảm bảo role_id không phải là string rỗng khi gửi lên server
+    const dataToSubmit = { ...formData };
+
+    if (dataToSubmit.role_id === "") {
+      dataToSubmit.role_id = null;
+    }
+
+    const response = await updateUser(id, dataToSubmit);
 
     if (response.success) {
       showSuccess("User updated successfully");

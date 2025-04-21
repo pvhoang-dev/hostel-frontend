@@ -162,11 +162,11 @@ const UserForm = ({
         <Select
           label="Role"
           name="role_id"
-          value={formData.role_id}
+          value={formData.role?.id}
           onChange={handleChange}
           error={errors.role_id}
-          options={roles}
-          placeholder="Select Role"
+          options={[{value: "", label: "No role"}, ...roles]}
+          placeholder="Select a Role"
         />
 
         <Input
