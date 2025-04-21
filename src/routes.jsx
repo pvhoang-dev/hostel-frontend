@@ -1,4 +1,3 @@
-// src/routes.jsx
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import Layout from "./components/layout/Layout";
 import Login from "./pages/auth/Login";
@@ -29,6 +28,10 @@ import SettingList from "./pages/settings/SettingList.jsx";
 import SettingCreate from "./pages/settings/SettingCreate.jsx";
 import SettingDetail from "./pages/settings/SettingDetail.jsx";
 import SettingEdit from "./pages/settings/SettingEdit.jsx";
+import HouseList from "./pages/houses/HouseList";
+import HouseCreate from "./pages/houses/HouseCreate";
+import HouseDetail from "./pages/houses/HouseDetail";
+import HouseEdit from "./pages/houses/HouseEdit";
 
 // Protected route wrapper component
 const ProtectedRoute = ({ element, allowedRoles = [] }) => {
@@ -131,6 +134,43 @@ const Routes = () => {
           path: "roles/:id/edit",
           element: (
             <ProtectedRoute element={<RoleEdit />} allowedRoles={["admin"]} />
+          ),
+        },
+        // House routes
+        {
+          path: "houses",
+          element: (
+            <ProtectedRoute 
+              element={<HouseList />} 
+              allowedRoles={["admin", "manager"]} 
+            />
+          ),
+        },
+        {
+          path: "houses/create",
+          element: (
+            <ProtectedRoute 
+              element={<HouseCreate />} 
+              allowedRoles={["admin"]} 
+            />
+          ),
+        },
+        {
+          path: "houses/:id",
+          element: (
+            <ProtectedRoute 
+              element={<HouseDetail />} 
+              allowedRoles={["admin", "manager"]} 
+            />
+          ),
+        },
+        {
+          path: "houses/:id/edit",
+          element: (
+            <ProtectedRoute 
+              element={<HouseEdit />} 
+              allowedRoles={["admin", "manager"]} 
+            />
           ),
         },
         // Equipments routes

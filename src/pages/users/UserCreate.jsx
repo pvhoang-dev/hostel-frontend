@@ -33,12 +33,12 @@ const UserCreate = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">Create User</h1>
+        <h1 className="text-2xl font-semibold">Tạo người dùng</h1>
         <button
           onClick={() => navigate("/users")}
           className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded"
         >
-          Back to Users
+          Back
         </button>
       </div>
 
