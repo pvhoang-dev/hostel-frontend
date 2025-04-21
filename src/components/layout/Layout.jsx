@@ -5,6 +5,7 @@ import Sidebar from "./Sidebar";
 import Alert from "../common/Alert";
 import RightBar from "./RightBar";
 import Header from "./Header";
+import SideBar from "./SideBar2";
 
 const Layout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -16,7 +17,7 @@ const Layout = () => {
   return (
     <>
       <div className="wrapper">
-        <Sidebar />
+        <SideBar />
         <div className="content-page">
           <div className="content">
             <Header />
