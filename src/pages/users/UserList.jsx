@@ -15,10 +15,7 @@ import { STATUS_OPTIONS } from "../../utils/constants";
 // Component con hiển thị các action buttons
 const ActionButtons = ({ user, onDelete }) => (
   <div className="flex space-x-2">
-    <Link
-      to={`/users/${user.id}`}
-      className="text-blue-600 hover:underline"
-    >
+    <Link to={`/users/${user.id}`} className="text-blue-600 hover:underline">
       View
     </Link>
     <Link
@@ -37,12 +34,12 @@ const ActionButtons = ({ user, onDelete }) => (
 );
 
 // Component con hiển thị phần filter
-const FilterSection = ({ 
-  filters, 
-  roles, 
-  onFilterChange, 
-  onClearFilters, 
-  onApplyFilters 
+const FilterSection = ({
+  filters,
+  roles,
+  onFilterChange,
+  onClearFilters,
+  onApplyFilters,
 }) => (
   <Card title="Filters" className="mb-6">
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -52,21 +49,21 @@ const FilterSection = ({
         value={filters.username}
         onChange={onFilterChange}
       />
-      
+
       <Input
         label="Name"
         name="name"
         value={filters.name}
         onChange={onFilterChange}
       />
-      
+
       <Input
         label="Email"
         name="email"
         value={filters.email}
         onChange={onFilterChange}
       />
-      
+
       <Select
         label="Role"
         name="role_id"
@@ -74,10 +71,10 @@ const FilterSection = ({
         onChange={onFilterChange}
         options={[
           { value: "", label: "All Roles" },
-          ...roles.map(role => ({ value: role.id, label: role.name }))
+          ...roles.map((role) => ({ value: role.id, label: role.name })),
         ]}
       />
-      
+
       <Select
         label="Status"
         name="status"
@@ -86,24 +83,16 @@ const FilterSection = ({
         options={[
           { value: "", label: "All Statuses" },
           { value: "active", label: "Active" },
-          { value: "inactive", label: "Inactive" }
+          { value: "inactive", label: "Inactive" },
         ]}
       />
     </div>
-    
+
     <div className="mt-4 flex justify-end">
-      <Button
-        variant="secondary"
-        onClick={onClearFilters}
-        className="mr-2"
-      >
+      <Button variant="secondary" onClick={onClearFilters} className="mr-2">
         Clear Filters
       </Button>
-      <Button
-        onClick={onApplyFilters}
-      >
-        Apply Filters
-      </Button>
+      <Button onClick={onApplyFilters}>Apply Filters</Button>
     </div>
   </Card>
 );
@@ -112,7 +101,7 @@ const UserList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { showSuccess, showError } = useAlert();
   const navigate = useNavigate();
-  
+
   // Get current filters from URL
   const currentPage = Number(searchParams.get("page")) || 1;
   const perPage = Number(searchParams.get("per_page")) || 5;
@@ -123,33 +112,35 @@ const UserList = () => {
   const email = searchParams.get("email") || "";
   const roleId = searchParams.get("role_id") || "";
   const status = searchParams.get("status") || "";
-  
+
   // API hooks
-  const { 
-    data: usersData, 
-    loading: loadingUsers, 
-    execute: fetchUsers 
+  const {
+    data: usersData,
+    loading: loadingUsers,
+    execute: fetchUsers,
   } = useApi(userService.getUsers);
-  
-  const { 
-    data: rolesData, 
-    loading: loadingRoles, 
-    execute: fetchRoles 
+
+  const {
+    data: rolesData,
+    loading: loadingRoles,
+    execute: fetchRoles,
   } = useApi(roleService.getRoles);
-  
+
   const { execute: deleteUser } = useApi(userService.deleteUser);
-  
+
   // Derived state
   const users = usersData?.data || [];
-  const pagination = usersData ? {
-    current_page: usersData.meta.current_page,
-    last_page: usersData.meta.last_page,
-    total: usersData.meta.total,
-    per_page: usersData.meta.per_page,
-  } : null;
-  
+  const pagination = usersData
+    ? {
+        current_page: usersData.meta.current_page,
+        last_page: usersData.meta.last_page,
+        total: usersData.meta.total,
+        per_page: usersData.meta.per_page,
+      }
+    : null;
+
   const roles = rolesData?.data || [];
-  
+
   // Column definitions for the table
   const columns = [
     {
@@ -190,10 +181,7 @@ const UserList = () => {
       accessorKey: "actions",
       header: "Actions",
       cell: ({ row }) => (
-        <ActionButtons 
-          user={row.original} 
-          onDelete={handleDeleteUser} 
-        />
+        <ActionButtons user={row.original} onDelete={handleDeleteUser} />
       ),
     },
   ];
@@ -202,7 +190,7 @@ const UserList = () => {
     loadUsers();
     loadRoles();
   }, []);
-  
+
   useEffect(() => {
     if (!loadingRoles && !loadingUsers) {
       loadUsers();
@@ -235,7 +223,7 @@ const UserList = () => {
     if (status) params.status = status;
 
     const response = await fetchUsers(params);
-    
+
     if (!response.success) {
       showError("Failed to load users");
     }
@@ -248,7 +236,7 @@ const UserList = () => {
   const handleDeleteUser = async (id) => {
     if (window.confirm("Are you sure you want to delete this user?")) {
       const response = await deleteUser(id);
-      
+
       if (response.success) {
         showSuccess("User deleted successfully");
         loadUsers();
@@ -277,15 +265,15 @@ const UserList = () => {
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
-    
+
     const newParams = { ...Object.fromEntries(searchParams), page: "1" };
-    
+
     if (value) {
       newParams[name] = value;
     } else {
       delete newParams[name];
     }
-    
+
     setSearchParams(newParams);
   };
 
@@ -302,10 +290,7 @@ const UserList = () => {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-semibold">Users</h1>
-        <Button
-          as={Link}
-          to="/users/create"
-        >
+        <Button as={Link} to="/users/create">
           Add User
         </Button>
       </div>

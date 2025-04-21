@@ -14,5 +14,5 @@ export const notificationService = {
   markAllAsRead: async () => {
     const response = await api.post("/notifications/mark-all-as-read");
     return response.data;
-  }
+  },
 };

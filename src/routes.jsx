@@ -107,91 +107,135 @@ const Routes = () => {
         {
           path: "roles",
           element: (
-              <ProtectedRoute element={<RoleList/>} allowedRoles={["admin"]}/>
+            <ProtectedRoute element={<RoleList />} allowedRoles={["admin"]} />
           ),
         },
         {
           path: "roles/create",
           element: (
-              <ProtectedRoute element={<RoleCreate/>} allowedRoles={["admin"]}/>
+            <ProtectedRoute element={<RoleCreate />} allowedRoles={["admin"]} />
           ),
         },
         {
           path: "roles/:id",
           element: (
-              <ProtectedRoute element={<RoleDetail/>} allowedRoles={["admin"]}/>
+            <ProtectedRoute element={<RoleDetail />} allowedRoles={["admin"]} />
           ),
         },
         {
           path: "roles/:id/edit",
           element: (
-              <ProtectedRoute element={<RoleEdit/>} allowedRoles={["admin"]}/>
+            <ProtectedRoute element={<RoleEdit />} allowedRoles={["admin"]} />
           ),
         },
         // Equipments routes
         {
           path: "equipments",
           element: (
-            <ProtectedRoute element={<EquipmentList />} allowedRoles={["admin"]} />
+            <ProtectedRoute
+              element={<EquipmentList />}
+              allowedRoles={["admin"]}
+            />
           ),
         },
         {
           path: "equipments/create",
           element: (
-            <ProtectedRoute element={<EquipmentCreate />} allowedRoles={["admin"]} />
+            <ProtectedRoute
+              element={<EquipmentCreate />}
+              allowedRoles={["admin"]}
+            />
           ),
         },
         {
           path: "equipments/:id",
           element: (
-              <ProtectedRoute element={<EquipmentDetail/>} allowedRoles={["admin"]}/>
+            <ProtectedRoute
+              element={<EquipmentDetail />}
+              allowedRoles={["admin"]}
+            />
           ),
         },
         {
           path: "equipments/:id/edit",
           element: (
-              <ProtectedRoute element={<EquipmentEdit/>} allowedRoles={["admin"]}/>
+            <ProtectedRoute
+              element={<EquipmentEdit />}
+              allowedRoles={["admin"]}
+            />
           ),
         },
         // Service routes
         {
           path: "services",
-          element: <ProtectedRoute element={<ServiceList />} allowedRoles={["admin", "manager"]} />,
+          element: (
+            <ProtectedRoute
+              element={<ServiceList />}
+              allowedRoles={["admin", "manager"]}
+            />
+          ),
         },
         {
           path: "services/create",
-          element: <ProtectedRoute element={<ServiceCreate />} allowedRoles={["admin", "manager"]} />,
+          element: (
+            <ProtectedRoute
+              element={<ServiceCreate />}
+              allowedRoles={["admin", "manager"]}
+            />
+          ),
         },
         {
           path: "services/:id",
-          element: <ProtectedRoute element={<ServiceDetail />} allowedRoles={["admin", "manager"]} />,
+          element: (
+            <ProtectedRoute
+              element={<ServiceDetail />}
+              allowedRoles={["admin", "manager"]}
+            />
+          ),
         },
         {
           path: "services/:id/edit",
-          element: <ProtectedRoute element={<ServiceEdit />} allowedRoles={["admin", "manager"]} />,
+          element: (
+            <ProtectedRoute
+              element={<ServiceEdit />}
+              allowedRoles={["admin", "manager"]}
+            />
+          ),
         },
         {
           path: "payment-methods",
           element: (
-              <ProtectedRoute element={<PaymentMethodList />} allowedRoles={["admin"]} />
+            <ProtectedRoute
+              element={<PaymentMethodList />}
+              allowedRoles={["admin"]}
+            />
           ),
         },
         {
           path: "payment-methods/create",
           element: (
-              <ProtectedRoute element={<PaymentMethodCreate />} allowedRoles={["admin"]} />
+            <ProtectedRoute
+              element={<PaymentMethodCreate />}
+              allowedRoles={["admin"]}
+            />
           ),
         },
         {
           path: "payment-methods/:id",
           element: (
-              <ProtectedRoute element={<PaymentMethodDetail />} allowedRoles={["admin"]} />
+            <ProtectedRoute
+              element={<PaymentMethodDetail />}
+              allowedRoles={["admin"]}
+            />
           ),
         },
         {
           path: "payment-methods/:id/edit",
           element: (
-              <ProtectedRoute element={<PaymentMethodEdit/>} allowedRoles={["admin"]}/>
+            <ProtectedRoute
+              element={<PaymentMethodEdit />}
+              allowedRoles={["admin"]}
+            />
           ),
         },
       ],
