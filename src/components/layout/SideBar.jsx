@@ -16,7 +16,7 @@ const SideBar = () => {
     { path: "/services", label: "Dịch vụ", roles: ["admin", "manager"] },
     {
       path: "/payment-methods",
-      label: "Thanh toán",
+      label: "PT Thanh toán",
       roles: ["admin", "manager"],
     },
     { path: "/settings", label: "Nội quy chung", roles: ["admin"] },

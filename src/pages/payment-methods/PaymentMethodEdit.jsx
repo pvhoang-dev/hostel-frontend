@@ -33,7 +33,7 @@ const PaymentMethodEdit = () => {
     if (response.success) {
       setPaymentMethodData(response.data);
     } else {
-      showError("Failed to load payment method");
+      showError("Lỗi khi tải phương thức thanh toán");
       navigate("/payment-methods");
     }
   };
@@ -42,13 +42,15 @@ const PaymentMethodEdit = () => {
     const response = await updatePaymentMethod(id, formData);
 
     if (response.success) {
-      showSuccess("Payment method updated successfully");
+      showSuccess("Cập nhật phương thức thanh toán thành công");
       navigate("/payment-methods");
     } else {
       if (response.data && typeof response.data === "object") {
         setErrors(response.data);
       } else {
-        showError(response.message || "Failed to update payment method");
+        showError(
+          response.message || "Lỗi khi cập nhật phương thức thanh toán"
+        );
       }
     }
   };
@@ -60,7 +62,7 @@ const PaymentMethodEdit = () => {
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center my-2">
-        <h1 className="fs-2 fw-semibold">Edit Payment Method</h1>
+        <h3 className="fs-2 fw-semibold">Chỉnh sửa phương thức thanh toán</h3>
         <button
           onClick={() => navigate("/payment-methods")}
           className="btn btn-light fw-semibold"

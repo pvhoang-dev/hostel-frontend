@@ -107,7 +107,7 @@ const PaymentMethodList = () => {
             row.original.status === "active" ? "text-success" : "text-danger"
           }
         >
-          {row.original.status === "active" ? "Hoạt động" : "Không hoạt động"}
+          {row.original.status}
         </span>
       ),
     },
@@ -115,8 +115,7 @@ const PaymentMethodList = () => {
       accessorKey: "created_at",
       header: "Ngày tạo",
       cell: ({ row }) => {
-        const date = new Date(row.original.created_at);
-        return date.toLocaleDateString();
+        return row.original.created_at;
       },
     },
     {

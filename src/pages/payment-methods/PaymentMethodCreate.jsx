@@ -19,13 +19,13 @@ const PaymentMethodCreate = () => {
     const response = await createPaymentMethod(formData);
 
     if (response.success) {
-      showSuccess("Payment method created successfully");
+      showSuccess("Tạo phương thức thanh toán thành công");
       navigate("/payment-methods");
     } else {
       if (response.data && typeof response.data === "object") {
         setErrors(response.data);
       } else {
-        showError(response.message || "Failed to create payment method");
+        showError(response.message || "Lỗi khi tạo phương thức thanh toán");
       }
     }
   };
@@ -33,7 +33,7 @@ const PaymentMethodCreate = () => {
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center my-2">
-        <h1 className="fs-2 fw-semibold">Create Payment Method</h1>
+        <h3 className="fs-2 fw-semibold">Tạo phương thức thanh toán</h3>
         <button
           onClick={() => navigate("/payment-methods")}
           className="btn btn-light fw-semibold"

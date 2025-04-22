@@ -26,7 +26,7 @@ const PaymentMethodDetail = () => {
     if (response.success) {
       setPaymentMethod(response.data);
     } else {
-      showError("Failed to load payment method");
+      showError("Lỗi khi tải phương thức thanh toán");
       navigate("/payment-methods");
     }
   };
@@ -39,10 +39,12 @@ const PaymentMethodDetail = () => {
     return <div>Payment method not found</div>;
   }
 
+  console.log(paymentMethod);
+
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center my-2">
-        <h1 className="fs-2 fw-semibold">Payment Method Details</h1>
+        <h3 className="fs-2 fw-semibold">Thông tin phương thức thanh toán</h3>
         <div className="d-flex gap-2">
           <button
             onClick={() => navigate("/payment-methods")}
@@ -62,19 +64,19 @@ const PaymentMethodDetail = () => {
       <Card>
         <div className="d-flex flex-column gap-4">
           <div>
-            <h2 className="fs-5 fw-semibold mb-2">Basic Information</h2>
+            <h4 className="fs-5 fw-semibold mb-2">Thông tin cơ bản</h4>
             <div className="row g-4">
               <div className="col-12 col-md-6">
-                <span className="text-secondary">Name:</span>
+                <span className="text-secondary">Name: </span>
                 <span className="ms-2 fw-medium">{paymentMethod.name}</span>
               </div>
               <div className="col-12 col-md-6">
-                <span className="text-secondary">Status:</span>
+                <span className="text-secondary">Status: </span>
                 <span
                   className={`ms-2 d-inline-block px-2 py-1 rounded small ${
                     paymentMethod.status === "active"
-                      ? "bg-success bg-opacity-10 text-success"
-                      : "bg-danger bg-opacity-10 text-danger"
+                      ? "bg-success bg-opacity-10 text-white"
+                      : "bg-danger bg-opacity-10 text-white"
                   }`}
                 >
                   {paymentMethod.status?.charAt(0).toUpperCase() +
@@ -92,23 +94,19 @@ const PaymentMethodDetail = () => {
           )}
 
           <div>
-            <h2 className="fs-5 fw-semibold mb-2">System Information</h2>
+            <h4 className="fs-5 fw-semibold mb-2">Thông tin hệ thống</h4>
             <div className="row g-4">
               <div className="col-12 col-md-6">
-                <span className="text-secondary">ID:</span>
+                <span className="text-secondary">ID: </span>
                 <span className="ms-2">{paymentMethod.id}</span>
               </div>
               <div className="col-12 col-md-6">
-                <span className="text-secondary">Created At:</span>
-                <span className="ms-2">
-                  {new Date(paymentMethod.created_at).toLocaleString()}
-                </span>
+                <span className="text-secondary">Tạo: </span>
+                <span className="ms-2">{paymentMethod.created_at}</span>
               </div>
               <div className="col-12 col-md-6">
-                <span className="text-secondary">Last Updated:</span>
-                <span className="ms-2">
-                  {new Date(paymentMethod.updated_at).toLocaleString()}
-                </span>
+                <span className="text-secondary">Cập nhật lần cuối: </span>
+                <span className="ms-2">{paymentMethod.updated_at}</span>
               </div>
             </div>
           </div>
