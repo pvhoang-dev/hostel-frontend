@@ -11,20 +11,28 @@ const UserForm = ({
   errors = {},
   mode = "create",
 }) => {
-  const [formData, setFormData] = useState({
-    username: "",
-    name: "",
-    email: "",
-    password: "",
-    password_confirmation: "",
-    phone_number: "",
-    hometown: "",
-    identity_card: "",
-    vehicle_plate: "",
-    status: "active",
-    role_id: "",
-    avatar_url: "",
-    ...initialData,
+  const [formData, setFormData] = useState(() => {
+    const data = {
+      username: "",
+      name: "",
+      email: "",
+      password: "",
+      password_confirmation: "",
+      phone_number: "",
+      hometown: "",
+      identity_card: "",
+      vehicle_plate: "",
+      status: "active",
+      role_id: "",
+      avatar_url: "",
+      ...initialData,
+    };
+
+    if (!data.role_id && data.role?.id) {
+      data.role_id = data.role.id;
+    }
+
+    return data;
   });
 
   const [roles, setRoles] = useState([]);
@@ -56,7 +64,14 @@ const UserForm = ({
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(formData);
+
+    const submitData = { ...formData };
+
+    if (submitData.role) {
+      delete submitData.role;
+    }
+
+    onSubmit(submitData);
   };
 
   return (
@@ -182,7 +197,7 @@ const UserForm = ({
           <Select
             label="Vai trò"
             name="role_id"
-            value={formData.role?.id}
+            value={formData.role_id || ""}
             onChange={handleChange}
             error={errors.role_id}
             options={[{ value: "", label: "No role" }, ...roles]}

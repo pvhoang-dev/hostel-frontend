@@ -32,8 +32,8 @@ const UserEdit = () => {
     if (response.success) {
       const user = response.data;
 
-      if (user.role?.id) {
-        user.role.id = String(user.role?.id);
+      if (user.role && user.role.id) {
+        user.role_id = user.role.id;
       }
 
       setUserData(user);
@@ -45,7 +45,6 @@ const UserEdit = () => {
   };
 
   const handleSubmit = async (formData) => {
-    // Đảm bảo role_id không phải là string rỗng khi gửi lên server
     const dataToSubmit = { ...formData };
 
     if (dataToSubmit.role_id === "") {

@@ -112,18 +112,16 @@ const UserDetail = () => {
             <h3 className="fs-5 fw-medium mb-2">Thông tin liên hệ</h3>
             <div className="d-flex flex-column gap-2">
               <div>
-                <span className="text-secondary">Email:</span>
-                <span className="ms-2">{user.email || "Not provided"}</span>
+                <span className="text-secondary">Email: </span>
+                <span className="ms-2">{user.email || "N/A"}</span>
               </div>
               <div>
-                <span className="text-secondary">Số điện thoại:</span>
-                <span className="ms-2">
-                  {user.phone_number || "Not provided"}
-                </span>
+                <span className="text-secondary">Số điện thoại: </span>
+                <span className="ms-2">{user.phone_number || "N/A"}</span>
               </div>
               <div>
-                <span className="text-secondary">Quê quán:</span>
-                <span className="ms-2">{user.hometown || "Not provided"}</span>
+                <span className="text-secondary">Quê quán: </span>
+                <span className="ms-2">{user.hometown || "N/A"}</span>
               </div>
             </div>
           </div>
@@ -132,16 +130,12 @@ const UserDetail = () => {
             <h3 className="fs-5 fw-medium mb-2">Thông tin cá nhân</h3>
             <div className="d-flex flex-column gap-2">
               <div>
-                <span className="text-secondary">Số CMND/CCCD</span>
-                <span className="ms-2">
-                  {user.identity_card || "Not provided"}
-                </span>
+                <span className="text-secondary">Số CMND/CCCD: </span>
+                <span className="ms-2">{user.identity_card || "N/A"}</span>
               </div>
               <div>
-                <span className="text-secondary">Biển số xe:</span>
-                <span className="ms-2">
-                  {user.vehicle_plate || "Not provided"}
-                </span>
+                <span className="text-secondary">Biển số xe: </span>
+                <span className="ms-2">{user.vehicle_plate || "N/A"}</span>
               </div>
             </div>
           </div>
@@ -151,15 +145,15 @@ const UserDetail = () => {
           <h3 className="fs-5 fw-medium mb-2">Thông tin hệ thống</h3>
           <div className="d-flex flex-column gap-2">
             <div>
-              <span className="text-secondary">User ID:</span>
+              <span className="text-secondary">User ID: </span>
               <span className="ms-2">{user.id}</span>
             </div>
             <div>
-              <span className="text-secondary">Tạo:</span>
+              <span className="text-secondary">Tạo: </span>
               <span className="ms-2">{user.created_at}</span>
             </div>
             <div>
-              <span className="text-secondary">Lần cuối cập nhật:</span>
+              <span className="text-secondary">Lần cuối cập nhật: </span>
               <span className="ms-2">{user.updated_at}</span>
             </div>
           </div>
