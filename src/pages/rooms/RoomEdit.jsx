@@ -35,13 +35,13 @@ const RoomEdit = () => {
 
     if (response.success) {
       setRoomData(response.data);
-      
+
       // Check if user has permission to edit
       if (user) {
         const isAdmin = user.role === "admin";
         const isManager = user.role === "manager";
         const isHouseManager = response.data.house?.manager_id === user.id;
-        
+
         if (!isAdmin && !(isManager && isHouseManager)) {
           showError("Bạn không có quyền chỉnh sửa phòng này");
           navigate(`/rooms/${id}`);
@@ -81,13 +81,13 @@ const RoomEdit = () => {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">Chỉnh sửa phòng</h1>
+      <div className="d-flex justify-content-between align-items-center my-2">
+        <h1 className="fs-2 fw-semibold">Chỉnh sửa phòng</h1>
         <button
           onClick={() => navigate("/rooms")}
-          className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded"
+          className="btn btn-light fw-semibold"
         >
-          Quay lại
+          Back
         </button>
       </div>
 

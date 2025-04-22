@@ -1,72 +1,53 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { roomService } from "../../api/rooms";
-import { useContext } from "react";
-import { AlertContext } from "../../contexts/AlertContext";
-import { useAuth } from "../../hooks/useAuth";
+import Card from "../../components/common/Card";
 import Loader from "../../components/common/Loader";
+import useAlert from "../../hooks/useAlert";
+import useApi from "../../hooks/useApi";
 
 const RoomDetail = () => {
   const { id } = useParams();
-  const [room, setRoom] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const { user } = useAuth();
-
-  const { showError } = useContext(AlertContext);
   const navigate = useNavigate();
+  const { showError } = useAlert();
 
-  const isAdmin = user?.role === "admin";
-  const isManager = user?.role === "manager";
+  const {
+    data: room,
+    loading,
+    execute: fetchRoom,
+  } = useApi(roomService.getRoom);
 
   useEffect(() => {
-    if (user) {
-      loadRoom();
-    }
-  }, [id, user]);
+    loadRoom();
+  }, [id]);
 
   const loadRoom = async () => {
-    setLoading(true);
-    try {
-      const response = await roomService.getRoom(id);
-      if (response.success) {
-        setRoom(response.data);
-      } else {
-        showError("Lỗi khi tải thông tin phòng");
-        navigate("/rooms");
-      }
-    } catch (error) {
-      showError("Có lỗi xảy ra khi tải thông tin phòng");
-      console.error("Error loading room:", error);
+    const response = await fetchRoom(id);
+
+    if (!response.success) {
+      showError("Lỗi khi tải thông tin phòng");
       navigate("/rooms");
-    } finally {
-      setLoading(false);
     }
   };
-
-  if (!user) {
-    return <Loader />;
-  }
 
   if (loading) {
     return <Loader />;
   }
 
   if (!room) {
-    return <div>Không tìm thấy phòng</div>;
+    return <div>Room not found</div>;
   }
-
-  const canEdit = isAdmin || (isManager && room.house?.manager_id === user.id);
 
   const getStatusText = (status) => {
     switch (status) {
       case "available":
-        return "Có sẵn";
+        return "Trống";
       case "occupied":
         return "Đã thuê";
       case "maintenance":
         return "Bảo trì";
-      case "unavailable":
-        return "Không khả dụng";
+      case "reserved":
+        return "Đã đặt trước";
       default:
         return status;
     }
@@ -75,116 +56,142 @@ const RoomDetail = () => {
   const getStatusClass = (status) => {
     switch (status) {
       case "available":
-        return "bg-green-100 text-green-800";
+        return "bg-success bg-opacity-10 text-success";
       case "occupied":
-        return "bg-blue-100 text-blue-800";
+        return "bg-danger bg-opacity-10 text-danger";
       case "maintenance":
-        return "bg-yellow-100 text-yellow-800";
-      case "unavailable":
-        return "bg-red-100 text-red-800";
+        return "bg-warning bg-opacity-10 text-warning";
+      case "reserved":
+        return "bg-info bg-opacity-10 text-info";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-secondary bg-opacity-10 text-secondary";
     }
-  };
-
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND'
-    }).format(amount);
   };
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">Chi tiết phòng</h1>
-        <div className="flex space-x-2">
+      <div className="d-flex justify-content-between align-items-center my-2">
+        <h1 className="fs-2 fw-semibold">Chi tiết phòng</h1>
+        <div className="d-flex gap-2">
           <button
             onClick={() => navigate("/rooms")}
-            className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded"
+            className="btn btn-light fw-semibold mr-2"
           >
-            Quay lại
+            Back
           </button>
-          {canEdit && (
-            <Link
-              to={`/rooms/${id}/edit`}
-              className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
-            >
-              Chỉnh sửa
-            </Link>
-          )}
+          <Link
+            to={`/rooms/${id}/edit`}
+            className="btn btn-primary fw-semibold"
+          >
+            Sửa
+          </Link>
         </div>
       </div>
 
-      <div className="bg-white p-6 rounded shadow">
-        <div className="flex items-start">
-          <div className="flex-1">
-            <h2 className="text-xl font-semibold">Phòng {room.room_number}</h2>
-            <p className="text-gray-600">
-              Thuộc nhà: {room.house?.name || "Không xác định"}
-            </p>
-
-            <span className={`inline-block ${getStatusClass(room.status)} px-2 py-1 rounded text-sm mt-2`}>
+      <Card>
+        <div className="mb-4">
+          <div className="d-flex justify-content-between align-items-center">
+            <h2 className="fs-4 fw-semibold mb-0">{room.name}</h2>
+            <span
+              className={`d-inline-block ${getStatusClass(
+                room.status
+              )} px-2 py-1 rounded small`}
+            >
               {getStatusText(room.status)}
             </span>
           </div>
+          {room.house && (
+            <p className="text-secondary mt-2">Thuộc nhà: {room.house.name}</p>
+          )}
         </div>
 
-        <hr className="my-6" />
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <h3 className="text-lg font-medium mb-2">Thông tin phòng</h3>
-            <div className="space-y-2">
+        <div className="row g-4">
+          <div className="col-12 col-md-6">
+            <div className="d-flex flex-column gap-2">
               <div>
-                <span className="text-gray-600">Sức chứa:</span>
-                <span className="ml-2">{room.capacity} người</span>
+                <span className="text-secondary">Loại phòng:</span>
+                <span className="ms-2 fw-medium">{room.room_type}</span>
               </div>
               <div>
-                <span className="text-gray-600">Giá cơ bản:</span>
-                <span className="ml-2">{formatCurrency(room.base_price)}</span>
+                <span className="text-secondary">Giá thuê:</span>
+                <span className="ms-2 fw-medium">
+                  {new Intl.NumberFormat("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  }).format(room.price || 0)}
+                  /tháng
+                </span>
               </div>
               <div>
-                <span className="text-gray-600">Địa chỉ:</span>
-                <span className="ml-2">{room.house?.address || "Không có thông tin"}</span>
+                <span className="text-secondary">Diện tích:</span>
+                <span className="ms-2">
+                  {room.area} m<sup>2</sup>
+                </span>
               </div>
-              {room.house && (
-                <div className="mt-2">
-                  <Link 
-                    to={`/houses/${room.house.id}`}
-                    className="text-blue-600 hover:underline"
-                  >
-                    Xem chi tiết nhà
-                  </Link>
-                </div>
-              )}
             </div>
           </div>
 
-          <div>
-            <h3 className="text-lg font-medium mb-2">Thông tin mô tả</h3>
-            <p className="whitespace-pre-wrap">{room.description || "Không có mô tả"}</p>
+          <div className="col-12 col-md-6">
+            <div className="d-flex flex-column gap-2">
+              <div>
+                <span className="text-secondary">Tiền đặt cọc:</span>
+                <span className="ms-2 fw-medium">
+                  {new Intl.NumberFormat("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  }).format(room.deposit || 0)}
+                </span>
+              </div>
+              <div>
+                <span className="text-secondary">Số người tối đa:</span>
+                <span className="ms-2">
+                  {room.max_occupants || "Không giới hạn"}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="mt-6">
-          <h3 className="text-lg font-medium mb-2">Thông tin hệ thống</h3>
-          <div className="space-y-2">
+        {room.description && (
+          <div className="mt-4">
+            <h3 className="fs-5 fw-medium mb-2">Mô tả</h3>
+            <p style={{ whiteSpace: "pre-wrap" }} className="text-secondary">
+              {room.description}
+            </p>
+          </div>
+        )}
+
+        {room.amenities && room.amenities.length > 0 && (
+          <div className="mt-4">
+            <h3 className="fs-5 fw-medium mb-2">Tiện ích</h3>
+            <div className="d-flex flex-wrap gap-2">
+              {room.amenities.map((amenity, index) => (
+                <span key={index} className="bg-light px-3 py-1 rounded-pill">
+                  {amenity}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="mt-4">
+          <h3 className="fs-5 fw-medium mb-2">Thông tin hệ thống</h3>
+          <div className="d-flex flex-column gap-2">
             <div>
-              <span className="text-gray-600">ID phòng:</span>
-              <span className="ml-2">{room.id}</span>
+              <span className="text-secondary">ID:</span>
+              <span className="ms-2">{room.id}</span>
             </div>
             <div>
-              <span className="text-gray-600">Tạo:</span>
-              <span className="ml-2">{room.created_at}</span>
+              <span className="text-secondary">Tạo:</span>
+              <span className="ms-2">{room.created_at}</span>
             </div>
             <div>
-              <span className="text-gray-600">Lần cuối cập nhật:</span>
-              <span className="ml-2">{room.updated_at}</span>
+              <span className="text-secondary">Lần cuối cập nhật:</span>
+              <span className="ms-2">{room.updated_at}</span>
             </div>
           </div>
         </div>
-      </div>
+      </Card>
     </div>
   );
 };

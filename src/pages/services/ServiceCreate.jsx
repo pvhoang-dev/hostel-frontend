@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { serviceService } from "../../api/services";
 import ServiceForm from "../../components/forms/ServiceForm";
 import Card from "../../components/common/Card";
-import Button from "../../components/common/Button";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 
@@ -33,11 +32,14 @@ const ServiceCreate = () => {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">Tạo dịch vụ</h1>
-        <Button variant="secondary" onClick={() => navigate("/services")}>
+      <div className="d-flex justify-content-between align-items-center my-2">
+        <h1 className="fs-2 fw-semibold">Tạo dịch vụ</h1>
+        <button
+          onClick={() => navigate("/services")}
+          className="btn btn-light fw-semibold"
+        >
           Back
-        </Button>
+        </button>
       </div>
 
       <Card>

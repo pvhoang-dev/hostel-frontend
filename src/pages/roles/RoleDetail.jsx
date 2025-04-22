@@ -1,4 +1,3 @@
-// src/pages/roles/RoleDetail.jsx
 import { useState, useEffect } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { roleService } from "../../api/roles";
@@ -41,18 +40,18 @@ const RoleDetail = () => {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">Thông tin vai trò</h1>
-        <div className="flex space-x-2">
+      <div className="d-flex justify-content-between align-items-center my-2">
+        <h1 className="fs-2 fw-semibold">Thông tin vai trò</h1>
+        <div className="d-flex gap-2 mr-2">
           <button
             onClick={() => navigate("/roles")}
-            className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded"
+            className="btn btn-light fw-semibold mr-2"
           >
             Back
           </button>
           <Link
             to={`/roles/${id}/edit`}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
+            className="btn btn-primary fw-semibold"
           >
             Sửa
           </Link>
@@ -60,34 +59,34 @@ const RoleDetail = () => {
       </div>
 
       <Card>
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold mb-4">{role.name}</h2>
-          <div className="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">
+        <div className="mb-4">
+          <h2 className="fs-4 fw-semibold mb-3">{role.name}</h2>
+          <div className="d-inline-block bg-primary bg-opacity-10 text-primary px-2 py-1 rounded small">
             {role.code}
           </div>
         </div>
 
-        <div className="mt-6">
-          <h3 className="text-lg font-medium mb-2">Thông tin hệ thống</h3>
-          <div className="space-y-2">
+        <div className="mt-4">
+          <h3 className="fs-5 fw-medium mb-2">Thông tin hệ thống</h3>
+          <div className="d-flex flex-column gap-2">
             <div>
-              <span className="text-gray-600">ID:</span>
-              <span className="ml-2">{role.id}</span>
+              <span className="text-secondary">ID:</span>
+              <span className="ms-2">{role.id}</span>
             </div>
             <div>
-              <span className="text-gray-600">Tạo:</span>
-              <span className="ml-2">{role.created_at}</span>
+              <span className="text-secondary">Tạo:</span>
+              <span className="ms-2">{role.created_at}</span>
             </div>
             <div>
-              <span className="text-gray-600">Cập nhật lần cuối:</span>
-              <span className="ml-2">{role.updated_at}</span>
+              <span className="text-secondary">Cập nhật lần cuối:</span>
+              <span className="ms-2">{role.updated_at}</span>
             </div>
           </div>
         </div>
 
-        {/*<div className="mt-6">*/}
-        {/*  <h3 className="text-lg font-medium mb-2">Users with this Role</h3>*/}
-        {/*  <div className="text-gray-600">*/}
+        {/*<div className="mt-4">*/}
+        {/*  <h3 className="fs-5 fw-medium mb-2">Users with this Role</h3>*/}
+        {/*  <div className="text-secondary">*/}
         {/*    {role.users_count || 0} users have this role assigned*/}
         {/*  </div>*/}
         {/*</div>*/}

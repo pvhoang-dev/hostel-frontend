@@ -76,13 +76,13 @@ const ContractEdit = () => {
 
   return (
     <div>
-      <div className="d-flex justify-content-between align-items-center my-3">
+      <div className="d-flex justify-content-between align-items-center my-2">
         <h3>Sửa hợp đồng</h3>
         <Button
           variant="secondary"
           onClick={() => navigate(`/contracts/${id}`)}
         >
-          <i className="mdi mdi-close me-1"></i> Hủy
+          Hủy
         </Button>
       </div>
 

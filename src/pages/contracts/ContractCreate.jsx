@@ -48,10 +48,10 @@ const ContractCreate = () => {
 
   return (
     <div>
-      <div className="d-flex justify-content-between align-items-center my-3">
+      <div className="d-flex justify-content-between align-items-center my-2">
         <h3>Tạo hợp đồng mới</h3>
         <Button variant="secondary" onClick={() => navigate("/contracts")}>
-          <i className="mdi mdi-arrow-left me-1"></i> Quay lại
+          Back
         </Button>
       </div>
 

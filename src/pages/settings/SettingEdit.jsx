@@ -80,13 +80,13 @@ const SettingEdit = () => {
   // Kiểm tra dữ liệu trước khi render form
   if (!settingData) {
     return (
-      <div className="text-center py-8">
-        <p className="text-red-500">
+      <div className="text-center py-4">
+        <p className="text-danger">
           Không thể tải dữ liệu cài đặt. Vui lòng thử lại.
         </p>
         <button
           onClick={() => navigate("/settings")}
-          className="mt-4 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded"
+          className="mt-3 btn btn-light fw-semibold"
         >
           Quay lại danh sách
         </button>
@@ -96,13 +96,13 @@ const SettingEdit = () => {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">Chỉnh sửa cài đặt</h1>
+      <div className="d-flex justify-content-between align-items-center my-2">
+        <h1 className="fs-2 fw-semibold">Chỉnh sửa cài đặt</h1>
         <button
           onClick={() => navigate("/settings")}
-          className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded"
+          className="btn btn-light fw-semibold"
         >
-          Quay lại
+          Back
         </button>
       </div>
 

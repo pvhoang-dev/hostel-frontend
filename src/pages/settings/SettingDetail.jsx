@@ -53,59 +53,59 @@ const SettingDetail = () => {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">Chi tiết cài đặt</h1>
-        <div className="flex space-x-2">
+      <div className="d-flex justify-content-between align-items-center my-2">
+        <h1 className="fs-2 fw-semibold">Chi tiết cài đặt</h1>
+        <div className="d-flex gap-2">
           <button
             onClick={() => navigate("/settings")}
-            className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded"
+            className="btn btn-light fw-semibold mr-2"
           >
-            Quay lại
+            Back
           </button>
           <Link
             to={`/settings/${id}/edit`}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
+            className="btn btn-primary fw-semibold"
           >
-            Chỉnh sửa
+            Sửa
           </Link>
         </div>
       </div>
 
       <Card>
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold mb-4">
+        <div className="mb-4">
+          <h2 className="fs-4 fw-semibold mb-3">
             {setting.key}. {setting.value}
           </h2>
-          <div className="mt-4">
-            <h3 className="text-lg font-medium mb-2">Mô tả</h3>
-            <p className="text-gray-700">
+          <div className="mt-3">
+            <h3 className="fs-5 fw-medium mb-2">Mô tả</h3>
+            <p className="text-secondary">
               {setting.description || "Không có mô tả"}
             </p>
           </div>
         </div>
 
-        <div className="mt-6 border-t pt-4">
-          <h3 className="text-lg font-medium mb-2">Thông tin hệ thống</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <span className="text-gray-600">ID:</span>
-              <span className="ml-2">{setting.id}</span>
+        <div className="mt-4 border-top pt-3">
+          <h3 className="fs-5 fw-medium mb-2">Thông tin hệ thống</h3>
+          <div className="row g-3">
+            <div className="col-12 col-md-6">
+              <span className="text-secondary">ID:</span>
+              <span className="ms-2">{setting.id}</span>
             </div>
-            <div>
-              <span className="text-gray-600">Người tạo:</span>
-              <span className="ml-2">{renderUserInfo(setting.created_by)}</span>
+            <div className="col-12 col-md-6">
+              <span className="text-secondary">Người tạo:</span>
+              <span className="ms-2">{renderUserInfo(setting.created_by)}</span>
             </div>
-            <div>
-              <span className="text-gray-600">Ngày tạo:</span>
-              <span className="ml-2">{setting.created_at}</span>
+            <div className="col-12 col-md-6">
+              <span className="text-secondary">Ngày tạo:</span>
+              <span className="ms-2">{setting.created_at}</span>
             </div>
-            <div>
-              <span className="text-gray-600">Người cập nhật:</span>
-              <span className="ml-2">{renderUserInfo(setting.updated_by)}</span>
+            <div className="col-12 col-md-6">
+              <span className="text-secondary">Người cập nhật:</span>
+              <span className="ms-2">{renderUserInfo(setting.updated_by)}</span>
             </div>
-            <div>
-              <span className="text-gray-600">Cập nhật lần cuối:</span>
-              <span className="ml-2">{setting.updated_at}</span>
+            <div className="col-12 col-md-6">
+              <span className="text-secondary">Cập nhật lần cuối:</span>
+              <span className="ms-2">{setting.updated_at}</span>
             </div>
           </div>
         </div>

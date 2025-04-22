@@ -88,7 +88,7 @@ const ContractDetail = () => {
 
   return (
     <div>
-      <div className="d-flex justify-content-between align-items-center my-3">
+      <div className="d-flex justify-content-between align-items-center my-2">
         <h3>Chi tiết hợp đồng</h3>
         <div className="d-flex gap-2">
           <Button
@@ -96,11 +96,11 @@ const ContractDetail = () => {
             variant="secondary"
             onClick={() => navigate("/contracts")}
           >
-            <i className="mdi mdi-arrow-left me-1"></i> Quay lại
+            Back
           </Button>
           {canEdit && (
             <Button variant="primary" as={Link} to={`/contracts/${id}/edit`}>
-              <i className="mdi mdi-pencil me-1"></i> Chỉnh sửa
+              Sửa
             </Button>
           )}
         </div>

@@ -41,18 +41,18 @@ const EquipmentDetail = () => {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">Thông tin thiết bị</h1>
-        <div className="flex space-x-2">
+      <div className="d-flex justify-content-between align-items-center my-2">
+        <h1 className="fs-2 fw-semibold">Thông tin thiết bị</h1>
+        <div className="d-flex gap-2">
           <button
             onClick={() => navigate("/equipments")}
-            className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded"
+            className="btn btn-light fw-semibold mr-2"
           >
             Back
           </button>
           <Link
             to={`/equipments/${id}/edit`}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
+            className="btn btn-primary fw-semibold"
           >
             Sửa
           </Link>
@@ -60,31 +60,31 @@ const EquipmentDetail = () => {
       </div>
 
       <Card>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <h3 className="text-lg font-medium mb-2">Thông tin</h3>
-            <div className="space-y-2">
+        <div className="row g-4">
+          <div className="col-12 col-md-6">
+            <h3 className="fs-5 fw-medium mb-3">Thông tin</h3>
+            <div className="d-flex flex-column gap-2">
               <div>
-                <span className="text-gray-600">Tên:</span>
-                <span className="ml-2 font-medium">{equipment.name}</span>
+                <span className="text-secondary">Tên:</span>
+                <span className="ms-2 fw-medium">{equipment.name}</span>
               </div>
             </div>
           </div>
 
-          <div>
-            <h3 className="text-lg font-medium mb-2">Thông tin hệ thống</h3>
-            <div className="space-y-2">
+          <div className="col-12 col-md-6">
+            <h3 className="fs-5 fw-medium mb-3">Thông tin hệ thống</h3>
+            <div className="d-flex flex-column gap-2">
               <div>
-                <span className="text-gray-600">ID:</span>
-                <span className="ml-2">{equipment.id}</span>
+                <span className="text-secondary">ID:</span>
+                <span className="ms-2">{equipment.id}</span>
               </div>
               <div>
-                <span className="text-gray-600">Tạo:</span>
-                <span className="ml-2">{equipment.created_at}</span>
+                <span className="text-secondary">Tạo:</span>
+                <span className="ms-2">{equipment.created_at}</span>
               </div>
               <div>
-                <span className="text-gray-600">Sửa lần cuối:</span>
-                <span className="ml-2">{equipment.updated_at}</span>
+                <span className="text-secondary">Sửa lần cuối:</span>
+                <span className="ms-2">{equipment.updated_at}</span>
               </div>
             </div>
           </div>
