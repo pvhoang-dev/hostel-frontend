@@ -1,4 +1,3 @@
-// src/utils/validators.js
 export const isRequired = (value) => {
   if (value === null || value === undefined || value === "") {
     return "This field is required";

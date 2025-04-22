@@ -1,5 +1,4 @@
 import { useState } from "react";
-import axios from "axios";
 
 const useApi = (apiFunc) => {
   const [data, setData] = useState(null);
