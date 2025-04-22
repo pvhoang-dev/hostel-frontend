@@ -46,7 +46,7 @@ const UserDetail = () => {
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center my-2">
-        <h1 className="fs-2 fw-semibold">Chi tiết người dùng</h1>
+        <h3 className="fs-2 fw-semibold">Chi tiết người dùng</h3>
         <div className="d-flex gap-2">
           <button
             onClick={() => navigate("/users")}
@@ -70,23 +70,23 @@ const UserDetail = () => {
               src={user.avatar_url}
               alt={user.name}
               className="rounded-circle object-fit-cover me-4"
-              style={{ width: "8rem", height: "8rem" }}
+              style={{ width: "4rem", height: "4rem" }}
             />
           ) : (
             <div
-              className="rounded-circle d-flex align-items-center justify-content-center text-secondary fs-1 me-4 bg-light"
-              style={{ width: "8rem", height: "8rem" }}
+              className="rounded-circle d-flex align-items-center justify-content-center text-secondary fs-1 me-4 bg-light mr-3"
+              style={{ width: "4rem", height: "4rem" }}
             >
               {user.name.charAt(0).toUpperCase()}
             </div>
           )}
 
           <div className="flex-grow-1">
-            <h2 className="fs-4 fw-semibold">{user.name}</h2>
+            <h4 className="fs-4 fw-semibold">{user.name}</h4>
             <p className="text-secondary">@{user.username}</p>
 
             {user.role && (
-              <span className="d-inline-block bg-primary bg-opacity-10 text-primary px-2 py-1 rounded small mt-2">
+              <span className="d-inline-block bg-primary bg-opacity-10 text-white px-2 py-1 rounded small mt-2 mr-2">
                 {user.role.name}
               </span>
             )}
@@ -95,8 +95,8 @@ const UserDetail = () => {
               <span
                 className={`d-inline-block ${
                   user.status === "active"
-                    ? "bg-success bg-opacity-10 text-success"
-                    : "bg-danger bg-opacity-10 text-danger"
+                    ? "bg-success bg-opacity-10 text-white"
+                    : "bg-danger bg-opacity-10 text-white"
                 } px-2 py-1 rounded small mt-2 ms-2`}
               >
                 {user.status.charAt(0).toUpperCase() + user.status.slice(1)}

@@ -40,6 +40,7 @@ import ContractList from "./pages/contracts/ContractList";
 import ContractCreate from "./pages/contracts/ContractCreate";
 import ContractDetail from "./pages/contracts/ContractDetail";
 import ContractEdit from "./pages/contracts/ContractEdit";
+import UserChangePassword from "./pages/users/UserChangePassword.jsx";
 
 // Protected route wrapper component
 const ProtectedRoute = ({ element, allowedRoles = [] }) => {
@@ -117,6 +118,12 @@ const Routes = () => {
           path: "users/:id/edit",
           element: (
             <ProtectedRoute element={<UserEdit />} allowedRoles={["admin"]} />
+          ),
+        },
+        {
+          path: "users/:id/change-password",
+          element: (
+              <ProtectedRoute element={<UserChangePassword />} />
           ),
         },
         // Roles routes

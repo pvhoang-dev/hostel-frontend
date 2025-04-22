@@ -39,8 +39,6 @@ const PaymentMethodDetail = () => {
     return <div>Payment method not found</div>;
   }
 
-  console.log(paymentMethod);
-
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center my-2">

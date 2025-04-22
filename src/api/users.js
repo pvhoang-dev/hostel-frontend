@@ -28,7 +28,7 @@ export const userService = {
 
   changePassword: async (id, passwordData) => {
     const response = await api.post(
-      `/users/${id}/change-password`,
+      `/users/change-password/${id}/`,
       passwordData
     );
     return response.data;
