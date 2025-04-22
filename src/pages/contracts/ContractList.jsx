@@ -157,7 +157,7 @@ const FilterSection = ({
 
 const ContractList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { showSuccess, showError, showConfirm } = useAlert();
+  const { showSuccess, showError } = useAlert();
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -365,19 +365,15 @@ const ContractList = () => {
   };
 
   const handleDeleteContract = async (contract) => {
-    showConfirm({
-      title: "Xác nhận xóa",
-      message: "Bạn có chắc chắn muốn xóa hợp đồng này không?",
-      onConfirm: async () => {
-        const response = await deleteContract(contract.id);
-        if (response.success) {
-          showSuccess("Xóa hợp đồng thành công");
-          loadContracts();
-        } else {
-          showError(response.message || "Không thể xóa hợp đồng");
-        }
-      },
-    });
+    if (window.confirm("Bạn có chắc chắn muốn xóa hợp đồng này không?")) {
+      const response = await deleteContract(contract.id);
+      if (response.success) {
+        showSuccess("Xóa hợp đồng thành công");
+        loadContracts();
+      } else {
+        showError(response.message || "Không thể xóa hợp đồng");
+      }
+    }
   };
 
   const handlePageChange = (page) => {
