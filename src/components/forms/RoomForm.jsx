@@ -153,7 +153,7 @@ const RoomForm = ({
           type="button"
           variant="secondary"
           onClick={() => window.history.back()}
-          className="me-2"
+          className="me-2 mr-2"
         >
           Hủy
         </Button>
