@@ -78,7 +78,11 @@ const FilterSection = ({
     </div>
 
     <div className="mt-3 d-flex justify-content-end">
-      <Button variant="secondary" onClick={onClearFilters} className="me-2">
+      <Button
+        variant="secondary"
+        onClick={onClearFilters}
+        className="me-2 mr-2"
+      >
         Xóa bộ lọc
       </Button>
       <Button onClick={onApplyFilters}>Tìm</Button>
