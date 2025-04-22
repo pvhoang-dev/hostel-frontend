@@ -15,31 +15,6 @@ import { useAuth } from "../../hooks/useAuth";
 import DatePicker from "../../components/common/DatePicker";
 import { formatDate, formatCurrency } from "../../utils/formatters";
 
-// Component con hiển thị các action buttons
-const ActionButtons = ({ contract, onDelete, isAdmin, isManager }) => (
-  <div className="flex space-x-2">
-    <Link to={`/contracts/${contract.id}`} className="text-blue-600 hover:underline">
-      Xem
-    </Link>
-    {(isAdmin || isManager) && (
-      <>
-        <Link
-          to={`/contracts/${contract.id}/edit`}
-          className="text-green-600 hover:underline"
-        >
-          Sửa
-        </Link>
-        <button
-          onClick={() => onDelete(contract.id)}
-          className="text-red-600 hover:underline"
-        >
-          Xóa
-        </button>
-      </>
-    )}
-  </div>
-);
-
 // Component con hiển thị phần filter
 const FilterSection = ({
   filters,
@@ -57,96 +32,117 @@ const FilterSection = ({
   };
 
   return (
-    <Card title="Bộ lọc" className="mb-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Select
-          label="Nhà"
-          name="house_id"
-          value={filters.house_id}
-          onChange={handleHouseChange}
-          options={[
-            { value: "", label: "Tất cả" },
-            ...houses.map((house) => ({ value: house.id, label: house.name })),
-          ]}
-        />
+    <Card title="Bộ lọc" className="mb-3">
+      <div className="row g-3">
+        <div className="col-md-4">
+          <Select
+            label="Nhà"
+            name="house_id"
+            value={filters.house_id}
+            onChange={handleHouseChange}
+            options={[
+              { value: "", label: "Tất cả" },
+              ...houses.map((house) => ({
+                value: house.id,
+                label: house.name,
+              })),
+            ]}
+          />
+        </div>
 
-        <Select
-          label="Phòng"
-          name="room_id"
-          value={filters.room_id}
-          onChange={onFilterChange}
-          options={[
-            { value: "", label: "Tất cả" },
-            ...rooms.map((room) => ({ 
-              value: room.id, 
-              label: `Phòng ${room.room_number}` 
-            })),
-          ]}
-        />
+        <div className="col-md-4">
+          <Select
+            label="Phòng"
+            name="room_id"
+            value={filters.room_id}
+            onChange={onFilterChange}
+            options={[
+              { value: "", label: "Tất cả" },
+              ...rooms.map((room) => ({
+                value: room.id,
+                label: `Phòng ${room.room_number}`,
+              })),
+            ]}
+          />
+        </div>
 
-        <Select
-          label="Trạng thái"
-          name="status"
-          value={filters.status}
-          onChange={onFilterChange}
-          options={[
-            { value: "", label: "Tất cả" },
-            { value: "active", label: "Đang hoạt động" },
-            { value: "pending", label: "Chờ duyệt" },
-            { value: "terminated", label: "Đã chấm dứt" },
-            { value: "expired", label: "Đã hết hạn" },
-          ]}
-        />
+        <div className="col-md-4">
+          <Select
+            label="Trạng thái"
+            name="status"
+            value={filters.status}
+            onChange={onFilterChange}
+            options={[
+              { value: "", label: "Tất cả" },
+              { value: "active", label: "Đang hoạt động" },
+              { value: "pending", label: "Chờ duyệt" },
+              { value: "terminated", label: "Đã chấm dứt" },
+              { value: "expired", label: "Đã hết hạn" },
+            ]}
+          />
+        </div>
 
-        <DatePicker
-          label="Ngày bắt đầu từ"
-          name="start_date_from"
-          value={filters.start_date_from}
-          onChange={onFilterChange}
-        />
+        <div className="col-md-4">
+          <DatePicker
+            label="Ngày bắt đầu từ"
+            name="start_date_from"
+            value={filters.start_date_from}
+            onChange={onFilterChange}
+          />
+        </div>
 
-        <DatePicker
-          label="Ngày bắt đầu đến"
-          name="start_date_to"
-          value={filters.start_date_to}
-          onChange={onFilterChange}
-        />
+        <div className="col-md-4">
+          <DatePicker
+            label="Ngày bắt đầu đến"
+            name="start_date_to"
+            value={filters.start_date_to}
+            onChange={onFilterChange}
+          />
+        </div>
 
-        <DatePicker
-          label="Ngày kết thúc từ"
-          name="end_date_from"
-          value={filters.end_date_from}
-          onChange={onFilterChange}
-        />
+        <div className="col-md-4">
+          <DatePicker
+            label="Ngày kết thúc từ"
+            name="end_date_from"
+            value={filters.end_date_from}
+            onChange={onFilterChange}
+          />
+        </div>
 
-        <DatePicker
-          label="Ngày kết thúc đến"
-          name="end_date_to"
-          value={filters.end_date_to}
-          onChange={onFilterChange}
-        />
+        <div className="col-md-4">
+          <DatePicker
+            label="Ngày kết thúc đến"
+            name="end_date_to"
+            value={filters.end_date_to}
+            onChange={onFilterChange}
+          />
+        </div>
 
-        <Input
-          label="Giá từ"
-          name="min_rent"
-          type="number"
-          min="0"
-          value={filters.min_rent}
-          onChange={onFilterChange}
-        />
+        <div className="col-md-4">
+          <Input
+            label="Giá từ"
+            name="min_rent"
+            type="number"
+            min="0"
+            value={filters.min_rent}
+            onChange={onFilterChange}
+          />
+        </div>
 
-        <Input
-          label="Giá đến"
-          name="max_rent"
-          type="number"
-          min="0"
-          value={filters.max_rent}
-          onChange={onFilterChange}
-        />
+        <div className="col-md-4">
+          <Input
+            label="Giá đến"
+            name="max_rent"
+            type="number"
+            min="0"
+            value={filters.max_rent}
+            onChange={onFilterChange}
+          />
+        </div>
       </div>
 
-      <div className="mt-4 flex justify-end">
-        <Button variant="secondary" onClick={onClearFilters} className="mr-2">
+      <div className="mt-3 d-flex justify-content-end">
+        <Button variant="secondary" onClick={onClearFilters} className="me-2">
           Xóa bộ lọc
         </Button>
         <Button onClick={onApplyFilters}>Tìm</Button>
@@ -159,7 +155,8 @@ const ContractList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { showSuccess, showError, showConfirm } = useAlert();
   const { user } = useAuth();
-  
+  const navigate = useNavigate();
+
   const isAdmin = user?.role === "admin";
   const isManager = user?.role === "manager";
 
@@ -168,7 +165,7 @@ const ContractList = () => {
   const perPage = Number(searchParams.get("per_page")) || 5;
   const sortBy = searchParams.get("sort_by") || "id";
   const sortDir = searchParams.get("sort_dir") || "asc";
-  
+
   const house_id = searchParams.get("house_id") || "";
   const room_id = searchParams.get("room_id") || "";
   const status = searchParams.get("status") || "";
@@ -246,67 +243,45 @@ const ContractList = () => {
       cell: ({ row }) => formatDate(row.original.end_date),
     },
     {
-      accessorKey: "monthly_rent",
+      accessorKey: "monthly_price",
       header: "Tiền thuê",
-      cell: ({ row }) => formatCurrency(row.original.monthly_rent),
+      cell: ({ row }) => formatCurrency(row.original.monthly_price),
     },
     {
       accessorKey: "status",
       header: "T.Thái",
       cell: ({ row }) => {
         const status = row.original.status;
-        let statusText, statusColor;
-        
+        let statusClass;
+
         switch (status) {
           case "active":
-            statusText = "Đang hoạt động";
-            statusColor = "text-green-600";
-            break;
+            statusClass = "text-success";
+            return <span className={statusClass}>Đang hoạt động</span>;
           case "pending":
-            statusText = "Chờ duyệt";
-            statusColor = "text-yellow-600";
-            break;
+            statusClass = "text-warning";
+            return <span className={statusClass}>Chờ duyệt</span>;
           case "terminated":
-            statusText = "Đã chấm dứt";
-            statusColor = "text-red-600";
-            break;
+            statusClass = "text-danger";
+            return <span className={statusClass}>Đã chấm dứt</span>;
           case "expired":
-            statusText = "Đã hết hạn";
-            statusColor = "text-gray-600";
-            break;
+            statusClass = "text-secondary";
+            return <span className={statusClass}>Đã hết hạn</span>;
           default:
-            statusText = status;
-            statusColor = "text-gray-600";
+            statusClass = "text-secondary";
+            return <span className={statusClass}>{status}</span>;
         }
-        
-        return <span className={statusColor}>{statusText}</span>;
-      }
+      },
     },
     {
       accessorKey: "actions",
       header: "Hành động",
-      cell: ({ row }) => {
-        // Check if user is manager of this house
-        const canManage = isManager && 
-          row.original.room?.house?.manager_id === user?.id;
-        
-        return (
-          <ActionButtons 
-            contract={row.original} 
-            onDelete={handleDeleteContract} 
-            isAdmin={isAdmin} 
-            isManager={canManage}
-          />
-        );
-      },
     },
   ];
 
   useEffect(() => {
-    // if (user) {
-      loadContracts();
-      loadHouses();
-    // }
+    loadContracts();
+    loadHouses();
   }, []);
 
   useEffect(() => {
@@ -327,7 +302,7 @@ const ContractList = () => {
     end_date_to,
     min_rent,
     max_rent,
-    user
+    user,
   ]);
 
   useEffect(() => {
@@ -378,19 +353,19 @@ const ContractList = () => {
 
   const loadRoomsByHouse = async (houseId) => {
     if (!houseId) return;
-    
+
     const response = await fetchRooms({ house_id: houseId });
     if (!response.success) {
       showError("Lỗi khi tải danh sách phòng");
     }
   };
 
-  const handleDeleteContract = async (id) => {
+  const handleDeleteContract = async (contract) => {
     showConfirm({
       title: "Xác nhận xóa",
       message: "Bạn có chắc chắn muốn xóa hợp đồng này không?",
       onConfirm: async () => {
-        const response = await deleteContract(id);
+        const response = await deleteContract(contract.id);
         if (response.success) {
           showSuccess("Xóa hợp đồng thành công");
           loadContracts();
@@ -455,24 +430,26 @@ const ContractList = () => {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">Hợp đồng</h1>
-        <Button as={Link} to="/contracts/create">
-          Thêm
-        </Button>
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h3>Hợp đồng</h3>
+        {canManageContracts && (
+          <Button as={Link} to="/contracts/create">
+            Thêm
+          </Button>
+        )}
       </div>
 
       <FilterSection
-        filters={{ 
-          house_id, 
-          room_id, 
-          status, 
-          start_date_from, 
-          start_date_to, 
-          end_date_from, 
-          end_date_to, 
-          min_rent, 
-          max_rent 
+        filters={{
+          house_id,
+          room_id,
+          status,
+          start_date_from,
+          start_date_to,
+          end_date_from,
+          end_date_to,
+          min_rent,
+          max_rent,
         }}
         houses={houses}
         rooms={rooms}
@@ -494,6 +471,49 @@ const ContractList = () => {
             sortingState={[{ id: sortBy, desc: sortDir === "desc" }]}
             onSortingChange={handleSortingChange}
             loading={isLoading}
+            actionColumn={{
+              key: "actions",
+              actions: [
+                {
+                  icon: "mdi-eye",
+                  handler: (contract) => navigate(`/contracts/${contract.id}`),
+                },
+                ...(isAdmin ||
+                (isManager &&
+                  contracts.some((c) => c.room?.house?.manager_id === user?.id))
+                  ? [
+                      {
+                        icon: "mdi-pencil",
+                        handler: (contract) => {
+                          // Check if user is manager of this house
+                          const canManage =
+                            isAdmin ||
+                            (isManager &&
+                              contract.room?.house?.manager_id === user?.id);
+
+                          if (canManage) {
+                            navigate(`/contracts/${contract.id}/edit`);
+                          }
+                        },
+                      },
+                      {
+                        icon: "mdi-delete",
+                        handler: (contract) => {
+                          // Check if user is manager of this house
+                          const canManage =
+                            isAdmin ||
+                            (isManager &&
+                              contract.room?.house?.manager_id === user?.id);
+
+                          if (canManage) {
+                            handleDeleteContract(contract);
+                          }
+                        },
+                      },
+                    ]
+                  : []),
+              ],
+            }}
           />
         )}
       </Card>

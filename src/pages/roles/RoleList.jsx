@@ -9,27 +9,6 @@ import Loader from "../../components/common/Loader";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 
-// Action buttons component
-const ActionButtons = ({ role, onDelete }) => (
-  <div className="flex space-x-2">
-    <Link to={`/roles/${role.id}`} className="text-blue-600 hover:underline">
-      Xem
-    </Link>
-    <Link
-      to={`/roles/${role.id}/edit`}
-      className="text-green-600 hover:underline"
-    >
-      Sửa
-    </Link>
-    <button
-      onClick={() => onDelete(role.id)}
-      className="text-red-600 hover:underline"
-    >
-      Xóa
-    </button>
-  </div>
-);
-
 // Filter section component
 const FilterSection = ({
   filters,
@@ -37,25 +16,29 @@ const FilterSection = ({
   onClearFilters,
   onApplyFilters,
 }) => (
-  <Card title="Bộ lọc" className="mb-6">
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <Input
-        label="Mã vai trò"
-        name="code"
-        value={filters.code}
-        onChange={onFilterChange}
-      />
+  <Card title="Bộ lọc" className="mb-3">
+    <div className="row g-3">
+      <div className="col-md-6">
+        <Input
+          label="Mã vai trò"
+          name="code"
+          value={filters.code}
+          onChange={onFilterChange}
+        />
+      </div>
 
-      <Input
-        label="Tên vai trò"
-        name="name"
-        value={filters.name}
-        onChange={onFilterChange}
-      />
+      <div className="col-md-6">
+        <Input
+          label="Tên vai trò"
+          name="name"
+          value={filters.name}
+          onChange={onFilterChange}
+        />
+      </div>
     </div>
 
-    <div className="mt-4 flex justify-end">
-      <Button variant="secondary" onClick={onClearFilters} className="mr-2">
+    <div className="mt-3 d-flex justify-content-end">
+      <Button variant="secondary" onClick={onClearFilters} className="me-2">
         Xóa bộ lọc
       </Button>
       <Button onClick={onApplyFilters}>Tìm</Button>
@@ -113,9 +96,6 @@ const RoleList = () => {
     {
       accessorKey: "actions",
       header: "Hành động",
-      cell: ({ row }) => (
-        <ActionButtons role={row.original} onDelete={handleDeleteRole} />
-      ),
     },
   ];
 
@@ -142,9 +122,9 @@ const RoleList = () => {
     }
   };
 
-  const handleDeleteRole = async (id) => {
+  const handleDeleteRole = async (role) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa vai trò này?")) {
-      const response = await deleteRole(id);
+      const response = await deleteRole(role.id);
 
       if (response.success) {
         showSuccess("Xóa vai trò thành công");
@@ -195,8 +175,8 @@ const RoleList = () => {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">Vai trò</h1>
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h3>Vai trò</h3>
         <Button as={Link} to="/roles/create">
           Thêm
         </Button>
@@ -221,6 +201,23 @@ const RoleList = () => {
             sortingState={[{ id: sortBy, desc: sortDir === "desc" }]}
             onSortingChange={handleSortingChange}
             loading={loadingRoles}
+            actionColumn={{
+              key: "actions",
+              actions: [
+                {
+                  icon: "mdi-eye",
+                  handler: (role) => navigate(`/roles/${role.id}`),
+                },
+                {
+                  icon: "mdi-pencil",
+                  handler: (role) => navigate(`/roles/${role.id}/edit`),
+                },
+                {
+                  icon: "mdi-delete",
+                  handler: handleDeleteRole,
+                },
+              ],
+            }}
           />
         )}
       </Card>

@@ -1,4 +1,3 @@
-// src/components/common/Alert.jsx
 import { useContext } from "react";
 import { AlertContext } from "../../contexts/AlertContext";
 
@@ -10,18 +9,24 @@ const Alert = () => {
   const { message, type } = alert;
 
   const alertClasses = {
-    success: "bg-green-100 border-green-500 text-green-700",
-    error: "bg-red-100 border-red-500 text-red-700",
-    warning: "bg-yellow-100 border-yellow-500 text-yellow-700",
-    info: "bg-blue-100 border-blue-500 text-blue-700",
+    success: "alert alert-success",
+    error: "alert alert-danger",
+    warning: "alert alert-warning bg-warning text-white border-0",
+    info: "alert alert-info bg-info text-white border-0",
   };
 
   return (
-    <div className={`border-l-4 p-4 mb-4 ${alertClasses[type]}`} role="alert">
-      <div className="flex items-center justify-between">
-        <p>{message}</p>
-        <button onClick={hideAlert} className="ml-4">
-          ×
+    <div className={`${alertClasses[type]} mb-4`} role="alert">
+      <div className="d-flex align-items-center justify-content-between">
+        <p className="mb-0">{message}</p>
+        <button
+          type="button"
+          className="close"
+          data-dismiss="alert"
+          aria-label="Close"
+          onClick={hideAlert}
+        >
+          <span aria-hidden="true">&times;</span>
         </button>
       </div>
     </div>

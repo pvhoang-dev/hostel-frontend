@@ -1,17 +1,18 @@
-// src/components/common/Card.jsx
 const Card = ({ title, subtitle, children, footer, className = "" }) => {
   return (
-    <div className={`bg-white rounded shadow ${className}`}>
+    <div className={`card ${className}`}>
       {(title || subtitle) && (
-        <div className="p-4 border-b">
-          {title && <h3 className="text-lg font-medium">{title}</h3>}
-          {subtitle && <p className="text-sm text-gray-500 mt-1">{subtitle}</p>}
+        <div className="card-header">
+          {title && <h5 className="card-title mb-0">{title}</h5>}
+          {subtitle && (
+            <h6 className="card-subtitle text-muted mt-1">{subtitle}</h6>
+          )}
         </div>
       )}
 
-      <div className="p-4">{children}</div>
+      <div className="card-body">{children}</div>
 
-      {footer && <div className="p-4 border-t">{footer}</div>}
+      {footer && <div className="card-footer">{footer}</div>}
     </div>
   );
 };

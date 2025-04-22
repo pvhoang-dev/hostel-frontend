@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { roomService } from "../../api/rooms";
 import { houseService } from "../../api/houses";
@@ -12,31 +12,6 @@ import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 import { useAuth } from "../../hooks/useAuth";
 
-// Component con hiển thị các action buttons
-const ActionButtons = ({ room, onDelete, isAdmin, isManager }) => (
-  <div className="flex space-x-2">
-    <Link to={`/rooms/${room.id}`} className="text-blue-600 hover:underline">
-      Xem
-    </Link>
-    {(isAdmin || isManager) && (
-      <>
-        <Link
-          to={`/rooms/${room.id}/edit`}
-          className="text-green-600 hover:underline"
-        >
-          Sửa
-        </Link>
-        <button
-          onClick={() => onDelete(room.id)}
-          className="text-red-600 hover:underline"
-        >
-          Xóa
-        </button>
-      </>
-    )}
-  </div>
-);
-
 // Component con hiển thị phần filter
 const FilterSection = ({
   filters,
@@ -45,70 +20,82 @@ const FilterSection = ({
   onClearFilters,
   onApplyFilters,
 }) => (
-  <Card title="Bộ lọc" className="mb-6">
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <Select
-        label="Nhà"
-        name="house_id"
-        value={filters.house_id}
-        onChange={onFilterChange}
-        options={[
-          { value: "", label: "Tất cả" },
-          ...houses.map((house) => ({ value: house.id, label: house.name })),
-        ]}
-      />
+  <Card title="Bộ lọc" className="mb-3">
+    <div className="row g-3">
+      <div className="col-md-4">
+        <Select
+          label="Nhà"
+          name="house_id"
+          value={filters.house_id}
+          onChange={onFilterChange}
+          options={[
+            { value: "", label: "Tất cả" },
+            ...houses.map((house) => ({ value: house.id, label: house.name })),
+          ]}
+        />
+      </div>
 
-      <Input
-        label="Số phòng"
-        name="room_number"
-        value={filters.room_number}
-        onChange={onFilterChange}
-      />
+      <div className="col-md-4">
+        <Input
+          label="Số phòng"
+          name="room_number"
+          value={filters.room_number}
+          onChange={onFilterChange}
+        />
+      </div>
 
-      <Input
-        label="Sức chứa"
-        name="capacity"
-        type="number"
-        min="1"
-        value={filters.capacity}
-        onChange={onFilterChange}
-      />
+      <div className="col-md-4">
+        <Input
+          label="Sức chứa"
+          name="capacity"
+          type="number"
+          min="1"
+          value={filters.capacity}
+          onChange={onFilterChange}
+        />
+      </div>
 
-      <Select
-        label="Trạng thái"
-        name="status"
-        value={filters.status}
-        onChange={onFilterChange}
-        options={[
-          { value: "", label: "Tất cả" },
-          { value: "available", label: "Có sẵn" },
-          { value: "occupied", label: "Đã thuê" },
-          { value: "maintenance", label: "Bảo trì" },
-          { value: "unavailable", label: "Không khả dụng" },
-        ]}
-      />
+      <div className="col-md-4">
+        <Select
+          label="Trạng thái"
+          name="status"
+          value={filters.status}
+          onChange={onFilterChange}
+          options={[
+            { value: "", label: "Tất cả" },
+            { value: "available", label: "Có sẵn" },
+            { value: "occupied", label: "Đã thuê" },
+            { value: "maintenance", label: "Bảo trì" },
+            { value: "unavailable", label: "Không khả dụng" },
+          ]}
+        />
+      </div>
 
-      <Input
-        label="Giá từ"
-        name="min_price"
-        type="number"
-        min="0"
-        value={filters.min_price}
-        onChange={onFilterChange}
-      />
+      <div className="col-md-4">
+        <Input
+          label="Giá từ"
+          name="min_price"
+          type="number"
+          min="0"
+          value={filters.min_price}
+          onChange={onFilterChange}
+        />
+      </div>
 
-      <Input
-        label="Giá đến"
-        name="max_price"
-        type="number"
-        min="0"
-        value={filters.max_price}
-        onChange={onFilterChange}
-      />
+      <div className="col-md-4">
+        <Input
+          label="Giá đến"
+          name="max_price"
+          type="number"
+          min="0"
+          value={filters.max_price}
+          onChange={onFilterChange}
+        />
+      </div>
     </div>
 
-    <div className="mt-4 flex justify-end">
-      <Button variant="secondary" onClick={onClearFilters} className="mr-2">
+    <div className="mt-3 d-flex justify-content-end">
+      <Button variant="secondary" onClick={onClearFilters} className="me-2">
         Xóa bộ lọc
       </Button>
       <Button onClick={onApplyFilters}>Tìm</Button>
@@ -121,7 +108,7 @@ const RoomList = () => {
   const { showSuccess, showError } = useAlert();
   const navigate = useNavigate();
   const { user } = useAuth();
-  
+
   const isAdmin = user?.role === "admin";
   const isManager = user?.role === "manager";
 
@@ -130,7 +117,7 @@ const RoomList = () => {
   const perPage = Number(searchParams.get("per_page")) || 5;
   const sortBy = searchParams.get("sort_by") || "id";
   const sortDir = searchParams.get("sort_dir") || "asc";
-  
+
   const house_id = searchParams.get("house_id") || "";
   const room_number = searchParams.get("room_number") || "";
   const capacity = searchParams.get("capacity") || "";
@@ -188,10 +175,10 @@ const RoomList = () => {
     {
       accessorKey: "base_price",
       header: "Giá",
-      cell: ({ row }) => 
-        new Intl.NumberFormat('vi-VN', {
-          style: 'currency',
-          currency: 'VND'
+      cell: ({ row }) =>
+        new Intl.NumberFormat("vi-VN", {
+          style: "currency",
+          currency: "VND",
         }).format(row.original.base_price),
     },
     {
@@ -200,27 +187,27 @@ const RoomList = () => {
       cell: ({ row }) => {
         const status = row.original.status;
         let statusText, statusColor;
-        
+
         switch (status) {
           case "available":
             statusText = "Có sẵn";
-            statusColor = "text-green-600";
+            statusColor = "text-success";
             break;
           case "occupied":
             statusText = "Đã thuê";
-            statusColor = "text-blue-600";
+            statusColor = "text-primary";
             break;
           case "maintenance":
             statusText = "Bảo trì";
-            statusColor = "text-yellow-600";
+            statusColor = "text-warning";
             break;
           default:
             statusText = "Không khả dụng";
-            statusColor = "text-red-600";
+            statusColor = "text-danger";
         }
-        
+
         return <span className={statusColor}>{statusText}</span>;
-      }
+      },
     },
     {
       accessorKey: "created_at",
@@ -229,14 +216,6 @@ const RoomList = () => {
     {
       accessorKey: "actions",
       header: "Hành động",
-      cell: ({ row }) => (
-        <ActionButtons 
-          room={row.original} 
-          onDelete={handleDeleteRoom} 
-          isAdmin={isAdmin} 
-          isManager={isManager && row.original.house?.manager_id === user?.id}
-        />
-      ),
     },
   ];
 
@@ -262,7 +241,7 @@ const RoomList = () => {
     status,
     min_price,
     max_price,
-    user
+    user,
   ]);
 
   const loadRooms = async () => {
@@ -295,9 +274,15 @@ const RoomList = () => {
     await fetchHouses(params);
   };
 
-  const handleDeleteRoom = async (id) => {
+  const handleDeleteRoom = async (room) => {
+    // Only allow admins or the manager of this house to delete
+    if (!(isAdmin || (isManager && room.house?.manager_id === user?.id))) {
+      showError("Bạn không có quyền xóa phòng này");
+      return;
+    }
+
     if (window.confirm("Bạn có chắc chắn muốn xóa phòng này?")) {
-      const response = await deleteRoom(id);
+      const response = await deleteRoom(room.id);
 
       if (response.success) {
         showSuccess("Xóa phòng thành công");
@@ -306,6 +291,16 @@ const RoomList = () => {
         showError(response.message || "Có lỗi xảy ra khi xóa phòng");
       }
     }
+  };
+
+  // Custom handler for edit to check permissions
+  const handleEditRoom = (room) => {
+    // Only allow admins or the manager of this house to edit
+    if (!(isAdmin || (isManager && room.house?.manager_id === user?.id))) {
+      showError("Bạn không có quyền sửa phòng này");
+      return;
+    }
+    navigate(`/rooms/${room.id}/edit`);
   };
 
   const handlePageChange = (page) => {
@@ -355,8 +350,8 @@ const RoomList = () => {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">Phòng</h1>
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h3>Phòng</h3>
         {(isAdmin || isManager) && (
           <Button as={Link} to="/rooms/create">
             Thêm
@@ -365,7 +360,14 @@ const RoomList = () => {
       </div>
 
       <FilterSection
-        filters={{ house_id, room_number, capacity, status, min_price, max_price }}
+        filters={{
+          house_id,
+          room_number,
+          capacity,
+          status,
+          min_price,
+          max_price,
+        }}
         houses={houses}
         onFilterChange={handleFilterChange}
         onClearFilters={clearFilters}
@@ -384,6 +386,27 @@ const RoomList = () => {
             sortingState={[{ id: sortBy, desc: sortDir === "desc" }]}
             onSortingChange={handleSortingChange}
             loading={isLoading}
+            actionColumn={{
+              key: "actions",
+              actions: [
+                {
+                  icon: "mdi-eye",
+                  handler: (room) => navigate(`/rooms/${room.id}`),
+                },
+                ...(isAdmin || isManager
+                  ? [
+                      {
+                        icon: "mdi-pencil",
+                        handler: handleEditRoom,
+                      },
+                      {
+                        icon: "mdi-delete",
+                        handler: handleDeleteRoom,
+                      },
+                    ]
+                  : []),
+              ],
+            }}
           />
         )}
       </Card>

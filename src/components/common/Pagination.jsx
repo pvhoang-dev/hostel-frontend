@@ -1,4 +1,3 @@
-// src/components/common/Pagination.jsx
 const Pagination = ({ currentPage, totalPages, onPageChange }) => {
   const pagesToShow = 3; // Reduced for mobile
   const pages = [];
@@ -15,68 +14,71 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
   }
 
   return (
-      <div className="flex flex-col sm:flex-row justify-between items-center my-4 space-y-2 sm:space-y-0">
-      <span className="text-sm text-gray-600">
+    <div className="d-flex flex-column flex-sm-row justify-content-between align-items-center my-3">
+      <span className="text-muted small mb-2 mb-sm-0">
         Trang {currentPage} / {totalPages}
       </span>
-        <div className="flex flex-wrap justify-center items-center space-x-1">
-          {/* First and Previous buttons for mobile and desktop */}
-          <button
+      <nav aria-label="Page navigation">
+        <ul className="pagination pagination-sm flex-wrap mb-0">
+          <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+            <button
+              className="page-link"
               onClick={() => onPageChange(1)}
               disabled={currentPage === 1}
-              className="px-2 py-1 sm:px-3 sm:py-1 rounded border text-xs sm:text-sm
-                     disabled:opacity-50 disabled:cursor-not-allowed
-                     hover:bg-gray-100 transition-colors"
-          >
-            Đầu
-          </button>
-          <button
+            >
+              Đầu
+            </button>
+          </li>
+          <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+            <button
+              className="page-link"
               onClick={() => onPageChange(currentPage - 1)}
               disabled={currentPage === 1}
-              className="px-2 py-1 sm:px-3 sm:py-1 rounded border text-xs sm:text-sm
-                     disabled:opacity-50 disabled:cursor-not-allowed
-                     hover:bg-gray-100 transition-colors"
-          >
-            Trước
-          </button>
+            >
+              <span aria-hidden="true">&laquo;</span>
+            </button>
+          </li>
 
-          {/* Page numbers with responsive design */}
           {pages.map((page) => (
-              <button
-                  key={page}
-                  onClick={() => onPageChange(page)}
-                  className={`px-2 py-1 sm:px-3 sm:py-1 rounded border text-xs sm:text-sm 
-                        ${
-                      currentPage === page
-                          ? "bg-blue-500 text-white"
-                          : "hover:bg-gray-100"
-                  } transition-colors`}
-              >
+            <li
+              key={page}
+              className={`page-item ${currentPage === page ? "active" : ""}`}
+            >
+              <button className="page-link" onClick={() => onPageChange(page)}>
                 {page}
               </button>
+            </li>
           ))}
 
-          {/* Next and Last buttons for mobile and desktop */}
-          <button
+          <li
+            className={`page-item ${
+              currentPage === totalPages ? "disabled" : ""
+            }`}
+          >
+            <button
+              className="page-link"
               onClick={() => onPageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="px-2 py-1 sm:px-3 sm:py-1 rounded border text-xs sm:text-sm
-                     disabled:opacity-50 disabled:cursor-not-allowed
-                     hover:bg-gray-100 transition-colors"
+            >
+              <span aria-hidden="true">&raquo;</span>
+            </button>
+          </li>
+          <li
+            className={`page-item ${
+              currentPage === totalPages ? "disabled" : ""
+            }`}
           >
-            Sau
-          </button>
-          <button
+            <button
+              className="page-link"
               onClick={() => onPageChange(totalPages)}
               disabled={currentPage === totalPages}
-              className="px-2 py-1 sm:px-3 sm:py-1 rounded border text-xs sm:text-sm
-                     disabled:opacity-50 disabled:cursor-not-allowed
-                     hover:bg-gray-100 transition-colors"
-          >
-            Cuối
-          </button>
-        </div>
-      </div>
+            >
+              Cuối
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </div>
   );
 };
 

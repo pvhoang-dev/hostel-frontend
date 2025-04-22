@@ -10,30 +10,6 @@ import Loader from "../../components/common/Loader";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 
-// Action buttons component
-const ActionButtons = ({ service, onDelete }) => (
-  <div className="flex space-x-2">
-    <Link
-      to={`/services/${service.id}`}
-      className="text-blue-600 hover:underline"
-    >
-      Xem
-    </Link>
-    <Link
-      to={`/services/${service.id}/edit`}
-      className="text-green-600 hover:underline"
-    >
-      Sửa
-    </Link>
-    <button
-      onClick={() => onDelete(service.id)}
-      className="text-red-600 hover:underline"
-    >
-      Xóa
-    </button>
-  </div>
-);
-
 // Filter section component
 const FilterSection = ({
   filters,
@@ -41,39 +17,40 @@ const FilterSection = ({
   onClearFilters,
   onApplyFilters,
 }) => (
-  <Card title="Bộ lọc" className="mb-6">
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <Input
-        label="Tên"
-        name="name"
-        value={filters.name}
-        onChange={onFilterChange}
-      />
-      <Input
-        label="Đơn vị"
-        name="unit"
-        value={filters.unit}
-        onChange={onFilterChange}
-      />
-      <Select
-        label="Được đo?"
-        name="is_metered"
-        value={filters.is_metered}
-        onChange={onFilterChange}
-        options={[
-          { value: "1", label: "Có" },
-          { value: "0", label: "Không" },
-        ]}
-      />
-      {/* Add price range filters if needed */}
-      {/*
-       <Input label="Min Price" name="min_price" type="number" value={filters.min_price} onChange={onFilterChange} />
-       <Input label="Max Price" name="max_price" type="number" value={filters.max_price} onChange={onFilterChange} />
-       */}
+  <Card title="Bộ lọc" className="mb-3">
+    <div className="row g-3">
+      <div className="col-md-4">
+        <Input
+          label="Tên"
+          name="name"
+          value={filters.name}
+          onChange={onFilterChange}
+        />
+      </div>
+      <div className="col-md-4">
+        <Input
+          label="Đơn vị"
+          name="unit"
+          value={filters.unit}
+          onChange={onFilterChange}
+        />
+      </div>
+      <div className="col-md-4">
+        <Select
+          label="Được đo?"
+          name="is_metered"
+          value={filters.is_metered}
+          onChange={onFilterChange}
+          options={[
+            { value: "1", label: "Có" },
+            { value: "0", label: "Không" },
+          ]}
+        />
+      </div>
     </div>
 
-    <div className="mt-4 flex justify-end">
-      <Button variant="secondary" onClick={onClearFilters} className="mr-2">
+    <div className="mt-3 d-flex justify-content-end">
+      <Button variant="secondary" onClick={onClearFilters} className="me-2">
         Xóa bộ lọc
       </Button>
       <Button onClick={onApplyFilters}>Tìm</Button>
@@ -94,7 +71,6 @@ const ServiceList = () => {
   const name = searchParams.get("name") || "";
   const unit = searchParams.get("unit") || "";
   const isMetered = searchParams.get("is_metered") || "";
-  // Add other filters like min_price, max_price if implemented
 
   // API hooks
   const {
@@ -118,35 +94,29 @@ const ServiceList = () => {
 
   // Table columns definition
   const columns = [
-    { accessorKey: "id", header: "ID", enableSorting: true },
-    { accessorKey: "name", header: "Tên", enableSorting: true },
+    { accessorKey: "id", header: "ID" },
+    { accessorKey: "name", header: "Tên" },
     {
       accessorKey: "default_price",
       header: "Giá mặc định",
       cell: ({ row }) => row.original.default_price?.toLocaleString(),
-      enableSorting: true,
     },
-    { accessorKey: "unit", header: "Đơn vị", enableSorting: true },
+    { accessorKey: "unit", header: "Đơn vị" },
     {
       accessorKey: "is_metered",
       header: "Được đo?",
       cell: ({ row }) => (row.original.is_metered ? "Có" : "Không"),
-      enableSorting: true,
     },
     {
       accessorKey: "actions",
       header: "Hành động",
-      cell: ({ row }) => (
-        <ActionButtons service={row.original} onDelete={handleDeleteService} />
-      ),
-      enableSorting: false,
     },
   ];
 
   // Fetch data on initial load and when params change
   useEffect(() => {
     loadServices();
-  }, [currentPage, perPage, sortBy, sortDir, name, unit, isMetered]); // Add other filters to dependency array
+  }, [currentPage, perPage, sortBy, sortDir, name, unit, isMetered]);
 
   const loadServices = async () => {
     const params = {
@@ -159,8 +129,7 @@ const ServiceList = () => {
     // Add filters if they exist
     if (name) params.name = name;
     if (unit) params.unit = unit;
-    if (isMetered !== "") params.is_metered = isMetered; // Pass filter value if selected
-    // Add other filters like min_price, max_price
+    if (isMetered !== "") params.is_metered = isMetered;
 
     const response = await fetchServices(params);
     if (!response.success) {
@@ -168,9 +137,9 @@ const ServiceList = () => {
     }
   };
 
-  const handleDeleteService = async (id) => {
+  const handleDeleteService = async (service) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa dịch vụ này?")) {
-      const response = await deleteServiceApi(id);
+      const response = await deleteServiceApi(service.id);
       if (response.success) {
         showSuccess("Xóa dịch vụ thành công");
         // Reload data, potentially checking if current page becomes empty
@@ -195,7 +164,6 @@ const ServiceList = () => {
     // Remove empty params
     Object.keys(updatedParams).forEach((key) => {
       if (!updatedParams[key] && key !== "page") {
-        // Keep page=1 even if it's the only param
         delete updatedParams[key];
       }
     });
@@ -219,7 +187,6 @@ const ServiceList = () => {
         sort_dir: sort.desc ? "desc" : "asc",
       });
     } else {
-      // Reset to default sorting if needed
       updateSearchParams({ sort_by: "name", sort_dir: "asc" });
     }
   };
@@ -242,8 +209,8 @@ const ServiceList = () => {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">Dịch vụ</h1>
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h3>Dịch vụ</h3>
         <Button as={Link} to="/services/create">
           Tạo
         </Button>
@@ -265,11 +232,28 @@ const ServiceList = () => {
             columns={columns}
             pagination={pagination}
             onPageChange={handlePageChange}
-            // Pass sorting state expected by your Table component
-            manualSorting={true} // Indicate server-side sorting
+            manualSorting={true}
             sortingState={[{ id: sortBy, desc: sortDir === "desc" }]}
-            onSortingChange={handleSortingChange} // Function to handle sorting changes
+            onSortingChange={handleSortingChange}
             loading={loadingServices}
+            actionColumn={{
+              key: "actions",
+              actions: [
+                {
+                  icon: "mdi-eye",
+                  handler: (service) => navigate(`/services/${service.id}`),
+                },
+                {
+                  icon: "mdi-pencil",
+                  handler: (service) =>
+                    navigate(`/services/${service.id}/edit`),
+                },
+                {
+                  icon: "mdi-delete",
+                  handler: handleDeleteService,
+                },
+              ],
+            }}
           />
         )}
       </Card>

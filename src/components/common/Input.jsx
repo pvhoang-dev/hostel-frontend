@@ -1,4 +1,3 @@
-// src/components/common/Input.jsx
 import { forwardRef } from "react";
 
 const Input = forwardRef(
@@ -19,13 +18,10 @@ const Input = forwardRef(
     ref
   ) => {
     return (
-      <div className="mb-4">
+      <div className="mb-3">
         {label && (
-          <label
-            htmlFor={name}
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            {label} {required && <span className="text-red-500">*</span>}
+          <label htmlFor={name} className="form-label">
+            {label} {required && <span className="text-danger">*</span>}
           </label>
         )}
         <input
@@ -37,12 +33,10 @@ const Input = forwardRef(
           onChange={onChange}
           onBlur={onBlur}
           placeholder={placeholder}
-          className={`w-full p-2 border rounded ${
-            error ? "border-red-500" : "border-gray-300"
-          } ${className}`}
+          className={`form-control ${error ? "is-invalid" : ""} ${className}`}
           {...props}
         />
-        {error && <span className="text-red-500 text-sm mt-1">{error}</span>}
+        {error && <div className="invalid-feedback">{error}</div>}
       </div>
     );
   }

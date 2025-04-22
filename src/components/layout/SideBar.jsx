@@ -73,7 +73,7 @@ const SideBar = () => {
                   activeClassName="active"
                 >
                   <i className="dripicons-chevron-right"></i>
-                  <span className="h4">{item.label}</span>
+                  <span className="h4 font-weight-normal">{item.label}</span>
                 </NavLink>
               </li>
             ))}

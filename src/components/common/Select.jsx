@@ -1,4 +1,3 @@
-// src/components/common/Select.jsx
 import { forwardRef } from "react";
 
 const Select = forwardRef(
@@ -19,35 +18,32 @@ const Select = forwardRef(
     ref
   ) => {
     return (
-      <div className="mb-4">
+      <div className="form-group mb-3">
         {label && (
-          <label
-            htmlFor={name}
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            {label} {required && <span className="text-red-500">*</span>}
+          <label htmlFor={name + "id"} className="form-label">
+            {label} {required && <span className="text-danger">*</span>}
           </label>
         )}
         <select
           ref={ref}
-          id={name}
+          id={name + "id"}
           name={name}
           value={value}
           onChange={onChange}
           onBlur={onBlur}
-          className={`w-full p-2 border rounded ${
-            error ? "border-red-500" : "border-gray-300"
-          } ${className}`}
+          className={`form-control ${error ? "is-invalid" : ""} ${className}`}
           {...props}
         >
-          <option value="" disabled>{placeholder}</option>
+          <option value="" disabled>
+            {placeholder}
+          </option>
           {options.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
             </option>
           ))}
         </select>
-        {error && <span className="text-red-500 text-sm mt-1">{error}</span>}
+        {error && <div className="invalid-feedback">{error}</div>}
       </div>
     );
   }

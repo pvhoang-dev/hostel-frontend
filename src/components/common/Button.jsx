@@ -1,4 +1,3 @@
-// src/components/common/Button.jsx
 import React from "react";
 
 const Button = ({
@@ -13,17 +12,21 @@ const Button = ({
   ...props
 }) => {
   const variantClasses = {
-    primary: "bg-blue-500 hover:bg-blue-600 text-white",
-    secondary: "bg-gray-200 hover:bg-gray-300 text-gray-800",
-    danger: "bg-red-500 hover:bg-red-600 text-white",
-    success: "bg-green-500 hover:bg-green-600 text-white",
-    warning: "bg-yellow-500 hover:bg-yellow-600 text-white",
+    primary: "btn-primary",
+    secondary: "btn-secondary",
+    success: "btn-success",
+    danger: "btn-danger",
+    warning: "btn-warning",
+    info: "btn-info",
+    light: "btn-light",
+    dark: "btn-dark",
+    link: "btn-link",
   };
 
   const sizeClasses = {
-    sm: "py-1 px-2 text-sm",
-    md: "py-2 px-4",
-    lg: "py-3 px-6 text-lg",
+    sm: "btn-sm",
+    md: "",
+    lg: "btn-lg",
   };
 
   const buttonProps = Component === "button" ? { type } : {};
@@ -33,11 +36,7 @@ const Button = ({
       {...buttonProps}
       onClick={onClick}
       disabled={disabled}
-      className={`font-medium rounded transition-colors ${
-        variantClasses[variant]
-      } ${sizeClasses[size]} ${
-        disabled ? "opacity-50 cursor-not-allowed" : ""
-      } ${className}`}
+      className={`btn ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
       {...props}
     >
       {children}

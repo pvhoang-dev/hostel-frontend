@@ -12,13 +12,12 @@ const TextArea = ({
   ...props
 }) => {
   return (
-    <div className="mb-4">
-      <label
-        htmlFor={name}
-        className="block text-sm font-medium text-gray-700 mb-1"
-      >
-        {label} {required && <span className="text-red-500">*</span>}
-      </label>
+    <div className="form-group mb-3">
+      {label && (
+        <label htmlFor={name} className="form-label">
+          {label} {required && <span className="text-danger">*</span>}
+        </label>
+      )}
       <textarea
         id={name}
         name={name}
@@ -26,15 +25,13 @@ const TextArea = ({
         onChange={onChange}
         rows={rows}
         placeholder={placeholder}
-        className={`mt-1 block w-full rounded-md ${
-          error ? "border-red-300" : "border-gray-300"
-        } shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm`}
+        className={`form-control ${error ? "is-invalid" : ""}`}
         required={required}
         {...props}
       />
-      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+      {error && <div className="invalid-feedback">{error}</div>}
     </div>
   );
 };
 
-export default TextArea; 
+export default TextArea;

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { equipmentService } from "../../api/equipments";
 import Table from "../../components/common/Table";
@@ -9,30 +9,6 @@ import Loader from "../../components/common/Loader";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 
-// Component for action buttons
-const ActionButtons = ({ equipment, onDelete }) => (
-  <div className="flex space-x-2">
-    <Link
-      to={`/equipments/${equipment.id}`}
-      className="text-blue-600 hover:underline"
-    >
-      Xem
-    </Link>
-    <Link
-      to={`/equipments/${equipment.id}/edit`}
-      className="text-green-600 hover:underline"
-    >
-      Sửa
-    </Link>
-    <button
-      onClick={() => onDelete(equipment.id)}
-      className="text-red-600 hover:underline"
-    >
-      Xóa
-    </button>
-  </div>
-);
-
 // Filter section component
 const FilterSection = ({
   filters,
@@ -40,18 +16,20 @@ const FilterSection = ({
   onClearFilters,
   onApplyFilters,
 }) => (
-  <Card title="Bộ lọc" className="mb-6">
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <Input
-        label="Tên"
-        name="name"
-        value={filters.name}
-        onChange={onFilterChange}
-      />
+  <Card title="Bộ lọc" className="mb-3">
+    <div className="row g-3">
+      <div className="col-md-6">
+        <Input
+          label="Tên"
+          name="name"
+          value={filters.name}
+          onChange={onFilterChange}
+        />
+      </div>
     </div>
 
-    <div className="mt-4 flex justify-end">
-      <Button variant="secondary" onClick={onClearFilters} className="mr-2">
+    <div className="mt-3 d-flex justify-content-end">
+      <Button variant="secondary" onClick={onClearFilters} className="me-2">
         Xóa bộ lọc
       </Button>
       <Button onClick={onApplyFilters}>Tìm</Button>
@@ -104,23 +82,11 @@ const EquipmentList = () => {
     {
       accessorKey: "actions",
       header: "Hành động",
-      cell: ({ row }) => (
-        <ActionButtons
-          equipment={row.original}
-          onDelete={handleDeleteEquipment}
-        />
-      ),
     },
   ];
 
   useEffect(() => {
     loadEquipments();
-  }, []);
-
-  useEffect(() => {
-    if (!loadingEquipments) {
-      loadEquipments();
-    }
   }, [currentPage, perPage, sortBy, sortDir, name]);
 
   const loadEquipments = async () => {
@@ -141,9 +107,9 @@ const EquipmentList = () => {
     }
   };
 
-  const handleDeleteEquipment = async (id) => {
+  const handleDeleteEquipment = async (equipment) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa thiết bị này?")) {
-      const response = await deleteEquipment(id);
+      const response = await deleteEquipment(equipment.id);
 
       if (response.success) {
         showSuccess("Xóa thiết bị thành công");
@@ -194,8 +160,8 @@ const EquipmentList = () => {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">Thiết bị</h1>
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h3>Thiết bị</h3>
         <Button as={Link} to="/equipments/create">
           Thêm
         </Button>
@@ -220,6 +186,25 @@ const EquipmentList = () => {
             sortingState={[{ id: sortBy, desc: sortDir === "desc" }]}
             onSortingChange={handleSortingChange}
             loading={loadingEquipments}
+            actionColumn={{
+              key: "actions",
+              actions: [
+                {
+                  icon: "mdi-eye",
+                  handler: (equipment) =>
+                    navigate(`/equipments/${equipment.id}`),
+                },
+                {
+                  icon: "mdi-pencil",
+                  handler: (equipment) =>
+                    navigate(`/equipments/${equipment.id}/edit`),
+                },
+                {
+                  icon: "mdi-delete",
+                  handler: handleDeleteEquipment,
+                },
+              ],
+            }}
           />
         )}
       </Card>

@@ -9,68 +9,50 @@ import Loader from "../../components/common/Loader";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 
-// Action buttons component
-const ActionButtons = ({ setting, onDelete }) => (
-  <div className="flex space-x-2">
-    <Link
-      to={`/settings/${setting.id}`}
-      className="text-blue-600 hover:underline"
-    >
-      Xem
-    </Link>
-    <Link
-      to={`/settings/${setting.id}/edit`}
-      className="text-green-600 hover:underline"
-    >
-      Sửa
-    </Link>
-    <button
-      onClick={() => onDelete(setting.id)}
-      className="text-red-600 hover:underline"
-    >
-      Xóa
-    </button>
-  </div>
-);
-
 // Filter section component
 const FilterSection = ({
-  filters,
-  onFilterChange,
-  onClearFilters,
-  onApplyFilters,
-}) => (
-  <Card title="Bộ lọc" className="mb-6">
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <Input
-        label="Số thứ tự"
-        name="key"
-        value={filters.key}
-        onChange={onFilterChange}
-      />
+                         filters,
+                         onFilterChange,
+                         onClearFilters,
+                         onApplyFilters,
+                       }) => (
+    <Card title="Bộ lọc" className="mb-3">
+      <div className="row g-3">
+        <div className="col-md-4">
+          <Input
+              label="Số thứ tự"
+              name="key"
+              value={filters.key}
+              onChange={onFilterChange}
+          />
+        </div>
 
-      <Input
-        label="Nội dung"
-        name="value"
-        value={filters.value}
-        onChange={onFilterChange}
-      />
+        <div className="col-md-4">
+          <Input
+              label="Nội dung"
+              name="value"
+              value={filters.value}
+              onChange={onFilterChange}
+          />
+        </div>
 
-      <Input
-        label="Mô tả"
-        name="description"
-        value={filters.description}
-        onChange={onFilterChange}
-      />
-    </div>
+        <div className="col-md-4">
+          <Input
+              label="Mô tả"
+              name="description"
+              value={filters.description}
+              onChange={onFilterChange}
+          />
+        </div>
+      </div>
 
-    <div className="mt-4 flex justify-end">
-      <Button variant="secondary" onClick={onClearFilters} className="mr-2">
-        Xóa bộ lọc
-      </Button>
-      <Button onClick={onApplyFilters}>Tìm</Button>
-    </div>
-  </Card>
+      <div className="mt-3 d-flex justify-content-end">
+        <Button variant="secondary" onClick={onClearFilters} className="me-2">
+          Xóa bộ lọc
+        </Button>
+        <Button onClick={onApplyFilters}>Tìm</Button>
+      </div>
+    </Card>
 );
 
 const SettingList = () => {
@@ -99,13 +81,13 @@ const SettingList = () => {
   // Derived state
   const settings = settingsData?.data || [];
   const pagination = settingsData
-    ? {
+      ? {
         current_page: settingsData.meta.current_page,
         last_page: settingsData.meta.last_page,
         total: settingsData.meta.total,
         per_page: settingsData.meta.per_page,
       }
-    : null;
+      : null;
 
   // Column definitions for the table
   const columns = [
@@ -113,31 +95,28 @@ const SettingList = () => {
       accessorKey: "key",
       header: "Số thứ tự",
       cell: ({ row }) => (
-        <div className="font-medium text-gray-900">{row.original.key}</div>
+          <div className="fw-medium">{row.original.key}</div>
       ),
     },
     {
       accessorKey: "value",
       header: "Nội dung",
       cell: ({ row }) => (
-        <div className="font-medium text-gray-600">{row.original.value}</div>
+          <div>{row.original.value}</div>
       ),
     },
     {
       accessorKey: "description",
       header: "Mô tả",
       cell: ({ row }) => (
-        <div className="text-gray-600 truncate max-w-xs">
-          {row.original.description || "-"}
-        </div>
+          <div className="text-truncate" style={{ maxWidth: '300px' }}>
+            {row.original.description || "-"}
+          </div>
       ),
     },
     {
       accessorKey: "actions",
       header: "Hành động",
-      cell: ({ row }) => (
-        <ActionButtons setting={row.original} onDelete={handleDeleteSetting} />
-      ),
     },
   ];
 
@@ -165,9 +144,9 @@ const SettingList = () => {
     }
   };
 
-  const handleDeleteSetting = async (id) => {
+  const handleDeleteSetting = async (setting) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa cài đặt này?")) {
-      const response = await deleteSetting(id);
+      const response = await deleteSetting(setting.id);
 
       if (response.success) {
         showSuccess("Xóa cài đặt thành công");
@@ -217,37 +196,54 @@ const SettingList = () => {
   };
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">Cài đặt hệ thống</h1>
-        <Button as={Link} to="/settings/create">
-          Thêm
-        </Button>
+      <div>
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <h3>Cài đặt hệ thống</h3>
+          <Button as={Link} to="/settings/create">
+            Thêm
+          </Button>
+        </div>
+
+        <FilterSection
+            filters={{ key, value, description }}
+            onFilterChange={handleFilterChange}
+            onClearFilters={clearFilters}
+            onApplyFilters={loadSettings}
+        />
+
+        <Card>
+          {loadingSettings ? (
+              <Loader />
+          ) : (
+              <Table
+                  data={settings}
+                  columns={columns}
+                  pagination={pagination}
+                  onPageChange={handlePageChange}
+                  sortingState={[{ id: sortBy, desc: sortDir === "desc" }]}
+                  onSortingChange={handleSortingChange}
+                  loading={loadingSettings}
+                  actionColumn={{
+                    key: "actions",
+                    actions: [
+                      {
+                        icon: "mdi-eye",
+                        handler: (setting) => navigate(`/settings/${setting.id}`),
+                      },
+                      {
+                        icon: "mdi-pencil",
+                        handler: (setting) => navigate(`/settings/${setting.id}/edit`),
+                      },
+                      {
+                        icon: "mdi-delete",
+                        handler: handleDeleteSetting,
+                      },
+                    ],
+                  }}
+              />
+          )}
+        </Card>
       </div>
-
-      <FilterSection
-        filters={{ key, value, description }}
-        onFilterChange={handleFilterChange}
-        onClearFilters={clearFilters}
-        onApplyFilters={loadSettings}
-      />
-
-      <Card>
-        {loadingSettings ? (
-          <Loader />
-        ) : (
-          <Table
-            data={settings}
-            columns={columns}
-            pagination={pagination}
-            onPageChange={handlePageChange}
-            sortingState={[{ id: sortBy, desc: sortDir === "desc" }]}
-            onSortingChange={handleSortingChange}
-            loading={loadingSettings}
-          />
-        )}
-      </Card>
-    </div>
   );
 };
 

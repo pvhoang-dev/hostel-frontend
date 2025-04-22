@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Input from "../common/Input";
 import Button from "../common/Button";
+import TextArea from "../common/TextArea.jsx";
 
 const SettingForm = ({
   initialData = {},
@@ -48,29 +49,14 @@ const SettingForm = ({
           required
         />
 
-        <div className="col-span-1">
-          <label
-            htmlFor="description"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Mô tả
-          </label>
-          <textarea
-            id="description"
-            name="description"
-            rows={4}
-            value={formData.description || ""}
-            onChange={handleChange}
-            className={`w-full p-2 border rounded ${
-              errors.description ? "border-red-500" : "border-gray-300"
-            }`}
-          />
-          {errors.description && (
-            <span className="text-red-500 text-sm mt-1">
-              {errors.description}
-            </span>
-          )}
-        </div>
+        <TextArea
+          label="Mô tả"
+          name="description"
+          value={formData.description || ""}
+          onChange={handleChange}
+          rows={4}
+          error={errors.description}
+        />
       </div>
 
       <div className="mt-6 flex justify-end">

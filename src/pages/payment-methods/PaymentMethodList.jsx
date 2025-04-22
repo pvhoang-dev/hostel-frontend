@@ -1,5 +1,4 @@
-// src/pages/payment-methods/PaymentMethodList.jsx
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { paymentMethodService } from "../../api/paymentMethods";
 import Table from "../../components/common/Table";
@@ -11,62 +10,42 @@ import Loader from "../../components/common/Loader";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 
-const ActionButtons = ({ paymentMethod, onDelete }) => (
-  <div className="flex space-x-2">
-    <Link
-      to={`/payment-methods/${paymentMethod.id}`}
-      className="text-blue-600 hover:underline"
-    >
-      View
-    </Link>
-    <Link
-      to={`/payment-methods/${paymentMethod.id}/edit`}
-      className="text-green-600 hover:underline"
-    >
-      Edit
-    </Link>
-    <button
-      onClick={() => onDelete(paymentMethod.id)}
-      className="text-red-600 hover:underline"
-    >
-      Delete
-    </button>
-  </div>
-);
-
 const FilterSection = ({
   filters,
   onFilterChange,
   onClearFilters,
   onApplyFilters,
 }) => (
-  <Card title="Filters" className="mb-6">
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <Input
-        label="Name"
-        name="name"
-        value={filters.name}
-        onChange={onFilterChange}
-      />
-
-      <Select
-        label="Status"
-        name="status"
-        value={filters.status}
-        onChange={onFilterChange}
-        options={[
-          { value: "", label: "All Statuses" },
-          { value: "active", label: "Active" },
-          { value: "inactive", label: "Inactive" },
-        ]}
-      />
+  <Card title="Bộ lọc" className="mb-3">
+    <div className="row g-3">
+      <div className="col-md-6">
+        <Input
+          label="Tên"
+          name="name"
+          value={filters.name}
+          onChange={onFilterChange}
+        />
+      </div>
+      <div className="col-md-6">
+        <Select
+          label="Trạng thái"
+          name="status"
+          value={filters.status}
+          onChange={onFilterChange}
+          options={[
+            { value: "", label: "Tất cả" },
+            { value: "active", label: "Hoạt động" },
+            { value: "inactive", label: "Không hoạt động" },
+          ]}
+        />
+      </div>
     </div>
 
-    <div className="mt-4 flex justify-end">
-      <Button variant="secondary" onClick={onClearFilters} className="mr-2">
-        Clear Filters
+    <div className="mt-3 d-flex justify-content-end">
+      <Button variant="secondary" onClick={onClearFilters} className="me-2">
+        Xóa bộ lọc
       </Button>
-      <Button onClick={onApplyFilters}>Apply Filters</Button>
+      <Button onClick={onApplyFilters}>Tìm</Button>
     </div>
   </Card>
 );
@@ -109,55 +88,38 @@ const PaymentMethodList = () => {
   // Column definitions for the table
   const columns = [
     { accessorKey: "id", header: "ID" },
-    { accessorKey: "name", header: "Name" },
+    { accessorKey: "name", header: "Tên" },
     {
       accessorKey: "description",
-      header: "Description",
-      cell: ({ row }) => {
-        const desc = row.original.description;
-        return desc
-          ? desc.length > 100
-            ? `${desc.substring(0, 100)}...`
-            : desc
-          : "No description";
-      },
+      header: "Mô tả",
+      cell: ({ row }) => row.original.description || "N/A",
     },
     {
       accessorKey: "status",
-      header: "Status",
+      header: "Trạng thái",
       cell: ({ row }) => (
         <span
           className={
-            row.original.status === "active" ? "text-green-600" : "text-red-600"
+            row.original.status === "active" ? "text-success" : "text-danger"
           }
         >
-          {row.original.status || "Unknown"}
+          {row.original.status === "active" ? "Hoạt động" : "Không hoạt động"}
         </span>
       ),
     },
     {
       accessorKey: "created_at",
-      header: "Created At",
+      header: "Ngày tạo",
       cell: ({ row }) => {
-        const date = row.original.created_at;
-        return date ? new Date(date).toLocaleString() : "";
+        const date = new Date(row.original.created_at);
+        return date.toLocaleDateString();
       },
     },
     {
       accessorKey: "actions",
-      header: "Actions",
-      cell: ({ row }) => (
-        <ActionButtons
-          paymentMethod={row.original}
-          onDelete={handleDeletePaymentMethod}
-        />
-      ),
+      header: "Hành động",
     },
   ];
-
-  useEffect(() => {
-    loadPaymentMethods();
-  }, []);
 
   useEffect(() => {
     loadPaymentMethods();
@@ -178,21 +140,21 @@ const PaymentMethodList = () => {
     const response = await fetchPaymentMethods(params);
 
     if (!response.success) {
-      showError("Failed to load payment methods");
+      showError("Lỗi khi tải danh sách phương thức thanh toán");
     }
   };
 
-  const handleDeletePaymentMethod = async (id) => {
+  const handleDeletePaymentMethod = async (paymentMethod) => {
     if (
-      window.confirm("Are you sure you want to delete this payment method?")
+      window.confirm("Bạn có chắc chắn muốn xóa phương thức thanh toán này?")
     ) {
-      const response = await deletePaymentMethod(id);
+      const response = await deletePaymentMethod(paymentMethod.id);
 
       if (response.success) {
-        showSuccess("Payment method deleted successfully");
+        showSuccess("Xóa phương thức thanh toán thành công");
         loadPaymentMethods();
       } else {
-        showError(response.message || "Failed to delete payment method");
+        showError(response.message || "Lỗi khi xóa phương thức thanh toán");
       }
     }
   };
@@ -237,10 +199,10 @@ const PaymentMethodList = () => {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">Payment Methods</h1>
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h3>Phương thức thanh toán</h3>
         <Button as={Link} to="/payment-methods/create">
-          Add Payment Method
+          Thêm
         </Button>
       </div>
 
@@ -263,6 +225,25 @@ const PaymentMethodList = () => {
             sortingState={[{ id: sortBy, desc: sortDir === "desc" }]}
             onSortingChange={handleSortingChange}
             loading={loadingPaymentMethods}
+            actionColumn={{
+              key: "actions",
+              actions: [
+                {
+                  icon: "mdi-eye",
+                  handler: (paymentMethod) =>
+                    navigate(`/payment-methods/${paymentMethod.id}`),
+                },
+                {
+                  icon: "mdi-pencil",
+                  handler: (paymentMethod) =>
+                    navigate(`/payment-methods/${paymentMethod.id}/edit`),
+                },
+                {
+                  icon: "mdi-delete",
+                  handler: handleDeletePaymentMethod,
+                },
+              ],
+            }}
           />
         )}
       </Card>

@@ -12,29 +12,6 @@ import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 import { useAuth } from "../../hooks/useAuth";
 
-// Component con hiển thị các action buttons
-const ActionButtons = ({ house, onDelete, isAdmin }) => (
-  <div className="flex space-x-2">
-    <Link to={`/houses/${house.id}`} className="text-blue-600 hover:underline">
-      Xem
-    </Link>
-    <Link
-      to={`/houses/${house.id}/edit`}
-      className="text-green-600 hover:underline"
-    >
-      Sửa
-    </Link>
-    {isAdmin && (
-      <button
-        onClick={() => onDelete(house.id)}
-        className="text-red-600 hover:underline"
-      >
-        Xóa
-      </button>
-    )}
-  </div>
-);
-
 // Component con hiển thị phần filter
 const FilterSection = ({
   filters,
@@ -43,49 +20,57 @@ const FilterSection = ({
   onClearFilters,
   onApplyFilters,
 }) => (
-  <Card title="Bộ lọc" className="mb-6">
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <Input
-        label="Tên nhà"
-        name="name"
-        value={filters.name}
-        onChange={onFilterChange}
-      />
+  <Card title="Bộ lọc" className="mb-3">
+    <div className="row g-3">
+      <div className="col-md-4">
+        <Input
+          label="Tên nhà"
+          name="name"
+          value={filters.name}
+          onChange={onFilterChange}
+        />
+      </div>
 
-      <Input
-        label="Địa chỉ"
-        name="address"
-        value={filters.address}
-        onChange={onFilterChange}
-      />
+      <div className="col-md-4">
+        <Input
+          label="Địa chỉ"
+          name="address"
+          value={filters.address}
+          onChange={onFilterChange}
+        />
+      </div>
 
-      <Select
-        label="Quản lý"
-        name="manager_id"
-        value={filters.manager_id}
-        onChange={onFilterChange}
-        options={[
-          { value: "", label: "Tất cả" },
-          ...managers.map((user) => ({ value: user.id, label: user.name })),
-        ]}
-      />
+      <div className="col-md-4">
+        <Select
+          label="Quản lý"
+          name="manager_id"
+          value={filters.manager_id}
+          onChange={onFilterChange}
+          options={[
+            { value: "", label: "Tất cả" },
+            ...managers.map((user) => ({ value: user.id, label: user.name })),
+          ]}
+        />
+      </div>
 
-      <Select
-        label="Trạng thái"
-        name="status"
-        value={filters.status}
-        onChange={onFilterChange}
-        options={[
-          { value: "", label: "Tất cả" },
-          { value: "active", label: "Hoạt động" },
-          { value: "inactive", label: "Không hoạt động" },
-          { value: "maintenance", label: "Bảo trì" },
-        ]}
-      />
+      <div className="col-md-4">
+        <Select
+          label="Trạng thái"
+          name="status"
+          value={filters.status}
+          onChange={onFilterChange}
+          options={[
+            { value: "", label: "Tất cả" },
+            { value: "active", label: "Hoạt động" },
+            { value: "inactive", label: "Không hoạt động" },
+            { value: "maintenance", label: "Bảo trì" },
+          ]}
+        />
+      </div>
     </div>
 
-    <div className="mt-4 flex justify-end">
-      <Button variant="secondary" onClick={onClearFilters} className="mr-2">
+    <div className="mt-3 d-flex justify-content-end">
+      <Button variant="secondary" onClick={onClearFilters} className="me-2">
         Xóa bộ lọc
       </Button>
       <Button onClick={onApplyFilters}>Tìm</Button>
@@ -96,6 +81,7 @@ const FilterSection = ({
 const HouseList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { showSuccess, showError } = useAlert();
+  const navigate = useNavigate();
 
   // Get current filters from URL
   const currentPage = Number(searchParams.get("page")) || 1;
@@ -160,23 +146,22 @@ const HouseList = () => {
     {
       accessorKey: "status",
       header: "T.Thái",
-      cell: ({ row }) => (
-        <span
-          className={
-            row.original.status === "active" 
-              ? "text-green-600" 
-              : row.original.status === "maintenance"
-              ? "text-yellow-600"
-              : "text-red-600"
-          }
-        >
-          {row.original.status === "active" 
-            ? "Hoạt động" 
-            : row.original.status === "maintenance"
-            ? "Bảo trì"
-            : "Không hoạt động"}
-        </span>
-      ),
+      cell: ({ row }) => {
+        const status = row.original.status;
+        let statusClass;
+
+        switch (status) {
+          case "active":
+            statusClass = "text-success";
+            return <span className={statusClass}>Hoạt động</span>;
+          case "maintenance":
+            statusClass = "text-warning";
+            return <span className={statusClass}>Bảo trì</span>;
+          default:
+            statusClass = "text-danger";
+            return <span className={statusClass}>Không hoạt động</span>;
+        }
+      },
     },
     {
       accessorKey: "created_at",
@@ -185,9 +170,6 @@ const HouseList = () => {
     {
       accessorKey: "actions",
       header: "Hành động",
-      cell: ({ row }) => (
-        <ActionButtons house={row.original} onDelete={handleDeleteHouse} isAdmin={isAdmin} />
-      ),
     },
   ];
 
@@ -237,9 +219,9 @@ const HouseList = () => {
     await fetchManagers({ role: "admin,manager" });
   };
 
-  const handleDeleteHouse = async (id) => {
+  const handleDeleteHouse = async (house) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa nhà này?")) {
-      const response = await deleteHouse(id);
+      const response = await deleteHouse(house.id);
 
       if (response.success) {
         showSuccess("Xóa nhà thành công");
@@ -292,8 +274,8 @@ const HouseList = () => {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">Nhà</h1>
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h3>Nhà</h3>
         {isAdmin && (
           <Button as={Link} to="/houses/create">
             Thêm
@@ -321,6 +303,27 @@ const HouseList = () => {
             sortingState={[{ id: sortBy, desc: sortDir === "desc" }]}
             onSortingChange={handleSortingChange}
             loading={isLoading}
+            actionColumn={{
+              key: "actions",
+              actions: [
+                {
+                  icon: "mdi-eye",
+                  handler: (house) => navigate(`/houses/${house.id}`),
+                },
+                {
+                  icon: "mdi-pencil",
+                  handler: (house) => navigate(`/houses/${house.id}/edit`),
+                },
+                ...(isAdmin
+                  ? [
+                      {
+                        icon: "mdi-delete",
+                        handler: handleDeleteHouse,
+                      },
+                    ]
+                  : []),
+              ],
+            }}
           />
         )}
       </Card>
