@@ -33,7 +33,7 @@ const RoleCreate = () => {
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center my-2">
-        <h1 className="fs-2 fw-semibold">Tạo vai trò</h1>
+        <h3 className="fs-2 fw-semibold">Tạo vai trò</h3>
         <button
           onClick={() => navigate("/roles")}
           className="btn btn-light fw-semibold"

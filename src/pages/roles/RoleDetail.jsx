@@ -41,7 +41,7 @@ const RoleDetail = () => {
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center my-2">
-        <h1 className="fs-2 fw-semibold">Thông tin vai trò</h1>
+        <h3 className="fs-2 fw-semibold">Thông tin vai trò</h3>
         <div className="d-flex gap-2 mr-2">
           <button
             onClick={() => navigate("/roles")}
@@ -60,25 +60,25 @@ const RoleDetail = () => {
 
       <Card>
         <div className="mb-4">
-          <h2 className="fs-4 fw-semibold mb-3">{role.name}</h2>
-          <div className="d-inline-block bg-primary bg-opacity-10 text-primary px-2 py-1 rounded small">
+          <h3 className="fs-4 fw-semibold mb-3">{role.name}</h3>
+          <div className="d-inline-block bg-primary bg-opacity-10 text-white px-2 py-1 rounded small">
             {role.code}
           </div>
         </div>
 
         <div className="mt-4">
-          <h3 className="fs-5 fw-medium mb-2">Thông tin hệ thống</h3>
+          <h4 className="fs-5 fw-medium mb-2">Thông tin hệ thống</h4>
           <div className="d-flex flex-column gap-2">
             <div>
-              <span className="text-secondary">ID:</span>
+              <span className="text-secondary">ID: </span>
               <span className="ms-2">{role.id}</span>
             </div>
             <div>
-              <span className="text-secondary">Tạo:</span>
+              <span className="text-secondary">Tạo: </span>
               <span className="ms-2">{role.created_at}</span>
             </div>
             <div>
-              <span className="text-secondary">Cập nhật lần cuối:</span>
+              <span className="text-secondary">Cập nhật lần cuối: </span>
               <span className="ms-2">{role.updated_at}</span>
             </div>
           </div>

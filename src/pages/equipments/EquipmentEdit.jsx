@@ -59,7 +59,7 @@ const EquipmentEdit = () => {
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center my-2">
-        <h1 className="fs-2 fw-semibold">Chỉnh sửa thiết bị</h1>
+        <h3 className="fs-2 fw-semibold">Chỉnh sửa thiết bị</h3>
         <button
           onClick={() => navigate("/equipments")}
           className="btn btn-light fw-semibold"

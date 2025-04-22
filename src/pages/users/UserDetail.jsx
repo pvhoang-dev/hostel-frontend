@@ -109,7 +109,7 @@ const UserDetail = () => {
 
         <div className="row g-4">
           <div className="col-12 col-md-6">
-            <h3 className="fs-5 fw-medium mb-2">Thông tin liên hệ</h3>
+            <h4 className="fs-5 fw-medium mb-2">Thông tin liên hệ</h4>
             <div className="d-flex flex-column gap-2">
               <div>
                 <span className="text-secondary">Email: </span>
@@ -127,7 +127,7 @@ const UserDetail = () => {
           </div>
 
           <div className="col-12 col-md-6">
-            <h3 className="fs-5 fw-medium mb-2">Thông tin cá nhân</h3>
+            <h4 className="fs-5 fw-medium mb-2">Thông tin cá nhân</h4>
             <div className="d-flex flex-column gap-2">
               <div>
                 <span className="text-secondary">Số CMND/CCCD: </span>
@@ -142,7 +142,7 @@ const UserDetail = () => {
         </div>
 
         <div className="mt-4">
-          <h3 className="fs-5 fw-medium mb-2">Thông tin hệ thống</h3>
+          <h4 className="fs-5 fw-medium mb-2">Thông tin hệ thống</h4>
           <div className="d-flex flex-column gap-2">
             <div>
               <span className="text-secondary">User ID: </span>
