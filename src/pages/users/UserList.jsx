@@ -12,27 +12,6 @@ import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 import { STATUS_OPTIONS } from "../../utils/constants";
 
-// Component con hiển thị các action buttons
-const ActionButtons = ({ user, onDelete }) => (
-  <div className="flex space-x-2">
-    <Link to={`/users/${user.id}`} className="text-blue-600 hover:underline">
-      Xem
-    </Link>
-    <Link
-      to={`/users/${user.id}/edit`}
-      className="text-green-600 hover:underline"
-    >
-      Sửa
-    </Link>
-    <button
-      onClick={() => onDelete(user.id)}
-      className="text-red-600 hover:underline"
-    >
-      Xóa
-    </button>
-  </div>
-);
-
 // Component con hiển thị phần filter
 const FilterSection = ({
   filters,
@@ -41,55 +20,65 @@ const FilterSection = ({
   onClearFilters,
   onApplyFilters,
 }) => (
-  <Card title="Bộ lọc" className="mb-6">
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <Input
-        label="Username"
-        name="username"
-        value={filters.username}
-        onChange={onFilterChange}
-      />
+  <Card title="Bộ lọc" className="mb-3">
+    <div className="row g-3">
+      <div className="col-md-4">
+        <Input
+          label="Username"
+          name="username"
+          value={filters.username}
+          onChange={onFilterChange}
+        />
+      </div>
 
-      <Input
-        label="Tên"
-        name="name"
-        value={filters.name}
-        onChange={onFilterChange}
-      />
+      <div className="col-md-4">
+        <Input
+          label="Tên"
+          name="name"
+          value={filters.name}
+          onChange={onFilterChange}
+        />
+      </div>
 
-      <Input
-        label="Email"
-        name="email"
-        value={filters.email}
-        onChange={onFilterChange}
-      />
+      <div className="col-md-4">
+        <Input
+          label="Email"
+          name="email"
+          value={filters.email}
+          onChange={onFilterChange}
+        />
+      </div>
 
-      <Select
-        label="Vai trò"
-        name="role_id"
-        value={filters.roleId}
-        onChange={onFilterChange}
-        options={[
-          { value: "", label: "Tất cả" },
-          ...roles.map((role) => ({ value: role.id, label: role.name })),
-        ]}
-      />
+      <div className="col-md-4">
+        <Select
+          label="Vai trò"
+          name="role_id"
+          value={filters.roleId}
+          onChange={onFilterChange}
+          options={[
+            { value: "", label: "Tất cả" },
+            ...roles.map((role) => ({ value: role.id, label: role.name })),
+          ]}
+        />
+      </div>
 
-      <Select
-        label="Trạng thái"
-        name="status"
-        value={filters.status}
-        onChange={onFilterChange}
-        options={[
-          { value: "", label: "Tất cả" },
-          { value: "active", label: "Active" },
-          { value: "inactive", label: "Inactive" },
-        ]}
-      />
+      <div className="col-md-4">
+        <Select
+          label="Trạng thái"
+          name="status"
+          value={filters.status}
+          onChange={onFilterChange}
+          options={[
+            { value: "", label: "Tất cả" },
+            { value: "active", label: "Active" },
+            { value: "inactive", label: "Inactive" },
+          ]}
+        />
+      </div>
     </div>
 
-    <div className="mt-4 flex justify-end">
-      <Button variant="secondary" onClick={onClearFilters} className="mr-2">
+    <div className="mt-3 d-flex justify-content-end">
+      <Button variant="secondary" onClick={onClearFilters} className="me-2">
         Xóa bộ lọc
       </Button>
       <Button onClick={onApplyFilters}>Tìm</Button>
@@ -170,7 +159,7 @@ const UserList = () => {
       cell: ({ row }) => (
         <span
           className={
-            row.original.status === "active" ? "text-green-600" : "text-red-600"
+            row.original.status === "active" ? "text-success" : "text-danger"
           }
         >
           {row.original.status || "None"}
@@ -180,9 +169,6 @@ const UserList = () => {
     {
       accessorKey: "actions",
       header: "Hành động",
-      cell: ({ row }) => (
-        <ActionButtons user={row.original} onDelete={handleDeleteUser} />
-      ),
     },
   ];
 
@@ -233,9 +219,9 @@ const UserList = () => {
     await fetchRoles();
   };
 
-  const handleDeleteUser = async (id) => {
+  const handleDeleteUser = async (user) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa người dùng này?")) {
-      const response = await deleteUser(id);
+      const response = await deleteUser(user.id);
 
       if (response.success) {
         showSuccess("Xóa người dùng thành công");
@@ -288,8 +274,8 @@ const UserList = () => {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">Users</h1>
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h3>Users</h3>
         <Button as={Link} to="/users/create">
           Thêm
         </Button>
@@ -315,6 +301,23 @@ const UserList = () => {
             sortingState={[{ id: sortBy, desc: sortDir === "desc" }]}
             onSortingChange={handleSortingChange}
             loading={isLoading}
+            actionColumn={{
+              key: "actions",
+              actions: [
+                {
+                  icon: "mdi-eye",
+                  handler: (user) => navigate(`/users/${user.id}`),
+                },
+                {
+                  icon: "mdi-pencil",
+                  handler: (user) => navigate(`/users/${user.id}/edit`),
+                },
+                {
+                  icon: "mdi-delete",
+                  handler: handleDeleteUser,
+                },
+              ],
+            }}
           />
         )}
       </Card>
