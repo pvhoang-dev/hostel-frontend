@@ -1,4 +1,20 @@
+import { useState } from "react";
+
 const RightBar = () => {
+  // State for each settings group
+  const [colorScheme, setColorScheme] = useState("light");
+  const [width, setWidth] = useState("fluid");
+  const [theme, setTheme] = useState("default");
+  const [compact, setCompact] = useState("fixed");
+
+  // Handle reset
+  const handleReset = () => {
+    setColorScheme("light");
+    setWidth("fluid");
+    setTheme("default");
+    setCompact("fixed");
+  };
+
   return (
     <>
       <div className="right-bar">
@@ -28,9 +44,13 @@ const RightBar = () => {
                 name="color-scheme-mode"
                 value="light"
                 id="light-mode-check"
-                checked
+                checked={colorScheme === "light"}
+                onChange={() => setColorScheme("light")}
               />
-              <label className="custom-control-label" for="light-mode-check">
+              <label
+                className="custom-control-label"
+                htmlFor="light-mode-check"
+              >
                 Light Mode
               </label>
             </div>
@@ -42,11 +62,14 @@ const RightBar = () => {
                 name="color-scheme-mode"
                 value="dark"
                 id="dark-mode-check"
+                checked={colorScheme === "dark"}
+                onChange={() => setColorScheme("dark")}
               />
-              <label className="custom-control-label" for="dark-mode-check">
+              <label className="custom-control-label" htmlFor="dark-mode-check">
                 Dark Mode
               </label>
             </div>
+
             <h5 className="mt-4">Width</h5>
             <hr className="mt-1" />
             <div className="custom-control custom-switch mb-1">
@@ -56,9 +79,10 @@ const RightBar = () => {
                 name="width"
                 value="fluid"
                 id="fluid-check"
-                checked
+                checked={width === "fluid"}
+                onChange={() => setWidth("fluid")}
               />
-              <label className="custom-control-label" for="fluid-check">
+              <label className="custom-control-label" htmlFor="fluid-check">
                 Fluid
               </label>
             </div>
@@ -69,8 +93,10 @@ const RightBar = () => {
                 name="width"
                 value="boxed"
                 id="boxed-check"
+                checked={width === "boxed"}
+                onChange={() => setWidth("boxed")}
               />
-              <label className="custom-control-label" for="boxed-check">
+              <label className="custom-control-label" htmlFor="boxed-check">
                 Boxed
               </label>
             </div>
@@ -84,9 +110,10 @@ const RightBar = () => {
                 name="theme"
                 value="default"
                 id="default-check"
-                checked
+                checked={theme === "default"}
+                onChange={() => setTheme("default")}
               />
-              <label className="custom-control-label" for="default-check">
+              <label className="custom-control-label" htmlFor="default-check">
                 Default
               </label>
             </div>
@@ -98,8 +125,10 @@ const RightBar = () => {
                 name="theme"
                 value="light"
                 id="light-check"
+                checked={theme === "light"}
+                onChange={() => setTheme("light")}
               />
-              <label className="custom-control-label" for="light-check">
+              <label className="custom-control-label" htmlFor="light-check">
                 Light
               </label>
             </div>
@@ -111,8 +140,10 @@ const RightBar = () => {
                 name="theme"
                 value="dark"
                 id="dark-check"
+                checked={theme === "dark"}
+                onChange={() => setTheme("dark")}
               />
-              <label className="custom-control-label" for="dark-check">
+              <label className="custom-control-label" htmlFor="dark-check">
                 Dark
               </label>
             </div>
@@ -124,9 +155,10 @@ const RightBar = () => {
                 name="compact"
                 value="fixed"
                 id="fixed-check"
-                checked
+                checked={compact === "fixed"}
+                onChange={() => setCompact("fixed")}
               />
-              <label className="custom-control-label" for="fixed-check">
+              <label className="custom-control-label" htmlFor="fixed-check">
                 Fixed
               </label>
             </div>
@@ -138,8 +170,10 @@ const RightBar = () => {
                 name="compact"
                 value="condensed"
                 id="condensed-check"
+                checked={compact === "condensed"}
+                onChange={() => setCompact("condensed")}
               />
-              <label className="custom-control-label" for="condensed-check">
+              <label className="custom-control-label" htmlFor="condensed-check">
                 Condensed
               </label>
             </div>
@@ -151,13 +185,22 @@ const RightBar = () => {
                 name="compact"
                 value="scrollable"
                 id="scrollable-check"
+                checked={compact === "scrollable"}
+                onChange={() => setCompact("scrollable")}
               />
-              <label className="custom-control-label" for="scrollable-check">
+              <label
+                className="custom-control-label"
+                htmlFor="scrollable-check"
+              >
                 Scrollable
               </label>
             </div>
 
-            <button className="btn btn-primary btn-block mt-4" id="resetBtn">
+            <button
+              className="btn btn-primary btn-block mt-4"
+              id="resetBtn"
+              onClick={handleReset}
+            >
               Reset to Default
             </button>
           </div>
@@ -167,4 +210,5 @@ const RightBar = () => {
     </>
   );
 };
+
 export default RightBar;
