@@ -1,6 +1,5 @@
 import { useState } from "react";
 import Input from "../common/Input";
-import Select from "../common/Select";
 import Button from "../common/Button";
 import TextArea from "../common/TextArea";
 import Checkbox from "../common/Checkbox";
@@ -36,7 +35,7 @@ const ServiceForm = ({
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="row">
+      <div className="row g-3">
         <div className="col-md-6">
           <Input
             label="Tên dịch vụ"
@@ -93,12 +92,12 @@ const ServiceForm = ({
         </div>
       </div>
 
-      <div className="mt-6 flex justify-end">
+      <div className="mt-4 d-flex justify-content-end">
         <Button
           type="button"
           variant="secondary"
           onClick={() => window.history.back()}
-          className="mr-2"
+          className="me-2"
         >
           Hủy
         </Button>

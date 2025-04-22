@@ -29,42 +29,48 @@ const SettingForm = ({
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="grid grid-cols-1 gap-6">
-        <Input
-          label="Số thứ tự"
-          name="key"
-          value={formData.key}
-          onChange={handleChange}
-          error={errors.key}
-          required
-          disabled={mode === "edit"}
-        />
+      <div className="row g-3">
+        <div className="col-12">
+          <Input
+            label="Số thứ tự"
+            name="key"
+            value={formData.key}
+            onChange={handleChange}
+            error={errors.key}
+            required
+            disabled={mode === "edit"}
+          />
+        </div>
 
-        <Input
-          label="Nội dung"
-          name="value"
-          value={formData.value}
-          onChange={handleChange}
-          error={errors.value}
-          required
-        />
+        <div className="col-12">
+          <Input
+            label="Nội dung"
+            name="value"
+            value={formData.value}
+            onChange={handleChange}
+            error={errors.value}
+            required
+          />
+        </div>
 
-        <TextArea
-          label="Mô tả"
-          name="description"
-          value={formData.description || ""}
-          onChange={handleChange}
-          rows={4}
-          error={errors.description}
-        />
+        <div className="col-12">
+          <TextArea
+            label="Mô tả"
+            name="description"
+            value={formData.description || ""}
+            onChange={handleChange}
+            rows={4}
+            error={errors.description}
+          />
+        </div>
       </div>
 
-      <div className="mt-6 flex justify-end">
+      <div className="mt-4 d-flex justify-content-end">
         <Button
           type="button"
           variant="secondary"
           onClick={() => window.history.back()}
-          className="mr-2"
+          className="me-2"
         >
           Hủy
         </Button>

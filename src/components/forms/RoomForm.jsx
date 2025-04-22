@@ -51,7 +51,7 @@ const RoomForm = ({
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
+
     // Convert numerical values
     if (name === "capacity" || name === "base_price") {
       setFormData({ ...formData, [name]: parseInt(value) || 0 });
@@ -67,66 +67,76 @@ const RoomForm = ({
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="row g-3">
         {!houseId && (
-          <Select
-            label="Nhà"
-            name="house_id"
-            value={formData.house_id}
-            onChange={handleChange}
-            error={errors.house_id}
-            options={[{value: "", label: "Chọn nhà"}, ...houses]}
-            placeholder="Chọn nhà"
-            required
-          />
+          <div className="col-md-6">
+            <Select
+              label="Nhà"
+              name="house_id"
+              value={formData.house_id}
+              onChange={handleChange}
+              error={errors.house_id}
+              options={[{ value: "", label: "Chọn nhà" }, ...houses]}
+              placeholder="Chọn nhà"
+              required
+            />
+          </div>
         )}
 
-        <Input
-          label="Số phòng"
-          name="room_number"
-          value={formData.room_number}
-          onChange={handleChange}
-          error={errors.room_number}
-          required
-        />
+        <div className="col-md-6">
+          <Input
+            label="Số phòng"
+            name="room_number"
+            value={formData.room_number}
+            onChange={handleChange}
+            error={errors.room_number}
+            required
+          />
+        </div>
 
-        <Input
-          label="Sức chứa"
-          name="capacity"
-          type="number"
-          min="1"
-          value={formData.capacity}
-          onChange={handleChange}
-          error={errors.capacity}
-          required
-        />
+        <div className="col-md-6">
+          <Input
+            label="Sức chứa"
+            name="capacity"
+            type="number"
+            min="1"
+            value={formData.capacity}
+            onChange={handleChange}
+            error={errors.capacity}
+            required
+          />
+        </div>
 
-        <Input
-          label="Giá cơ bản"
-          name="base_price"
-          type="number"
-          min="0"
-          value={formData.base_price}
-          onChange={handleChange}
-          error={errors.base_price}
-          required
-        />
+        <div className="col-md-6">
+          <Input
+            label="Giá cơ bản"
+            name="base_price"
+            type="number"
+            min="0"
+            value={formData.base_price}
+            onChange={handleChange}
+            error={errors.base_price}
+            required
+          />
+        </div>
 
-        <Select
-          label="Trạng thái"
-          name="status"
-          value={formData.status}
-          onChange={handleChange}
-          error={errors.status}
-          options={[
-            { value: "available", label: "Có sẵn" },
-            { value: "occupied", label: "Đã thuê" },
-            { value: "maintenance", label: "Bảo trì" },
-            { value: "unavailable", label: "Không khả dụng" },
-          ]}
-        />
+        <div className="col-md-6">
+          <Select
+            label="Trạng thái"
+            name="status"
+            value={formData.status}
+            onChange={handleChange}
+            error={errors.status}
+            options={[
+              { value: "available", label: "Có sẵn" },
+              { value: "occupied", label: "Đã thuê" },
+              { value: "maintenance", label: "Bảo trì" },
+              { value: "unavailable", label: "Không khả dụng" },
+            ]}
+          />
+        </div>
 
-        <div className="md:col-span-2">
+        <div className="col-12">
           <TextArea
             label="Mô tả"
             name="description"
@@ -138,12 +148,12 @@ const RoomForm = ({
         </div>
       </div>
 
-      <div className="mt-6 flex justify-end">
+      <div className="mt-4 d-flex justify-content-end">
         <Button
           type="button"
           variant="secondary"
           onClick={() => window.history.back()}
-          className="mr-2"
+          className="me-2"
         >
           Hủy
         </Button>
@@ -159,4 +169,4 @@ const RoomForm = ({
   );
 };
 
-export default RoomForm; 
+export default RoomForm;

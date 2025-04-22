@@ -30,7 +30,7 @@ const HouseForm = ({
   const loadManagers = async () => {
     try {
       const response = await userService.getUsers({
-        role: "manager,admin"
+        role: "manager,admin",
       });
       if (response.success) {
         setManagers(
@@ -57,49 +57,57 @@ const HouseForm = ({
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Input
-          label="Tên nhà"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          error={errors.name}
-          required
-        />
+      <div className="row g-3">
+        <div className="col-md-6">
+          <Input
+            label="Tên nhà"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            error={errors.name}
+            required
+          />
+        </div>
 
-        <Input
-          label="Địa chỉ"
-          name="address"
-          value={formData.address}
-          onChange={handleChange}
-          error={errors.address}
-          required
-        />
+        <div className="col-md-6">
+          <Input
+            label="Địa chỉ"
+            name="address"
+            value={formData.address}
+            onChange={handleChange}
+            error={errors.address}
+            required
+          />
+        </div>
 
-        <Select
-          label="Quản lý"
-          name="manager_id"
-          value={formData.manager_id || (formData.manager?.id || "")}
-          onChange={handleChange}
-          error={errors.manager_id}
-          options={[{value: "", label: "Chọn quản lý"}, ...managers]}
-          placeholder="Chọn quản lý"
-        />
+        <div className="col-md-6">
+          <Select
+            label="Quản lý"
+            name="manager_id"
+            value={formData.manager_id || formData.manager?.id || ""}
+            onChange={handleChange}
+            error={errors.manager_id}
+            options={[{ value: "", label: "Chọn quản lý" }, ...managers]}
+            placeholder="Chọn quản lý"
+          />
+        </div>
 
-        <Select
-          label="Trạng thái"
-          name="status"
-          value={formData.status}
-          onChange={handleChange}
-          error={errors.status}
-          options={[
-            { value: "active", label: "Hoạt động" },
-            { value: "inactive", label: "Không hoạt động" },
-            { value: "maintenance", label: "Bảo trì" },
-          ]}
-        />
+        <div className="col-md-6">
+          <Select
+            label="Trạng thái"
+            name="status"
+            value={formData.status}
+            onChange={handleChange}
+            error={errors.status}
+            options={[
+              { value: "active", label: "Hoạt động" },
+              { value: "inactive", label: "Không hoạt động" },
+              { value: "maintenance", label: "Bảo trì" },
+            ]}
+          />
+        </div>
 
-        <div className="md:col-span-2">
+        <div className="col-12">
           <TextArea
             label="Mô tả"
             name="description"
@@ -111,12 +119,12 @@ const HouseForm = ({
         </div>
       </div>
 
-      <div className="mt-6 flex justify-end">
+      <div className="mt-4 d-flex justify-content-end">
         <Button
           type="button"
           variant="secondary"
           onClick={() => window.history.back()}
-          className="mr-2"
+          className="me-2"
         >
           Hủy
         </Button>
@@ -132,4 +140,4 @@ const HouseForm = ({
   );
 };
 
-export default HouseForm; 
+export default HouseForm;

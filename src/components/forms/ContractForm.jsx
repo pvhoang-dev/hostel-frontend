@@ -6,7 +6,8 @@ import Select from "../common/Select";
 import Button from "../common/Button";
 import TextArea from "../common/TextArea";
 import DatePicker from "../common/DatePicker";
-import {USER_ROLES} from "../../utils/constants.js";
+import { USER_ROLES } from "../../utils/constants.js";
+
 const ContractForm = ({
   initialData = {},
   onSubmit,
@@ -18,8 +19,10 @@ const ContractForm = ({
   const [formData, setFormData] = useState({
     room_id: roomId || "",
     tenant_id: "",
-    start_date: new Date().toISOString().split('T')[0],
-    end_date: new Date(new Date().setMonth(new Date().getMonth() + 6)).toISOString().split('T')[0],
+    start_date: new Date().toISOString().split("T")[0],
+    end_date: new Date(new Date().setMonth(new Date().getMonth() + 6))
+      .toISOString()
+      .split("T")[0],
     monthly_rent: 0,
     deposit_amount: 0,
     payment_day: 5,
@@ -48,7 +51,7 @@ const ContractForm = ({
         setRooms(
           response.data.data.map((room) => ({
             value: room.id,
-            label: `${room.house?.name || 'N/A'} - ${room.room_number}`,
+            label: `${room.house?.name || "N/A"} - ${room.room_number}`,
           }))
         );
       }
@@ -77,7 +80,7 @@ const ContractForm = ({
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
+
     // Convert numerical values
     if (["monthly_rent", "deposit_amount", "payment_day"].includes(name)) {
       setFormData({ ...formData, [name]: parseInt(value) || 0 });
@@ -93,98 +96,114 @@ const ContractForm = ({
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="row g-3">
         {!roomId && (
-          <Select
-            label="Phòng"
-            name="room_id"
-            value={formData.room_id}
-            onChange={handleChange}
-            error={errors.room_id}
-            options={[{value: "", label: "Chọn phòng"}, ...rooms]}
-            placeholder="Chọn phòng"
-            required
-          />
+          <div className="col-md-6">
+            <Select
+              label="Phòng"
+              name="room_id"
+              value={formData.room_id}
+              onChange={handleChange}
+              error={errors.room_id}
+              options={[{ value: "", label: "Chọn phòng" }, ...rooms]}
+              placeholder="Chọn phòng"
+              required
+            />
+          </div>
         )}
 
-        <Select
-          label="Người thuê"
-          name="tenant_id"
-          value={formData.tenant_id}
-          onChange={handleChange}
-          error={errors.tenant_id}
-          options={[{value: "", label: "Chọn người thuê"}, ...tenants]}
-          placeholder="Chọn người thuê"
-          required
-        />
+        <div className="col-md-6">
+          <Select
+            label="Người thuê"
+            name="tenant_id"
+            value={formData.tenant_id}
+            onChange={handleChange}
+            error={errors.tenant_id}
+            options={[{ value: "", label: "Chọn người thuê" }, ...tenants]}
+            placeholder="Chọn người thuê"
+            required
+          />
+        </div>
 
-        <DatePicker
-          label="Ngày bắt đầu"
-          name="start_date"
-          value={formData.start_date}
-          onChange={handleChange}
-          error={errors.start_date}
-          required
-        />
+        <div className="col-md-6">
+          <DatePicker
+            label="Ngày bắt đầu"
+            name="start_date"
+            value={formData.start_date}
+            onChange={handleChange}
+            error={errors.start_date}
+            required
+          />
+        </div>
 
-        <DatePicker
-          label="Ngày kết thúc"
-          name="end_date"
-          value={formData.end_date}
-          onChange={handleChange}
-          error={errors.end_date}
-          required
-        />
+        <div className="col-md-6">
+          <DatePicker
+            label="Ngày kết thúc"
+            name="end_date"
+            value={formData.end_date}
+            onChange={handleChange}
+            error={errors.end_date}
+            required
+          />
+        </div>
 
-        <Input
-          label="Tiền thuê hàng tháng"
-          name="monthly_rent"
-          type="number"
-          min="0"
-          value={formData.monthly_rent}
-          onChange={handleChange}
-          error={errors.monthly_rent}
-          required
-        />
+        <div className="col-md-6">
+          <Input
+            label="Tiền thuê hàng tháng"
+            name="monthly_rent"
+            type="number"
+            min="0"
+            value={formData.monthly_rent}
+            onChange={handleChange}
+            error={errors.monthly_rent}
+            required
+          />
+        </div>
 
-        <Input
-          label="Tiền đặt cọc"
-          name="deposit_amount"
-          type="number"
-          min="0"
-          value={formData.deposit_amount}
-          onChange={handleChange}
-          error={errors.deposit_amount}
-          required
-        />
+        <div className="col-md-6">
+          <Input
+            label="Tiền đặt cọc"
+            name="deposit_amount"
+            type="number"
+            min="0"
+            value={formData.deposit_amount}
+            onChange={handleChange}
+            error={errors.deposit_amount}
+            required
+          />
+        </div>
 
-        <Input
-          label="Ngày thanh toán (hàng tháng)"
-          name="payment_day"
-          type="number"
-          min="1"
-          max="31"
-          value={formData.payment_day}
-          onChange={handleChange}
-          error={errors.payment_day}
-          required
-        />
+        <div className="col-md-6">
+          <Input
+            label="Ngày thanh toán (hàng tháng)"
+            name="payment_day"
+            type="number"
+            min="1"
+            max="31"
+            value={formData.payment_day}
+            onChange={handleChange}
+            error={errors.payment_day}
+            required
+          />
+        </div>
 
-        <Select
-          label="Trạng thái"
-          name="status"
-          value={formData.status}
-          onChange={handleChange}
-          error={errors.status}
-          options={[
-            { value: "active", label: "Đang hoạt động" },
-            { value: "pending", label: "Chờ duyệt" },
-            { value: "terminated", label: "Đã chấm dứt" },
-            { value: "expired", label: "Đã hết hạn" },
-          ]}
-        />
+        <div className="col-md-6">
+          <Select
+            label="Trạng thái"
+            name="status"
+            value={formData.status}
+            onChange={handleChange}
+            error={errors.status}
+            options={[
+              { value: "active", label: "Đang hoạt động" },
+              { value: "pending", label: "Chờ duyệt" },
+              { value: "terminated", label: "Đã chấm dứt" },
+              { value: "expired", label: "Đã hết hạn" },
+            ]}
+          />
+        </div>
 
-        <div className="md:col-span-2">
+        <div className="col-12">
           <TextArea
             label="Ghi chú"
             name="notes"
@@ -196,12 +215,12 @@ const ContractForm = ({
         </div>
       </div>
 
-      <div className="mt-6 flex justify-end">
+      <div className="mt-4 d-flex justify-content-end">
         <Button
           type="button"
           variant="secondary"
           onClick={() => window.history.back()}
-          className="mr-2"
+          className="me-2 mr-2"
         >
           Hủy
         </Button>
@@ -217,4 +236,4 @@ const ContractForm = ({
   );
 };
 
-export default ContractForm; 
+export default ContractForm;
