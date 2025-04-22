@@ -4,6 +4,7 @@ import { contractService } from "../../api/contracts";
 import ContractForm from "../../components/forms/ContractForm";
 import Card from "../../components/common/Card";
 import Loader from "../../components/common/Loader";
+import Button from "../../components/common/Button";
 import { useAuth } from "../../hooks/useAuth";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
@@ -47,14 +48,11 @@ const ContractCreate = () => {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">Tạo hợp đồng mới</h1>
-        <button
-          onClick={() => navigate("/contracts")}
-          className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded"
-        >
-          Quay lại
-        </button>
+      <div className="d-flex justify-content-between align-items-center my-3">
+        <h3>Tạo hợp đồng mới</h3>
+        <Button variant="secondary" onClick={() => navigate("/contracts")}>
+          <i className="mdi mdi-arrow-left me-1"></i> Quay lại
+        </Button>
       </div>
 
       <Card>

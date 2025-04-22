@@ -3,6 +3,8 @@ import { useNavigate, useParams, Link } from "react-router-dom";
 import { contractService } from "../../api/contracts";
 import { useAuth } from "../../hooks/useAuth";
 import Loader from "../../components/common/Loader";
+import Button from "../../components/common/Button";
+import Card from "../../components/common/Card";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 import { formatDate } from "../../utils/formatters";
@@ -50,8 +52,7 @@ const ContractDetail = () => {
   }
 
   // Check if user is manager of this house
-  const canManage = isManager &&
-    contract.room?.house?.manager_id === user?.id;
+  const canManage = isManager && contract.room?.house?.manager_id === user?.id;
 
   const canEdit = isAdmin || canManage;
 
@@ -73,59 +74,63 @@ const ContractDetail = () => {
   const getStatusClass = (status) => {
     switch (status) {
       case "active":
-        return "bg-green-100 text-green-800";
+        return "bg-success text-white";
       case "pending":
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-warning text-dark";
       case "terminated":
-        return "bg-red-100 text-red-800";
+        return "bg-danger text-white";
       case "expired":
-        return "bg-gray-100 text-gray-800";
+        return "bg-secondary text-white";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-light text-dark";
     }
   };
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">Chi tiết hợp đồng</h1>
-        <div className="flex space-x-2">
-          <button
+      <div className="d-flex justify-content-between align-items-center my-3">
+        <h3>Chi tiết hợp đồng</h3>
+        <div className="d-flex gap-2">
+          <Button
+            className="mr-2"
+            variant="secondary"
             onClick={() => navigate("/contracts")}
-            className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded"
           >
-            Quay lại
-          </button>
+            <i className="mdi mdi-arrow-left me-1"></i> Quay lại
+          </Button>
           {canEdit && (
-            <Link
-              to={`/contracts/${id}/edit`}
-              className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
-            >
-              Chỉnh sửa
-            </Link>
+            <Button variant="primary" as={Link} to={`/contracts/${id}/edit`}>
+              <i className="mdi mdi-pencil me-1"></i> Chỉnh sửa
+            </Button>
           )}
         </div>
       </div>
 
-      {/* Rest of the component remains the same */}
-      <div className="bg-white p-6 rounded shadow">
-        <div className="flex items-start justify-between">
+      <Card>
+        <div className="d-flex align-items-start justify-content-between mb-3">
           <div>
-            <h2 className="text-xl font-semibold">
-              Hợp đồng #{contract.id} - {contract.room?.house?.name || "N/A"} - Phòng {contract.room?.room_number || "N/A"}
-            </h2>
-            <span className={`inline-block ${getStatusClass(contract.status)} px-2 py-1 rounded text-sm mt-2`}>
+            <h4 className="mb-2">
+              Hợp đồng #{contract.id} - {contract.room?.house?.name || "N/A"} -
+              Phòng {contract.room?.room_number || "N/A"}
+            </h4>
+            <span
+              className={`badge ${getStatusClass(contract.status)} px-2 py-1`}
+            >
               {getStatusText(contract.status)}
             </span>
           </div>
-          <div className="text-right">
-            <p className="text-gray-600">Ngày tạo: {formatDate(contract.created_at)}</p>
-            <p className="text-gray-600">Cập nhật: {formatDate(contract.updated_at)}</p>
+          <div className="text-end">
+            <p className="text-muted mb-1">
+              Ngày tạo: {formatDate(contract.created_at)}
+            </p>
+            <p className="text-muted mb-0">
+              Cập nhật: {formatDate(contract.updated_at)}
+            </p>
           </div>
         </div>
 
-        {/* Rest of the JSX remains unchanged */}
-      </div>
+        {/* You can add more contract details formatted with Bootstrap classes here */}
+      </Card>
     </div>
   );
 };

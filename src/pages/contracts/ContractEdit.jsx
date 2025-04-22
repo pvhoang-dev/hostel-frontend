@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { contractService } from "../../api/contracts";
 import ContractForm from "../../components/forms/ContractForm";
 import Card from "../../components/common/Card";
+import Button from "../../components/common/Button";
 import Loader from "../../components/common/Loader";
 import { useAuth } from "../../hooks/useAuth";
 import useAlert from "../../hooks/useAlert";
@@ -39,7 +40,8 @@ const ContractEdit = () => {
       if (user) {
         const isAdmin = user?.role === "admin";
         const isManager = user?.role === "manager";
-        const isHouseManager = response.data.room?.house?.manager_id === user?.id;
+        const isHouseManager =
+          response.data.room?.house?.manager_id === user?.id;
 
         if (!isAdmin && !(isManager && isHouseManager)) {
           showError("Bạn không có quyền chỉnh sửa hợp đồng này");
@@ -74,14 +76,14 @@ const ContractEdit = () => {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">Sửa hợp đồng</h1>
-        <button
+      <div className="d-flex justify-content-between align-items-center my-3">
+        <h3>Sửa hợp đồng</h3>
+        <Button
+          variant="secondary"
           onClick={() => navigate(`/contracts/${id}`)}
-          className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded"
         >
-          Hủy
-        </button>
+          <i className="mdi mdi-close me-1"></i> Hủy
+        </Button>
       </div>
 
       <Card>
