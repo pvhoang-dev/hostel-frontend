@@ -1,5 +1,4 @@
-// src/pages/equipments/EquipmentDetail.jsx
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { equipmentService } from "../../api/equipments";
 import Card from "../../components/common/Card";

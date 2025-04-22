@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { roomService } from "../../api/rooms";
 import Card from "../../components/common/Card";

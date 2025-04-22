@@ -1,4 +1,3 @@
-// src/pages/roles/RoleCreate.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { roleService } from "../../api/roles";

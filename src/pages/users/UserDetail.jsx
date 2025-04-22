@@ -1,4 +1,3 @@
-// src/pages/users/UserDetail.jsx
 import { useState, useEffect } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { userService } from "../../api/users";

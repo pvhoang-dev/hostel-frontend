@@ -38,16 +38,13 @@ const SettingDetail = () => {
     return <div>Không tìm thấy cài đặt</div>;
   }
 
-  // Xử lý hiển thị thông tin người tạo/cập nhật
   const renderUserInfo = (user) => {
     if (!user) return "-";
 
-    // Nếu user là một đối tượng, hiển thị tên hoặc username
     if (typeof user === "object") {
       return user.name || user.username || `ID: ${user.id}`;
     }
 
-    // Nếu user là một chuỗi hoặc số, hiển thị trực tiếp
     return user;
   };
 

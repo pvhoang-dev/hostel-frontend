@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { userService } from "../../api/users";
 import { roleService } from "../../api/roles";
@@ -10,7 +10,6 @@ import Select from "../../components/common/Select";
 import Loader from "../../components/common/Loader";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
-import { STATUS_OPTIONS } from "../../utils/constants";
 
 // Component con hiển thị phần filter
 const FilterSection = ({

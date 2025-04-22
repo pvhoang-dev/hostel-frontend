@@ -1,4 +1,3 @@
-// src/pages/equipments/EquipmentEdit.jsx
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { equipmentService } from "../../api/equipments";
