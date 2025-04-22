@@ -274,7 +274,7 @@ const HouseList = () => {
 
   return (
     <div>
-      <div className="d-flex justify-content-between align-items-center mb-3">
+      <div className="d-flex justify-content-between align-items-center my-2">
         <h3>Nhà</h3>
         {isAdmin && (
           <Button as={Link} to="/houses/create">

@@ -197,7 +197,7 @@ const SettingList = () => {
 
   return (
       <div>
-        <div className="d-flex justify-content-between align-items-center mb-3">
+        <div className="d-flex justify-content-between align-items-center my-2">
           <h3>Cài đặt hệ thống</h3>
           <Button as={Link} to="/settings/create">
             Thêm

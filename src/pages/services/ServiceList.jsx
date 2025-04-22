@@ -209,10 +209,10 @@ const ServiceList = () => {
 
   return (
     <div>
-      <div className="d-flex justify-content-between align-items-center mb-3">
+      <div className="d-flex justify-content-between align-items-center my-2">
         <h3>Dịch vụ</h3>
         <Button as={Link} to="/services/create">
-          Tạo
+          Thêm
         </Button>
       </div>
 

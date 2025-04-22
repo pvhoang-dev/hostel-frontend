@@ -274,7 +274,7 @@ const UserList = () => {
 
   return (
     <div>
-      <div className="d-flex justify-content-between align-items-center mb-3">
+      <div className="d-flex justify-content-between align-items-center my-2">
         <h3>Users</h3>
         <Button as={Link} to="/users/create">
           Thêm

@@ -199,7 +199,7 @@ const PaymentMethodList = () => {
 
   return (
     <div>
-      <div className="d-flex justify-content-between align-items-center mb-3">
+      <div className="d-flex justify-content-between align-items-center my-2">
         <h3>Phương thức thanh toán</h3>
         <Button as={Link} to="/payment-methods/create">
           Thêm
