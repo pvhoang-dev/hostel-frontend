@@ -41,6 +41,10 @@ import ContractCreate from "./pages/contracts/ContractCreate";
 import ContractDetail from "./pages/contracts/ContractDetail";
 import ContractEdit from "./pages/contracts/ContractEdit";
 import UserChangePassword from "./pages/users/UserChangePassword.jsx";
+import InvoiceList from "./pages/invoices/InvoiceList";
+import InvoiceCreate from "./pages/invoices/InvoiceCreate";
+import InvoiceDetail from "./pages/invoices/InvoiceDetail";
+import InvoiceEdit from "./pages/invoices/InvoiceEdit";
 
 // Protected route wrapper component
 const ProtectedRoute = ({ element, allowedRoles = [] }) => {
@@ -122,9 +126,7 @@ const Routes = () => {
         },
         {
           path: "users/:id/change-password",
-          element: (
-              <ProtectedRoute element={<UserChangePassword />} />
-          ),
+          element: <ProtectedRoute element={<UserChangePassword />} />,
         },
         // Roles routes
         {
@@ -155,36 +157,36 @@ const Routes = () => {
         {
           path: "houses",
           element: (
-            <ProtectedRoute 
-              element={<HouseList />} 
-              allowedRoles={["admin", "manager"]} 
+            <ProtectedRoute
+              element={<HouseList />}
+              allowedRoles={["admin", "manager"]}
             />
           ),
         },
         {
           path: "houses/create",
           element: (
-            <ProtectedRoute 
-              element={<HouseCreate />} 
-              allowedRoles={["admin"]} 
+            <ProtectedRoute
+              element={<HouseCreate />}
+              allowedRoles={["admin"]}
             />
           ),
         },
         {
           path: "houses/:id",
           element: (
-            <ProtectedRoute 
-              element={<HouseDetail />} 
-              allowedRoles={["admin", "manager"]} 
+            <ProtectedRoute
+              element={<HouseDetail />}
+              allowedRoles={["admin", "manager"]}
             />
           ),
         },
         {
           path: "houses/:id/edit",
           element: (
-            <ProtectedRoute 
-              element={<HouseEdit />} 
-              allowedRoles={["admin", "manager"]} 
+            <ProtectedRoute
+              element={<HouseEdit />}
+              allowedRoles={["admin", "manager"]}
             />
           ),
         },
@@ -192,45 +194,45 @@ const Routes = () => {
         {
           path: "rooms",
           element: (
-            <ProtectedRoute 
-              element={<RoomList />} 
-              allowedRoles={["admin", "manager"]} 
+            <ProtectedRoute
+              element={<RoomList />}
+              allowedRoles={["admin", "manager"]}
             />
           ),
         },
         {
           path: "rooms/create",
           element: (
-            <ProtectedRoute 
-              element={<RoomCreate />} 
-              allowedRoles={["admin", "manager"]} 
+            <ProtectedRoute
+              element={<RoomCreate />}
+              allowedRoles={["admin", "manager"]}
             />
           ),
         },
         {
           path: "houses/:houseId/rooms/create",
           element: (
-            <ProtectedRoute 
-              element={<RoomCreate />} 
-              allowedRoles={["admin", "manager"]} 
+            <ProtectedRoute
+              element={<RoomCreate />}
+              allowedRoles={["admin", "manager"]}
             />
           ),
         },
         {
           path: "rooms/:id",
           element: (
-            <ProtectedRoute 
-              element={<RoomDetail />} 
-              allowedRoles={["admin", "manager"]} 
+            <ProtectedRoute
+              element={<RoomDetail />}
+              allowedRoles={["admin", "manager"]}
             />
           ),
         },
         {
           path: "rooms/:id/edit",
           element: (
-            <ProtectedRoute 
-              element={<RoomEdit />} 
-              allowedRoles={["admin", "manager"]} 
+            <ProtectedRoute
+              element={<RoomEdit />}
+              allowedRoles={["admin", "manager"]}
             />
           ),
         },
@@ -238,54 +240,36 @@ const Routes = () => {
         {
           path: "contracts",
           element: (
-            <ProtectedRoute 
-              element={<ContractList />} 
-              allowedRoles={["admin", "manager", "tenant"]} 
+            <ProtectedRoute
+              element={<ContractList />}
+              allowedRoles={["admin", "manager", "tenant"]}
             />
           ),
         },
         {
           path: "contracts/create",
           element: (
-            <ProtectedRoute 
-              element={<ContractCreate />} 
-              allowedRoles={["admin", "manager"]} 
-            />
-          ),
-        },
-        {
-          path: "houses/:houseId/contracts/create",
-          element: (
-            <ProtectedRoute 
-              element={<ContractCreate />} 
-              allowedRoles={["admin", "manager"]} 
-            />
-          ),
-        },
-        {
-          path: "rooms/:roomId/contracts/create",
-          element: (
-            <ProtectedRoute 
-              element={<ContractCreate />} 
-              allowedRoles={["admin", "manager"]} 
+            <ProtectedRoute
+              element={<ContractCreate />}
+              allowedRoles={["admin", "manager"]}
             />
           ),
         },
         {
           path: "contracts/:id",
           element: (
-            <ProtectedRoute 
-              element={<ContractDetail />} 
-              allowedRoles={["admin", "manager", "tenant"]} 
+            <ProtectedRoute
+              element={<ContractDetail />}
+              allowedRoles={["admin", "manager", "tenant"]}
             />
           ),
         },
         {
           path: "contracts/:id/edit",
           element: (
-            <ProtectedRoute 
-              element={<ContractEdit />} 
-              allowedRoles={["admin", "manager"]} 
+            <ProtectedRoute
+              element={<ContractEdit />}
+              allowedRoles={["admin", "manager"]}
             />
           ),
         },
@@ -415,6 +399,52 @@ const Routes = () => {
         {
           path: "settings/:id/edit",
           element: <SettingEdit />,
+        },
+        // Invoice routes
+        {
+          path: "invoices",
+          element: (
+            <ProtectedRoute
+              element={<InvoiceList />}
+              allowedRoles={["admin", "manager", "tenant"]}
+            />
+          ),
+        },
+        {
+          path: "invoices/create",
+          element: (
+            <ProtectedRoute
+              element={<InvoiceCreate />}
+              allowedRoles={["admin", "manager"]}
+            />
+          ),
+        },
+        {
+          path: "rooms/:roomId/invoices/create",
+          element: (
+            <ProtectedRoute
+              element={<InvoiceCreate />}
+              allowedRoles={["admin", "manager"]}
+            />
+          ),
+        },
+        {
+          path: "invoices/:id",
+          element: (
+            <ProtectedRoute
+              element={<InvoiceDetail />}
+              allowedRoles={["admin", "manager", "tenant"]}
+            />
+          ),
+        },
+        {
+          path: "invoices/:id/edit",
+          element: (
+            <ProtectedRoute
+              element={<InvoiceEdit />}
+              allowedRoles={["admin", "manager"]}
+            />
+          ),
         },
       ],
     },
