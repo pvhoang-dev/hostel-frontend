@@ -34,6 +34,7 @@ const Input = forwardRef(
           onBlur={onBlur}
           placeholder={placeholder}
           className={`form-control ${error ? "is-invalid" : ""} ${className}`}
+          required={required}
           {...props}
         />
         {error && <div className="invalid-feedback">{error}</div>}

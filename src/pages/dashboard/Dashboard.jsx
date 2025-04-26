@@ -46,7 +46,7 @@ const Dashboard = () => {
         <div className="col-12">
           <div className="d-flex justify-content-between align-items-center">
             <h3 className="mb-0">Bảng thông tin</h3>
-            <span className="badge bg-info">
+            <span className="badge bg-info text-white p-1">
               Xin chào, {user?.username || "Người dùng"}
             </span>
           </div>
@@ -161,7 +161,9 @@ const Dashboard = () => {
                   <tr>
                     <td>Trạng thái</td>
                     <td className="text-end">
-                      <span className="badge bg-success">Hoạt động</span>
+                      <span className="badge bg-success text-white p-1">
+                        Hoạt động
+                      </span>
                     </td>
                   </tr>
                   <tr>

@@ -32,10 +32,12 @@ const Header = () => {
         if (reset) {
           setNotifications(newNotifications);
         } else {
-          setNotifications(prev => [...prev, ...newNotifications]);
+          setNotifications((prev) => [...prev, ...newNotifications]);
         }
 
-        setHasMore(response.data.meta.current_page < response.data.meta.last_page);
+        setHasMore(
+          response.data.meta.current_page < response.data.meta.last_page
+        );
         setPage(pageNumber);
       }
     } catch (error) {
@@ -125,29 +127,35 @@ const Header = () => {
             >
               <div className="dropdown-item noti-title">
                 <h5 className="m-0">
-                  <span className="float-right">
-                    <a
-                      href="#"
-                      className="text-dark"
-                      onClick={handleMarkAllAsRead}
-                    >
-                      <small>Mark All As Read</small>
-                    </a>
+                  {notifications.length !== 0 && unreadCount > 0 && (
+                    <span className="float-right">
+                      <a
+                        href=""
+                        className="text-dark"
+                        onClick={handleMarkAllAsRead}
+                      >
+                        <small>Đánh dấu tất cả là đã đọc</small>
+                      </a>
+                    </span>
+                  )}
+                  <span>
+                    <p className="text-white">
+                      Thông báo {unreadCount > 0 && `(${unreadCount})`}
+                    </p>
                   </span>
-                  Notification {unreadCount > 0 && `(${unreadCount})`}
                 </h5>
               </div>
 
               <div style={{ maxHeight: "230px", overflowY: "auto" }}>
                 {loading && page === 1 && (
                   <div className="text-center p-3">
-                    <small>Loading notifications...</small>
+                    <small>Đang tải các thông báo...</small>
                   </div>
                 )}
 
                 {!loading && notifications.length === 0 && (
                   <div className="text-center p-3">
-                    <small>No notifications found</small>
+                    <small>Không có thông báo</small>
                   </div>
                 )}
 
@@ -188,7 +196,7 @@ const Header = () => {
 
                 {loading && page > 1 && (
                   <div className="text-center p-2">
-                    <small>Loading more...</small>
+                    <small>Đang tải thêm...</small>
                   </div>
                 )}
               </div>
@@ -200,7 +208,7 @@ const Header = () => {
                   className="dropdown-item text-center text-primary notify-item notify-all"
                   onMouseDown={(e) => e.preventDefault()} // Add this line to prevent dropdown closing in some browsers
                 >
-                  {loading && page > 1 ? "Loading..." : "View More"}
+                  {loading && page > 1 ? "Loading..." : "Xem thêm"}
                 </a>
               )}
             </div>
@@ -231,18 +239,18 @@ const Header = () => {
             </a>
             <div className="dropdown-menu dropdown-menu-right dropdown-menu-animated topbar-dropdown-menu profile-dropdown">
               <div className="dropdown-header noti-title">
-                <h6 className="text-overflow m-0">Welcome!</h6>
+                <h6 className="text-overflow m-0">Xin chào!</h6>
               </div>
               <a
                 href="#"
                 className="dropdown-item notify-item"
                 onClick={(e) => {
                   e.preventDefault();
-                  navigate("/profile");
+                  navigate(`/users/${user?.id}`);
                 }}
               >
                 <i className="mdi mdi-account-circle mr-1"></i>
-                <span>My Account</span>
+                <span>Tài khoản của bạn</span>
               </a>
               <a
                 href="#"
@@ -253,7 +261,7 @@ const Header = () => {
                 }}
               >
                 <i className="mdi mdi-logout mr-1"></i>
-                <span>Logout</span>
+                <span>Đăng xuất</span>
               </a>
             </div>
           </li>

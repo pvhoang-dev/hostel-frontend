@@ -103,30 +103,47 @@ const Routes = () => {
         {
           path: "users",
           element: (
-            <ProtectedRoute element={<UserList />} allowedRoles={["admin"]} />
+            <ProtectedRoute
+              element={<UserList />}
+              allowedRoles={["admin", "manager"]}
+            />
           ),
         },
         {
           path: "users/create",
           element: (
-            <ProtectedRoute element={<UserCreate />} allowedRoles={["admin"]} />
+            <ProtectedRoute
+              element={<UserCreate />}
+              allowedRoles={["admin", "manager"]}
+            />
           ),
         },
         {
           path: "users/:id",
           element: (
-            <ProtectedRoute element={<UserDetail />} allowedRoles={["admin"]} />
+            <ProtectedRoute
+              element={<UserDetail />}
+              allowedRoles={["admin", "manager", "tenant"]}
+            />
           ),
         },
         {
           path: "users/:id/edit",
           element: (
-            <ProtectedRoute element={<UserEdit />} allowedRoles={["admin"]} />
+            <ProtectedRoute
+              element={<UserEdit />}
+              allowedRoles={["admin", "manager"]}
+            />
           ),
         },
         {
           path: "users/:id/change-password",
-          element: <ProtectedRoute element={<UserChangePassword />} />,
+          element: (
+            <ProtectedRoute
+              element={<UserChangePassword />}
+              allowedRoles={["admin", "manager", "tenant"]}
+            />
+          ),
         },
         // Roles routes
         {

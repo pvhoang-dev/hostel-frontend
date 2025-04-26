@@ -23,7 +23,7 @@ const UserDetail = () => {
       if (response.success) {
         setUser(response.data);
       } else {
-        showError("Lỗi khi tải người dùng");
+        showError(response.message || "Có lỗi xảy ra khi xóa người dùng");
         navigate("/users");
       }
     } catch (error) {
@@ -63,7 +63,7 @@ const UserDetail = () => {
         </div>
       </div>
 
-      <div className="bg-white p-4 rounded shadow">
+      <div className="p-4 rounded shadow">
         <div className="d-flex align-items-start">
           {user.avatar_url ? (
             <img
@@ -74,7 +74,7 @@ const UserDetail = () => {
             />
           ) : (
             <div
-              className="rounded-circle d-flex align-items-center justify-content-center text-secondary fs-1 me-4 bg-light mr-3"
+              className="rounded-circle d-flex align-items-center justify-content-center text-white fs-1 me-4 bg-light mr-3"
               style={{ width: "4rem", height: "4rem" }}
             >
               {user.name.charAt(0).toUpperCase()}
@@ -83,7 +83,7 @@ const UserDetail = () => {
 
           <div className="flex-grow-1">
             <h4 className="fs-4 fw-semibold">{user.name}</h4>
-            <p className="text-secondary">@{user.username}</p>
+            <p>@{user.username}</p>
 
             {user.role && (
               <span className="d-inline-block bg-primary bg-opacity-10 text-white px-2 py-1 rounded small mt-2 mr-2">
@@ -112,15 +112,15 @@ const UserDetail = () => {
             <h4 className="fs-5 fw-medium mb-2">Thông tin liên hệ</h4>
             <div className="d-flex flex-column gap-2">
               <div>
-                <span className="text-secondary">Email: </span>
+                <span>Email: </span>
                 <span className="ms-2">{user.email || "N/A"}</span>
               </div>
               <div>
-                <span className="text-secondary">Số điện thoại: </span>
+                <span>Số điện thoại: </span>
                 <span className="ms-2">{user.phone_number || "N/A"}</span>
               </div>
               <div>
-                <span className="text-secondary">Quê quán: </span>
+                <span>Quê quán: </span>
                 <span className="ms-2">{user.hometown || "N/A"}</span>
               </div>
             </div>
@@ -130,11 +130,11 @@ const UserDetail = () => {
             <h4 className="fs-5 fw-medium mb-2">Thông tin cá nhân</h4>
             <div className="d-flex flex-column gap-2">
               <div>
-                <span className="text-secondary">Số CMND/CCCD: </span>
+                <span>Số CMND/CCCD: </span>
                 <span className="ms-2">{user.identity_card || "N/A"}</span>
               </div>
               <div>
-                <span className="text-secondary">Biển số xe: </span>
+                <span>Biển số xe: </span>
                 <span className="ms-2">{user.vehicle_plate || "N/A"}</span>
               </div>
             </div>
@@ -145,15 +145,15 @@ const UserDetail = () => {
           <h4 className="fs-5 fw-medium mb-2">Thông tin hệ thống</h4>
           <div className="d-flex flex-column gap-2">
             <div>
-              <span className="text-secondary">User ID: </span>
+              <span>User ID: </span>
               <span className="ms-2">{user.id}</span>
             </div>
             <div>
-              <span className="text-secondary">Tạo: </span>
+              <span>Tạo: </span>
               <span className="ms-2">{user.created_at}</span>
             </div>
             <div>
-              <span className="text-secondary">Lần cuối cập nhật: </span>
+              <span>Lần cuối cập nhật: </span>
               <span className="ms-2">{user.updated_at}</span>
             </div>
           </div>

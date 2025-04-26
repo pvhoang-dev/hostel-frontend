@@ -10,7 +10,7 @@ const SideBar = () => {
       label: "Trang chủ",
       roles: ["admin", "manager", "tenant"],
     },
-    { path: "/users", label: "Users", roles: ["admin"] },
+    { path: "/users", label: "Users", roles: ["admin", "manager"] },
     { path: "/roles", label: "Vai trò", roles: ["admin"] },
     { path: "/equipments", label: "Thiết bị", roles: ["admin", "manager"] },
     { path: "/services", label: "Dịch vụ", roles: ["admin", "manager"] },

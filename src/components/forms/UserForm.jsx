@@ -111,6 +111,17 @@ const UserForm = ({
           />
         </div>
 
+        <div className="col-md-6">
+          <Input
+            label="Số điện thoại"
+            name="phone_number"
+            value={formData.phone_number}
+            onChange={handleChange}
+            error={errors.phone_number}
+            required
+          />
+        </div>
+
         {mode === "create" && (
           <>
             <div className="col-md-6">
@@ -138,16 +149,6 @@ const UserForm = ({
             </div>
           </>
         )}
-
-        <div className="col-md-6">
-          <Input
-            label="Số điện thoại"
-            name="phone_number"
-            value={formData.phone_number}
-            onChange={handleChange}
-            error={errors.phone_number}
-          />
-        </div>
 
         <div className="col-md-6">
           <Input

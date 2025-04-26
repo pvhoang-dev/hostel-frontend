@@ -184,17 +184,7 @@ const UserList = () => {
     if (!loadingRoles && !loadingUsers) {
       loadUsers();
     }
-  }, [
-    currentPage,
-    perPage,
-    sortBy,
-    sortDir,
-    username,
-    name,
-    email,
-    roleId,
-    status,
-  ]);
+  }, [currentPage, perPage, sortBy, sortDir, roleId, status]);
 
   const loadUsers = async () => {
     const params = {
@@ -292,7 +282,7 @@ const UserList = () => {
         onApplyFilters={loadUsers}
       />
 
-      <Card>
+      <Card title="Người dùng">
         {isLoading ? (
           <Loader />
         ) : (
