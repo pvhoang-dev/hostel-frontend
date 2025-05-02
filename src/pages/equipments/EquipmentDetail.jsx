@@ -5,11 +5,13 @@ import Card from "../../components/common/Card";
 import Loader from "../../components/common/Loader";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
+import { useAuth } from "../../hooks/useAuth";
 
 const EquipmentDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { showError } = useAlert();
+  const { isAdmin } = useAuth();
 
   const {
     data: equipment,
@@ -49,12 +51,14 @@ const EquipmentDetail = () => {
           >
             Back
           </button>
-          <Link
-            to={`/equipments/${id}/edit`}
-            className="btn btn-primary fw-semibold"
-          >
-            Sửa
-          </Link>
+          {isAdmin && (
+            <Link
+              to={`/equipments/${id}/edit`}
+              className="btn btn-primary fw-semibold"
+            >
+              Sửa
+            </Link>
+          )}
         </div>
       </div>
 
@@ -64,7 +68,7 @@ const EquipmentDetail = () => {
             <h4 className="fs-5 fw-medium mb-3">Thông tin</h4>
             <div className="d-flex flex-column gap-2">
               <div>
-                <span className="text-secondary">Tên: </span>
+                <span>Tên: </span>
                 <span className="ms-2 fw-medium">{equipment.name}</span>
               </div>
             </div>
@@ -74,15 +78,15 @@ const EquipmentDetail = () => {
             <h4 className="fs-5 fw-medium mb-3">Thông tin hệ thống</h4>
             <div className="d-flex flex-column gap-2">
               <div>
-                <span className="text-secondary">ID: </span>
+                <span>ID: </span>
                 <span className="ms-2">{equipment.id}</span>
               </div>
               <div>
-                <span className="text-secondary">Tạo: </span>
+                <span>Tạo: </span>
                 <span className="ms-2">{equipment.created_at}</span>
               </div>
               <div>
-                <span className="text-secondary">Sửa lần cuối: </span>
+                <span>Sửa lần cuối: </span>
                 <span className="ms-2">{equipment.updated_at}</span>
               </div>
             </div>

@@ -9,12 +9,14 @@ import Select from "../../components/common/Select";
 import Loader from "../../components/common/Loader";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
+import { useAuth } from "../../hooks/useAuth";
 
 const FilterSection = ({
   filters,
   onFilterChange,
   onClearFilters,
   onApplyFilters,
+  isAdmin,
 }) => (
   <Card title="Bộ lọc" className="mb-3">
     <div className="row g-3">
@@ -26,21 +28,22 @@ const FilterSection = ({
           onChange={onFilterChange}
         />
       </div>
-      <div className="col-md-6">
-        <Select
-          label="Trạng thái"
-          name="status"
-          value={filters.status}
-          onChange={onFilterChange}
-          options={[
-            { value: "", label: "Tất cả" },
-            { value: "active", label: "Hoạt động" },
-            { value: "inactive", label: "Không hoạt động" },
-          ]}
-        />
-      </div>
+      {isAdmin && (
+        <div className="col-md-6">
+          <Select
+            label="Trạng thái"
+            name="status"
+            value={filters.status}
+            onChange={onFilterChange}
+            options={[
+              { value: "", label: "Tất cả" },
+              { value: "active", label: "Hoạt động" },
+              { value: "inactive", label: "Không hoạt động" },
+            ]}
+          />
+        </div>
+      )}
     </div>
-
     <div className="mt-3 d-flex justify-content-end">
       <Button
         variant="secondary"
@@ -58,6 +61,7 @@ const PaymentMethodList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { showSuccess, showError } = useAlert();
   const navigate = useNavigate();
+  const { isAdmin } = useAuth();
 
   // Get current filters from URL
   const currentPage = Number(searchParams.get("page")) || 1;
@@ -104,10 +108,14 @@ const PaymentMethodList = () => {
       cell: ({ row }) => (
         <span
           className={
-            row.original.status === "active" ? "text-success" : "text-danger"
+            row.original.deleted_at
+              ? "text-danger"
+              : row.original.status === "active"
+              ? "text-success"
+              : "text-warning"
           }
         >
-          {row.original.status}
+          {row.original.deleted_at ? "Đã xóa" : row.original.status}
         </span>
       ),
     },
@@ -126,7 +134,7 @@ const PaymentMethodList = () => {
 
   useEffect(() => {
     loadPaymentMethods();
-  }, [currentPage, perPage, sortBy, sortDir, name, status]);
+  }, [currentPage, perPage, sortBy, sortDir, status]);
 
   const loadPaymentMethods = async () => {
     const params = {
@@ -204,9 +212,11 @@ const PaymentMethodList = () => {
     <div>
       <div className="d-flex justify-content-between align-items-center my-2">
         <h3>Phương thức thanh toán</h3>
-        <Button as={Link} to="/payment-methods/create">
-          Thêm
-        </Button>
+        {isAdmin && (
+          <Button as={Link} to="/payment-methods/create">
+            Thêm
+          </Button>
+        )}
       </div>
 
       <FilterSection
@@ -214,6 +224,7 @@ const PaymentMethodList = () => {
         onFilterChange={handleFilterChange}
         onClearFilters={clearFilters}
         onApplyFilters={loadPaymentMethods}
+        isAdmin={isAdmin}
       />
 
       <Card>
@@ -230,22 +241,30 @@ const PaymentMethodList = () => {
             loading={loadingPaymentMethods}
             actionColumn={{
               key: "actions",
-              actions: [
-                {
-                  icon: "mdi-eye",
-                  handler: (paymentMethod) =>
-                    navigate(`/payment-methods/${paymentMethod.id}`),
-                },
-                {
-                  icon: "mdi-pencil",
-                  handler: (paymentMethod) =>
-                    navigate(`/payment-methods/${paymentMethod.id}/edit`),
-                },
-                {
-                  icon: "mdi-delete",
-                  handler: handleDeletePaymentMethod,
-                },
-              ],
+              actions: isAdmin
+                ? [
+                    {
+                      icon: "mdi-eye",
+                      handler: (paymentMethod) =>
+                        navigate(`/payment-methods/${paymentMethod.id}`),
+                    },
+                    {
+                      icon: "mdi-pencil",
+                      handler: (paymentMethod) =>
+                        navigate(`/payment-methods/${paymentMethod.id}/edit`),
+                    },
+                    {
+                      icon: "mdi-delete",
+                      handler: handleDeletePaymentMethod,
+                    },
+                  ]
+                : [
+                    {
+                      icon: "mdi-eye",
+                      handler: (paymentMethod) =>
+                        navigate(`/payment-methods/${paymentMethod.id}`),
+                    },
+                  ],
             }}
           />
         )}

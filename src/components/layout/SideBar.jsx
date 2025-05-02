@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 
 const SideBar = () => {
-  const { isAdmin, isManager } = useAuth();
+  const { isAdmin, isManager, isTenant } = useAuth();
 
   const menuItems = [
     {
@@ -10,34 +10,35 @@ const SideBar = () => {
       label: "Trang chủ",
       roles: ["admin", "manager", "tenant"],
     },
-    { path: "/users", label: "Users", roles: ["admin", "manager"] },
-    { path: "/roles", label: "Vai trò", roles: ["admin"] },
-    { path: "/equipments", label: "Thiết bị", roles: ["admin", "manager"] },
-    { path: "/services", label: "Dịch vụ", roles: ["admin", "manager"] },
+    { path: "/users", label: "QL Users", roles: ["admin", "manager"] },
+    { path: "/roles", label: "QL Vai trò", roles: ["admin"] },
     {
       path: "/payment-methods",
-      label: "PT Thanh toán",
+      label: "QL PT Thanh toán",
       roles: ["admin", "manager"],
     },
-    { path: "/settings", label: "Nội quy chung", roles: ["admin"] },
-    { path: "/houses", label: "Nhà trọ", roles: ["admin", "manager"] },
-    { path: "/rooms", label: "Phòng", roles: ["admin", "manager"] },
-    { path: "/contracts", label: "Hợp đồng", roles: ["admin", "manager"] },
+    { path: "/equipments", label: "QL Thiết bị", roles: ["admin", "manager"] },
+    { path: "/services", label: "QL Dịch vụ", roles: ["admin", "manager"] },
+    { path: "/houses", label: "QL Nhà trọ", roles: ["admin", "manager"] },
+    { path: "/storages", label: "QL Kho", roles: ["admin", "manager"] },
+    { path: "/rooms", label: "QL Phòng trọ", roles: ["admin", "manager"] },
+    { path: "/contracts", label: "QL Hợp đồng", roles: ["admin", "manager"] },
     {
       path: "/invoices",
-      label: "Hóa đơn",
+      label: isTenant ? "Hóa đơn" : "QL Hóa đơn",
       roles: ["admin", "manager", "tenant"],
     },
     {
       path: "/requests",
-      label: "Yêu cầu",
+      label: isTenant ? "Yêu cầu" : "QL Yêu cầu",
       roles: ["admin", "manager", "tenant"],
     },
     {
       path: "/notifications",
-      label: "Thông báo",
-      roles: ["admin", "manager", "tenant"],
+      label: "QL Thông báo",
+      roles: ["admin", "manager"],
     },
+    { path: "/settings", label: "QL Nội quy chung", roles: ["admin"] },
   ];
 
   const filteredMenuItems = menuItems.filter((item) => {
@@ -47,7 +48,7 @@ const SideBar = () => {
       (role) =>
         (role === "admin" && isAdmin) ||
         (role === "manager" && isManager) ||
-        role === "tenant"
+        (role === "tenant" && isTenant)
     );
   });
 
@@ -77,12 +78,6 @@ const SideBar = () => {
                 </NavLink>
               </li>
             ))}
-            {/* <li className="side-nav-item">
-              <a href="dashboard" className="side-nav-link">
-                <i className="uil-calender"></i>
-                <span> Dashboard </span>
-              </a>
-            </li> */}
           </ul>
           <div className="clearfix"></div>
         </div>

@@ -8,6 +8,7 @@ import Input from "../../components/common/Input";
 import Loader from "../../components/common/Loader";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
+import { useAuth } from "../../hooks/useAuth";
 
 // Filter section component
 const FilterSection = ({
@@ -45,6 +46,7 @@ const EquipmentList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { showSuccess, showError } = useAlert();
   const navigate = useNavigate();
+  const { isAdmin, isManager } = useAuth();
 
   // Get current filters from URL
   const currentPage = Number(searchParams.get("page")) || 1;
@@ -91,7 +93,7 @@ const EquipmentList = () => {
 
   useEffect(() => {
     loadEquipments();
-  }, [currentPage, perPage, sortBy, sortDir, name]);
+  }, [currentPage, perPage, sortBy, sortDir]);
 
   const loadEquipments = async () => {
     const params = {
@@ -166,9 +168,11 @@ const EquipmentList = () => {
     <div>
       <div className="d-flex justify-content-between align-items-center my-2">
         <h3>Thiết bị</h3>
-        <Button as={Link} to="/equipments/create">
-          Thêm
-        </Button>
+        {isAdmin && (
+          <Button as={Link} to="/equipments/create">
+            Thêm
+          </Button>
+        )}
       </div>
 
       <FilterSection
@@ -192,22 +196,30 @@ const EquipmentList = () => {
             loading={loadingEquipments}
             actionColumn={{
               key: "actions",
-              actions: [
-                {
-                  icon: "mdi-eye",
-                  handler: (equipment) =>
-                    navigate(`/equipments/${equipment.id}`),
-                },
-                {
-                  icon: "mdi-pencil",
-                  handler: (equipment) =>
-                    navigate(`/equipments/${equipment.id}/edit`),
-                },
-                {
-                  icon: "mdi-delete",
-                  handler: handleDeleteEquipment,
-                },
-              ],
+              actions: isAdmin
+                ? [
+                    {
+                      icon: "mdi-eye",
+                      handler: (equipment) =>
+                        navigate(`/equipments/${equipment.id}`),
+                    },
+                    {
+                      icon: "mdi-pencil",
+                      handler: (equipment) =>
+                        navigate(`/equipments/${equipment.id}/edit`),
+                    },
+                    {
+                      icon: "mdi-delete",
+                      handler: handleDeleteEquipment,
+                    },
+                  ]
+                : [
+                    {
+                      icon: "mdi-eye",
+                      handler: (equipment) =>
+                        navigate(`/equipments/${equipment.id}`),
+                    },
+                  ],
             }}
           />
         )}

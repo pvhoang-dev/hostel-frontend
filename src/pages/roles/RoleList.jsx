@@ -105,7 +105,7 @@ const RoleList = () => {
 
   useEffect(() => {
     loadRoles();
-  }, [currentPage, perPage, sortBy, sortDir, code, name]);
+  }, [currentPage, perPage, sortBy, sortDir]);
 
   const loadRoles = async () => {
     const params = {

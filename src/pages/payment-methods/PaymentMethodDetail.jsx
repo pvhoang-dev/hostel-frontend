@@ -5,12 +5,14 @@ import Card from "../../components/common/Card";
 import Loader from "../../components/common/Loader";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
+import { useAuth } from "../../hooks/useAuth";
 
 const PaymentMethodDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { showError } = useAlert();
   const [paymentMethod, setPaymentMethod] = useState(null);
+  const { isAdmin } = useAuth();
 
   const { execute: fetchPaymentMethod, loading } = useApi(
     paymentMethodService.getPaymentMethod
@@ -50,12 +52,14 @@ const PaymentMethodDetail = () => {
           >
             Back
           </button>
-          <Link
-            to={`/payment-methods/${id}/edit`}
-            className="btn btn-primary fw-semibold"
-          >
-            Sửa
-          </Link>
+          {isAdmin && (
+            <Link
+              to={`/payment-methods/${id}/edit`}
+              className="btn btn-primary fw-semibold"
+            >
+              Sửa
+            </Link>
+          )}
         </div>
       </div>
 
@@ -65,11 +69,11 @@ const PaymentMethodDetail = () => {
             <h4 className="fs-5 fw-semibold mb-2">Thông tin cơ bản</h4>
             <div className="row g-4">
               <div className="col-12 col-md-6">
-                <span className="text-secondary">Name: </span>
+                <span>Name: </span>
                 <span className="ms-2 fw-medium">{paymentMethod.name}</span>
               </div>
               <div className="col-12 col-md-6">
-                <span className="text-secondary">Status: </span>
+                <span>Status: </span>
                 <span
                   className={`ms-2 d-inline-block px-2 py-1 rounded small ${
                     paymentMethod.status === "active"
@@ -87,23 +91,23 @@ const PaymentMethodDetail = () => {
           {paymentMethod.description && (
             <div>
               <h2 className="fs-5 fw-semibold mb-2">Description</h2>
-              <p className="text-secondary">{paymentMethod.description}</p>
+              <p>{paymentMethod.description}</p>
             </div>
           )}
 
-          <div>
+          <div className="mt-4">
             <h4 className="fs-5 fw-semibold mb-2">Thông tin hệ thống</h4>
             <div className="row g-4">
               <div className="col-12 col-md-6">
-                <span className="text-secondary">ID: </span>
+                <span>ID: </span>
                 <span className="ms-2">{paymentMethod.id}</span>
               </div>
               <div className="col-12 col-md-6">
-                <span className="text-secondary">Tạo: </span>
+                <span>Tạo: </span>
                 <span className="ms-2">{paymentMethod.created_at}</span>
               </div>
               <div className="col-12 col-md-6">
-                <span className="text-secondary">Cập nhật lần cuối: </span>
+                <span>Cập nhật lần cuối: </span>
                 <span className="ms-2">{paymentMethod.updated_at}</span>
               </div>
             </div>

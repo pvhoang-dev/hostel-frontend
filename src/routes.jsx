@@ -296,7 +296,7 @@ const Routes = () => {
           element: (
             <ProtectedRoute
               element={<EquipmentList />}
-              allowedRoles={["admin"]}
+              allowedRoles={["admin", "manager"]}
             />
           ),
         },
@@ -314,7 +314,7 @@ const Routes = () => {
           element: (
             <ProtectedRoute
               element={<EquipmentDetail />}
-              allowedRoles={["admin"]}
+              allowedRoles={["admin", "manager"]}
             />
           ),
         },
@@ -342,7 +342,7 @@ const Routes = () => {
           element: (
             <ProtectedRoute
               element={<ServiceCreate />}
-              allowedRoles={["admin", "manager"]}
+              allowedRoles={["admin"]}
             />
           ),
         },
@@ -360,7 +360,7 @@ const Routes = () => {
           element: (
             <ProtectedRoute
               element={<ServiceEdit />}
-              allowedRoles={["admin", "manager"]}
+              allowedRoles={["admin"]}
             />
           ),
         },
@@ -369,7 +369,7 @@ const Routes = () => {
           element: (
             <ProtectedRoute
               element={<PaymentMethodList />}
-              allowedRoles={["admin"]}
+              allowedRoles={["admin", "manager"]}
             />
           ),
         },
@@ -387,7 +387,7 @@ const Routes = () => {
           element: (
             <ProtectedRoute
               element={<PaymentMethodDetail />}
-              allowedRoles={["admin"]}
+              allowedRoles={["admin", "manager"]}
             />
           ),
         },

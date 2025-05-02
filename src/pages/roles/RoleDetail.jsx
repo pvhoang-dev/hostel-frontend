@@ -70,15 +70,15 @@ const RoleDetail = () => {
           <h4 className="fs-5 fw-medium mb-2">Thông tin hệ thống</h4>
           <div className="d-flex flex-column gap-2">
             <div>
-              <span className="text-secondary">ID: </span>
+              <span>ID: </span>
               <span className="ms-2">{role.id}</span>
             </div>
             <div>
-              <span className="text-secondary">Tạo: </span>
+              <span>Tạo: </span>
               <span className="ms-2">{role.created_at}</span>
             </div>
             <div>
-              <span className="text-secondary">Cập nhật lần cuối: </span>
+              <span>Cập nhật lần cuối: </span>
               <span className="ms-2">{role.updated_at}</span>
             </div>
           </div>
@@ -86,7 +86,7 @@ const RoleDetail = () => {
 
         {/*<div className="mt-4">*/}
         {/*  <h3 className="fs-5 fw-medium mb-2">Users with this Role</h3>*/}
-        {/*  <div className="text-secondary">*/}
+        {/*  <div>*/}
         {/*    {role.users_count || 0} users have this role assigned*/}
         {/*  </div>*/}
         {/*</div>*/}

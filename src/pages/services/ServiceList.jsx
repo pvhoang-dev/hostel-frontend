@@ -9,6 +9,7 @@ import Select from "../../components/common/Select";
 import Loader from "../../components/common/Loader";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
+import { useAuth } from "../../hooks/useAuth";
 
 // Filter section component
 const FilterSection = ({
@@ -42,6 +43,7 @@ const FilterSection = ({
           value={filters.is_metered}
           onChange={onFilterChange}
           options={[
+            { value: "", label: "Tất cả" },
             { value: "1", label: "Có" },
             { value: "0", label: "Không" },
           ]}
@@ -66,6 +68,7 @@ const ServiceList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { showSuccess, showError } = useAlert();
   const navigate = useNavigate();
+  const { isAdmin } = useAuth();
 
   // Get current state from URL params
   const currentPage = Number(searchParams.get("page")) || 1;
@@ -120,7 +123,7 @@ const ServiceList = () => {
   // Fetch data on initial load and when params change
   useEffect(() => {
     loadServices();
-  }, [currentPage, perPage, sortBy, sortDir, name, unit, isMetered]);
+  }, [currentPage, perPage, sortBy, sortDir, isMetered]);
 
   const loadServices = async () => {
     const params = {
@@ -215,9 +218,11 @@ const ServiceList = () => {
     <div>
       <div className="d-flex justify-content-between align-items-center my-2">
         <h3>Dịch vụ</h3>
-        <Button as={Link} to="/services/create">
-          Thêm
-        </Button>
+        {isAdmin && (
+          <Button as={Link} to="/services/create">
+            Thêm
+          </Button>
+        )}
       </div>
 
       <FilterSection
@@ -242,21 +247,28 @@ const ServiceList = () => {
             loading={loadingServices}
             actionColumn={{
               key: "actions",
-              actions: [
-                {
-                  icon: "mdi-eye",
-                  handler: (service) => navigate(`/services/${service.id}`),
-                },
-                {
-                  icon: "mdi-pencil",
-                  handler: (service) =>
-                    navigate(`/services/${service.id}/edit`),
-                },
-                {
-                  icon: "mdi-delete",
-                  handler: handleDeleteService,
-                },
-              ],
+              actions: isAdmin
+                ? [
+                    {
+                      icon: "mdi-eye",
+                      handler: (service) => navigate(`/services/${service.id}`),
+                    },
+                    {
+                      icon: "mdi-pencil",
+                      handler: (service) =>
+                        navigate(`/services/${service.id}/edit`),
+                    },
+                    {
+                      icon: "mdi-delete",
+                      handler: handleDeleteService,
+                    },
+                  ]
+                : [
+                    {
+                      icon: "mdi-eye",
+                      handler: (service) => navigate(`/services/${service.id}`),
+                    },
+                  ],
             }}
           />
         )}
