@@ -292,22 +292,7 @@ const ContractList = () => {
     if (user && !loadingHouses && !loadingContracts) {
       loadContracts();
     }
-  }, [
-    currentPage,
-    perPage,
-    sortBy,
-    sortDir,
-    house_id,
-    room_id,
-    status,
-    start_date_from,
-    start_date_to,
-    end_date_from,
-    end_date_to,
-    min_rent,
-    max_rent,
-    user,
-  ]);
+  }, [currentPage, perPage, sortBy, sortDir, house_id, room_id, status, user]);
 
   useEffect(() => {
     if (house_id) {
@@ -417,6 +402,7 @@ const ContractList = () => {
       page: "1",
       per_page: perPage.toString(),
     });
+    loadContracts();
   };
 
   const isLoading = loadingContracts || loadingHouses || loadingRooms;

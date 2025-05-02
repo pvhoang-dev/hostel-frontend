@@ -261,6 +261,7 @@ const UserList = () => {
       page: "1",
       per_page: perPage.toString(),
     });
+    loadUsers();
   };
 
   const isLoading = loadingUsers || loadingRoles;

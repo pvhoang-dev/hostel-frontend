@@ -33,6 +33,7 @@ const Select = forwardRef(
           onBlur={onBlur}
           className={`form-control ${error ? "is-invalid" : ""} ${className}`}
           {...props}
+          required={required}
         >
           <option value="" disabled>
             {placeholder}

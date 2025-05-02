@@ -19,6 +19,7 @@ const FilterSection = ({
   onFilterChange,
   onClearFilters,
   onApplyFilters,
+  isAdmin,
 }) => (
   <Card title="Bộ lọc" className="mb-3">
     <div className="row g-3">
@@ -40,18 +41,20 @@ const FilterSection = ({
         />
       </div>
 
-      <div className="col-md-4">
-        <Select
-          label="Quản lý"
-          name="manager_id"
-          value={filters.manager_id}
-          onChange={onFilterChange}
-          options={[
-            { value: "", label: "Tất cả" },
-            ...managers.map((user) => ({ value: user.id, label: user.name })),
-          ]}
-        />
-      </div>
+      {isAdmin && (
+        <div className="col-md-4">
+          <Select
+            label="Quản lý"
+            name="manager_id"
+            value={filters.manager_id}
+            onChange={onFilterChange}
+            options={[
+              { value: "", label: "Tất cả" },
+              ...managers.map((user) => ({ value: user.id, label: user.name })),
+            ]}
+          />
+        </div>
+      )}
 
       <div className="col-md-4">
         <Select
@@ -125,8 +128,7 @@ const HouseList = () => {
 
   const managers = managersData?.data || [];
 
-  const { user } = useAuth();
-  const isAdmin = user?.role === "admin";
+  const { isAdmin } = useAuth();
 
   // Column definitions for the table
   const columns = [
@@ -158,7 +160,7 @@ const HouseList = () => {
           case "active":
             statusClass = "text-success";
             return <span className={statusClass}>Hoạt động</span>;
-          case "maintenance":
+          case "maintain":
             statusClass = "text-warning";
             return <span className={statusClass}>Bảo trì</span>;
           default:
@@ -186,16 +188,7 @@ const HouseList = () => {
     if (!loadingManagers && !loadingHouses) {
       loadHouses();
     }
-  }, [
-    currentPage,
-    perPage,
-    sortBy,
-    sortDir,
-    name,
-    address,
-    manager_id,
-    status,
-  ]);
+  }, [currentPage, perPage, sortBy, sortDir, manager_id, status]);
 
   const loadHouses = async () => {
     const params = {
@@ -272,6 +265,7 @@ const HouseList = () => {
       page: "1",
       per_page: perPage.toString(),
     });
+    loadHouses();
   };
 
   const isLoading = loadingHouses || loadingManagers;
@@ -293,6 +287,7 @@ const HouseList = () => {
         onFilterChange={handleFilterChange}
         onClearFilters={clearFilters}
         onApplyFilters={loadHouses}
+        isAdmin={isAdmin}
       />
 
       <Card>

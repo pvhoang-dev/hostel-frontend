@@ -122,7 +122,7 @@ const SettingList = () => {
 
   useEffect(() => {
     loadSettings();
-  }, [currentPage, perPage, sortBy, sortDir, key, value, description]);
+  }, [currentPage, perPage, sortBy, sortDir]);
 
   const loadSettings = async () => {
     const params = {
@@ -193,6 +193,7 @@ const SettingList = () => {
       page: "1",
       per_page: perPage.toString(),
     });
+    loadSettings();
   };
 
   return (

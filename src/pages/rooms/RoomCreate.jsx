@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { roomService } from "../../api/rooms";
 import RoomForm from "../../components/forms/RoomForm";
 import Card from "../../components/common/Card";
@@ -8,6 +8,8 @@ import useApi from "../../hooks/useApi";
 
 const RoomCreate = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const houseId = searchParams.get("house_id");
   const { showSuccess, showError } = useAlert();
   const [errors, setErrors] = useState({});
 
@@ -20,7 +22,13 @@ const RoomCreate = () => {
 
     if (response.success) {
       showSuccess("Tạo phòng thành công");
-      navigate("/rooms");
+
+      // If we came from a house detail page, go back to that page
+      if (houseId) {
+        navigate(`/houses/${houseId}`);
+      } else {
+        navigate("/rooms");
+      }
     } else {
       if (response.data && typeof response.data === "object") {
         setErrors(response.data);
@@ -30,12 +38,15 @@ const RoomCreate = () => {
     }
   };
 
+  // Determine the "Back" button URL
+  const backUrl = houseId ? `/houses/${houseId}` : "/rooms";
+
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center my-2">
         <h1 className="fs-2 fw-semibold">Tạo phòng mới</h1>
         <button
-          onClick={() => navigate("/rooms")}
+          onClick={() => navigate(backUrl)}
           className="btn btn-light fw-semibold"
         >
           Back
@@ -48,6 +59,8 @@ const RoomCreate = () => {
           isSubmitting={isSubmitting}
           errors={errors}
           mode="create"
+          initialValues={houseId ? { house_id: houseId } : {}}
+          houseId={houseId}
         />
       </Card>
     </div>

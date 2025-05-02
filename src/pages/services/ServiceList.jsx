@@ -212,6 +212,7 @@ const ServiceList = () => {
       sort_dir: sortDir,
     };
     setSearchParams(paramsToKeep);
+    loadServices();
   };
 
   return (

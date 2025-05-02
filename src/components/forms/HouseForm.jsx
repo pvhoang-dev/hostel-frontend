@@ -102,7 +102,7 @@ const HouseForm = ({
             options={[
               { value: "active", label: "Hoạt động" },
               { value: "inactive", label: "Không hoạt động" },
-              { value: "maintenance", label: "Bảo trì" },
+              { value: "maintain", label: "Bảo trì" },
             ]}
           />
         </div>

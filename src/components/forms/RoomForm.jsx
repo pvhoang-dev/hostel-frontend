@@ -13,8 +13,11 @@ const RoomForm = ({
   mode = "create",
   houseId = null,
 }) => {
+  // Use initialData.house_id if available, otherwise fall back to houseId
+  const preselectedHouseId = initialData.house_id || houseId || "";
+
   const [formData, setFormData] = useState({
-    house_id: houseId || "",
+    house_id: preselectedHouseId,
     room_number: "",
     capacity: 1,
     base_price: 0,
@@ -24,14 +27,15 @@ const RoomForm = ({
   });
 
   const [houses, setHouses] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!houseId) {
-      loadHouses();
-    }
-  }, [houseId]);
+    // Always load houses, even if houseId is provided
+    loadHouses();
+  }, []);
 
   const loadHouses = async () => {
+    setLoading(true);
     try {
       const response = await houseService.getHouses({
         status: "active",
@@ -46,6 +50,8 @@ const RoomForm = ({
       }
     } catch (error) {
       console.error("Error loading houses:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -68,20 +74,19 @@ const RoomForm = ({
   return (
     <form onSubmit={handleSubmit}>
       <div className="row g-3">
-        {!houseId && (
-          <div className="col-md-6">
-            <Select
-              label="Nhà"
-              name="house_id"
-              value={formData.house_id}
-              onChange={handleChange}
-              error={errors.house_id}
-              options={[{ value: "", label: "Chọn nhà" }, ...houses]}
-              placeholder="Chọn nhà"
-              required
-            />
-          </div>
-        )}
+        <div className="col-md-6">
+          <Select
+            label="Nhà"
+            name="house_id"
+            value={formData.house_id}
+            onChange={handleChange}
+            error={errors.house_id}
+            options={[{ value: "", label: "Chọn nhà" }, ...houses]}
+            placeholder="Chọn nhà"
+            required
+            disabled={!!houseId || loading}
+          />
+        </div>
 
         <div className="col-md-6">
           <Input
@@ -129,9 +134,8 @@ const RoomForm = ({
             error={errors.status}
             options={[
               { value: "available", label: "Có sẵn" },
-              { value: "occupied", label: "Đã thuê" },
-              { value: "maintenance", label: "Bảo trì" },
-              { value: "unavailable", label: "Không khả dụng" },
+              { value: "used", label: "Đã thuê" },
+              { value: "maintain", label: "Bảo trì" },
             ]}
           />
         </div>

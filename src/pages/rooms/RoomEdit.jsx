@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { roomService } from "../../api/rooms";
 import RoomForm from "../../components/forms/RoomForm";
 import Card from "../../components/common/Card";
@@ -13,7 +13,8 @@ const RoomEdit = () => {
   const navigate = useNavigate();
   const { showSuccess, showError } = useAlert();
   const { user } = useAuth();
-
+  const location = useLocation();
+  const fromHouseDetail = location.state?.fromHouseDetail;
   const [roomData, setRoomData] = useState(null);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(true);
@@ -34,7 +35,13 @@ const RoomEdit = () => {
     const response = await fetchRoom(id);
 
     if (response.success) {
-      setRoomData(response.data);
+      // Ensure house_id is properly set in the room data
+      const processedData = {
+        ...response.data,
+        house_id: response.data.house?.id || response.data.house_id,
+      };
+
+      setRoomData(processedData);
 
       // Check if user has permission to edit
       if (user) {
@@ -60,7 +67,13 @@ const RoomEdit = () => {
 
     if (response.success) {
       showSuccess("Cập nhật phòng thành công");
-      navigate("/rooms");
+
+      // Navigate back to house detail if we came from there
+      if (fromHouseDetail && roomData?.house?.id) {
+        navigate(`/houses/${roomData.house.id}`);
+      } else {
+        navigate("/rooms");
+      }
     } else {
       if (response.data && typeof response.data === "object") {
         setErrors(response.data);
@@ -68,6 +81,14 @@ const RoomEdit = () => {
         showError(response.message || "Có lỗi xảy ra khi cập nhật phòng");
       }
     }
+  };
+
+  // Determine the back button URL
+  const getBackUrl = () => {
+    if (fromHouseDetail && roomData?.house?.id) {
+      return `/houses/${roomData.house.id}`;
+    }
+    return "/rooms";
   };
 
   // Nếu chưa có thông tin user, hiển thị loading
@@ -84,7 +105,7 @@ const RoomEdit = () => {
       <div className="d-flex justify-content-between align-items-center my-2">
         <h1 className="fs-2 fw-semibold">Chỉnh sửa phòng</h1>
         <button
-          onClick={() => navigate("/rooms")}
+          onClick={() => navigate(getBackUrl())}
           className="btn btn-light fw-semibold"
         >
           Back

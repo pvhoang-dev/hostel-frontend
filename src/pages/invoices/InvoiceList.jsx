@@ -255,10 +255,6 @@ const InvoiceList = () => {
     house_id,
     room_id,
     invoice_type,
-    month,
-    year,
-    min_amount,
-    max_amount,
     user,
   ]);
 
@@ -367,6 +363,7 @@ const InvoiceList = () => {
       page: "1",
       per_page: perPage.toString(),
     });
+    loadInvoices();
   };
 
   const isLoading = loadingInvoices || loadingHouses || loadingRooms;

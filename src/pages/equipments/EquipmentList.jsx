@@ -162,6 +162,7 @@ const EquipmentList = () => {
       page: "1",
       per_page: perPage.toString(),
     });
+    loadEquipments();
   };
 
   return (

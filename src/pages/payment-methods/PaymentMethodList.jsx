@@ -206,6 +206,7 @@ const PaymentMethodList = () => {
       page: "1",
       per_page: perPage.toString(),
     });
+    loadPaymentMethods();
   };
 
   return (

@@ -19,21 +19,27 @@ const FilterSection = ({
   onFilterChange,
   onClearFilters,
   onApplyFilters,
+  hideHouseFilter = false,
 }) => (
   <Card title="Bộ lọc" className="mb-3">
     <div className="row g-3">
-      <div className="col-md-4">
-        <Select
-          label="Nhà"
-          name="house_id"
-          value={filters.house_id}
-          onChange={onFilterChange}
-          options={[
-            { value: "", label: "Tất cả" },
-            ...houses.map((house) => ({ value: house.id, label: house.name })),
-          ]}
-        />
-      </div>
+      {!hideHouseFilter && (
+        <div className="col-md-4">
+          <Select
+            label="Nhà"
+            name="house_id"
+            value={filters.house_id}
+            onChange={onFilterChange}
+            options={[
+              { value: "", label: "Tất cả" },
+              ...houses.map((house) => ({
+                value: house.id,
+                label: house.name,
+              })),
+            ]}
+          />
+        </div>
+      )}
 
       <div className="col-md-4">
         <Input
@@ -107,7 +113,7 @@ const FilterSection = ({
   </Card>
 );
 
-const RoomList = () => {
+const RoomList = ({ houseId, embedded = false, fromHouseDetail = false }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { showSuccess, showError } = useAlert();
   const navigate = useNavigate();
@@ -118,11 +124,12 @@ const RoomList = () => {
 
   // Get current filters from URL
   const currentPage = Number(searchParams.get("page")) || 1;
-  const perPage = Number(searchParams.get("per_page")) || 5;
+  const perPage = Number(searchParams.get("per_page")) || embedded ? 10 : 5;
   const sortBy = searchParams.get("sort_by") || "id";
   const sortDir = searchParams.get("sort_dir") || "asc";
 
-  const house_id = searchParams.get("house_id") || "";
+  // If embedded and houseId is provided, use it as the filter
+  const house_id = houseId || searchParams.get("house_id") || "";
   const room_number = searchParams.get("room_number") || "";
   const capacity = searchParams.get("capacity") || "";
   const status = searchParams.get("status") || "";
@@ -157,17 +164,22 @@ const RoomList = () => {
 
   const houses = housesData?.data || [];
 
-  // Column definitions for the table
+  // Column definitions for the table - adjusted for embedded mode
   const columns = [
     {
       accessorKey: "id",
       header: "ID",
     },
-    {
-      accessorKey: "house.name",
-      header: "Nhà",
-      cell: ({ row }) => row.original.house?.name || "N/A",
-    },
+    // Don't show house name when embedded in house detail
+    ...(!embedded
+      ? [
+          {
+            accessorKey: "house.name",
+            header: "Nhà",
+            cell: ({ row }) => row.original.house?.name || "N/A",
+          },
+        ]
+      : []),
     {
       accessorKey: "room_number",
       header: "Số phòng",
@@ -197,11 +209,11 @@ const RoomList = () => {
             statusText = "Có sẵn";
             statusColor = "text-success";
             break;
-          case "occupied":
+          case "used":
             statusText = "Đã thuê";
             statusColor = "text-primary";
             break;
-          case "maintenance":
+          case "maintain":
             statusText = "Bảo trì";
             statusColor = "text-warning";
             break;
@@ -213,10 +225,15 @@ const RoomList = () => {
         return <span className={statusColor}>{statusText}</span>;
       },
     },
-    {
-      accessorKey: "created_at",
-      header: "Ngày tạo",
-    },
+    // Only show created_at in standalone mode
+    ...(!embedded
+      ? [
+          {
+            accessorKey: "created_at",
+            header: "Ngày tạo",
+          },
+        ]
+      : []),
     {
       accessorKey: "actions",
       header: "Hành động",
@@ -226,27 +243,17 @@ const RoomList = () => {
   useEffect(() => {
     if (user) {
       loadRooms();
-      loadHouses();
+      if (!embedded) {
+        loadHouses();
+      }
     }
-  }, [user]);
+  }, [user, houseId, embedded]);
 
   useEffect(() => {
-    if (user && !loadingHouses && !loadingRooms) {
+    if (user && (!loadingHouses || embedded) && !loadingRooms) {
       loadRooms();
     }
-  }, [
-    currentPage,
-    perPage,
-    sortBy,
-    sortDir,
-    house_id,
-    room_number,
-    capacity,
-    status,
-    min_price,
-    max_price,
-    user,
-  ]);
+  }, [currentPage, perPage, sortBy, sortDir, house_id, status, user, houseId]);
 
   const loadRooms = async () => {
     const params = {
@@ -257,8 +264,14 @@ const RoomList = () => {
       include: "house",
     };
 
-    // Add filters if they exist
-    if (house_id) params.house_id = house_id;
+    // When embedded, always use the provided houseId
+    if (embedded && houseId) {
+      params.house_id = houseId;
+    } else {
+      // Add filters if they exist
+      if (house_id) params.house_id = house_id;
+    }
+
     if (room_number) params.room_number = room_number;
     if (capacity) params.capacity = capacity;
     if (status) params.status = status;
@@ -304,23 +317,56 @@ const RoomList = () => {
       showError("Bạn không có quyền sửa phòng này");
       return;
     }
-    navigate(`/rooms/${room.id}/edit`);
+
+    // Navigate to edit page with appropriate state
+    if (fromHouseDetail) {
+      navigate(`/rooms/${room.id}/edit`, {
+        state: {
+          fromHouseDetail: true,
+          houseId: houseId,
+        },
+      });
+    } else {
+      navigate(`/rooms/${room.id}/edit`);
+    }
   };
 
   const handlePageChange = (page) => {
-    setSearchParams({
-      ...Object.fromEntries(searchParams),
-      page: page.toString(),
-    });
+    if (embedded) {
+      // When embedded, just reload with the new page
+      const params = {
+        page: page,
+        per_page: perPage,
+        house_id: houseId,
+      };
+      fetchRooms(params);
+    } else {
+      setSearchParams({
+        ...Object.fromEntries(searchParams),
+        page: page.toString(),
+      });
+    }
   };
 
   const handleSortingChange = (sorting) => {
     if (sorting.length > 0) {
-      setSearchParams({
-        ...Object.fromEntries(searchParams),
-        sort_by: sorting[0].id,
-        sort_dir: sorting[0].desc ? "desc" : "asc",
-      });
+      if (embedded) {
+        // When embedded, just reload with the new sorting
+        const params = {
+          page: currentPage,
+          per_page: perPage,
+          sort_by: sorting[0].id,
+          sort_dir: sorting[0].desc ? "desc" : "asc",
+          house_id: houseId,
+        };
+        fetchRooms(params);
+      } else {
+        setSearchParams({
+          ...Object.fromEntries(searchParams),
+          sort_by: sorting[0].id,
+          sort_dir: sorting[0].desc ? "desc" : "asc",
+        });
+      }
     }
   };
 
@@ -339,13 +385,23 @@ const RoomList = () => {
   };
 
   const clearFilters = () => {
-    setSearchParams({
-      page: "1",
-      per_page: perPage.toString(),
-    });
+    if (embedded) {
+      const params = {
+        page: 1,
+        per_page: perPage,
+        house_id: houseId,
+      };
+      fetchRooms(params);
+    } else {
+      setSearchParams({
+        page: "1",
+        per_page: perPage.toString(),
+      });
+      loadRooms();
+    }
   };
 
-  const isLoading = loadingRooms || loadingHouses;
+  const isLoading = loadingRooms || (loadingHouses && !embedded);
 
   // Nếu chưa có thông tin user, hiển thị loading
   if (!user) {
@@ -353,32 +409,42 @@ const RoomList = () => {
   }
 
   return (
-    <div>
-      <div className="d-flex justify-content-between align-items-center my-2">
-        <h3>Phòng</h3>
-        {(isAdmin || isManager) && (
-          <Button as={Link} to="/rooms/create">
-            Thêm
-          </Button>
-        )}
-      </div>
+    <div className={embedded ? "" : "container-fluid"}>
+      {!embedded && (
+        <div className="d-flex justify-content-between align-items-center my-2">
+          <h3>Phòng</h3>
+          {(isAdmin || isManager) && (
+            <Button
+              as={Link}
+              to={
+                houseId ? `/rooms/create?house_id=${houseId}` : "/rooms/create"
+              }
+            >
+              Thêm
+            </Button>
+          )}
+        </div>
+      )}
 
-      <FilterSection
-        filters={{
-          house_id,
-          room_number,
-          capacity,
-          status,
-          min_price,
-          max_price,
-        }}
-        houses={houses}
-        onFilterChange={handleFilterChange}
-        onClearFilters={clearFilters}
-        onApplyFilters={loadRooms}
-      />
+      {!embedded && (
+        <FilterSection
+          filters={{
+            house_id,
+            room_number,
+            capacity,
+            status,
+            min_price,
+            max_price,
+          }}
+          houses={houses}
+          onFilterChange={handleFilterChange}
+          onClearFilters={clearFilters}
+          onApplyFilters={loadRooms}
+          hideHouseFilter={!!houseId}
+        />
+      )}
 
-      <Card>
+      <Card className={embedded ? "border-0 p-0" : ""}>
         {isLoading ? (
           <Loader />
         ) : (
