@@ -45,6 +45,9 @@ import InvoiceList from "./pages/invoices/InvoiceList";
 import InvoiceCreate from "./pages/invoices/InvoiceCreate";
 import InvoiceDetail from "./pages/invoices/InvoiceDetail";
 import InvoiceEdit from "./pages/invoices/InvoiceEdit";
+import HouseSettingCreate from "./pages/houses/settings/HouseSettingCreate";
+import HouseSettingDetail from "./pages/houses/settings/HouseSettingDetail";
+import HouseSettingEdit from "./pages/houses/settings/HouseSettingEdit";
 
 // Protected route wrapper component
 const ProtectedRoute = ({ element, allowedRoles = [] }) => {
@@ -203,6 +206,34 @@ const Routes = () => {
           element: (
             <ProtectedRoute
               element={<HouseEdit />}
+              allowedRoles={["admin", "manager"]}
+            />
+          ),
+        },
+        // House Settings routes
+        {
+          path: "houses/:houseId/settings/create",
+          element: (
+            <ProtectedRoute
+              element={<HouseSettingCreate />}
+              allowedRoles={["admin", "manager"]}
+            />
+          ),
+        },
+        {
+          path: "houses/:houseId/settings/:settingId",
+          element: (
+            <ProtectedRoute
+              element={<HouseSettingDetail />}
+              allowedRoles={["admin", "manager"]}
+            />
+          ),
+        },
+        {
+          path: "houses/:houseId/settings/:settingId/edit",
+          element: (
+            <ProtectedRoute
+              element={<HouseSettingEdit />}
               allowedRoles={["admin", "manager"]}
             />
           ),

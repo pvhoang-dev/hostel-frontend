@@ -5,6 +5,7 @@ import { useContext } from "react";
 import { AlertContext } from "../../contexts/AlertContext";
 import { useAuth } from "../../hooks/useAuth";
 import RoomList from "../rooms/RoomList";
+import HouseSettingList from "./settings/HouseSettingList";
 
 const HouseDetail = () => {
   const { id } = useParams();
@@ -190,7 +191,7 @@ const HouseDetail = () => {
 
         <div className="mt-4">
           <div className="d-flex justify-content-between align-items-center mb-3">
-            <h4 className="fs-5 fw-medium mb-0">Danh sách phòng</h4>
+            <h3 className="fs-5 fw-medium mb-0">Danh sách phòng</h3>
             <Link
               to={`/rooms/create?house_id=${id}`}
               className="btn btn-primary btn-sm"
@@ -199,6 +200,13 @@ const HouseDetail = () => {
             </Link>
           </div>
           <RoomList houseId={id} embedded={true} fromHouseDetail={true} />
+        </div>
+
+        <hr className="my-4" />
+
+        {/* Nội quy nhà */}
+        <div className="mt-4">
+          <HouseSettingList houseId={id} />
         </div>
       </div>
     </div>
