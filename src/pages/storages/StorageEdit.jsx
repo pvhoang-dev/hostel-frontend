@@ -13,7 +13,7 @@ const StorageEdit = () => {
   const navigate = useNavigate();
   const { showSuccess, showError } = useAlert();
   const [errors, setErrors] = useState({});
-  const { user } = useAuth();
+  const { user, isAdmin, isManager } = useAuth();
   const [loading, setLoading] = useState(true);
   const [canEdit, setCanEdit] = useState(false);
 
@@ -45,9 +45,6 @@ const StorageEdit = () => {
 
   const checkPermission = (storageData) => {
     try {
-      const isAdmin = user?.role === "admin";
-      const isManager = user?.role === "manager";
-
       if (isAdmin) {
         setCanEdit(true);
       } else if (
@@ -73,7 +70,6 @@ const StorageEdit = () => {
 
     if (response.success) {
       showSuccess("Cập nhật thông tin kho thiết bị thành công");
-      navigate(`/storages/${id}`);
     } else {
       if (response.data && typeof response.data === "object") {
         setErrors(response.data);
