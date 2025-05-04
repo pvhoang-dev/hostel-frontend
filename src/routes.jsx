@@ -48,6 +48,10 @@ import InvoiceEdit from "./pages/invoices/InvoiceEdit";
 import HouseSettingCreate from "./pages/houses/settings/HouseSettingCreate";
 import HouseSettingDetail from "./pages/houses/settings/HouseSettingDetail";
 import HouseSettingEdit from "./pages/houses/settings/HouseSettingEdit";
+import StorageList from "./pages/storages/StorageList";
+import StorageCreate from "./pages/storages/StorageCreate";
+import StorageDetail from "./pages/storages/StorageDetail";
+import StorageEdit from "./pages/storages/StorageEdit";
 
 // Protected route wrapper component
 const ProtectedRoute = ({ element, allowedRoles = [] }) => {
@@ -490,6 +494,52 @@ const Routes = () => {
           element: (
             <ProtectedRoute
               element={<InvoiceEdit />}
+              allowedRoles={["admin", "manager"]}
+            />
+          ),
+        },
+        // Storage routes
+        {
+          path: "storages",
+          element: (
+            <ProtectedRoute
+              element={<StorageList />}
+              allowedRoles={["admin", "manager"]}
+            />
+          ),
+        },
+        {
+          path: "storages/create",
+          element: (
+            <ProtectedRoute
+              element={<StorageCreate />}
+              allowedRoles={["admin", "manager"]}
+            />
+          ),
+        },
+        {
+          path: "houses/:houseId/storages/create",
+          element: (
+            <ProtectedRoute
+              element={<StorageCreate />}
+              allowedRoles={["admin", "manager"]}
+            />
+          ),
+        },
+        {
+          path: "storages/:id",
+          element: (
+            <ProtectedRoute
+              element={<StorageDetail />}
+              allowedRoles={["admin", "manager"]}
+            />
+          ),
+        },
+        {
+          path: "storages/:id/edit",
+          element: (
+            <ProtectedRoute
+              element={<StorageEdit />}
               allowedRoles={["admin", "manager"]}
             />
           ),

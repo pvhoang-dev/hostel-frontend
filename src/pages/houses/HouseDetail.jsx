@@ -6,6 +6,7 @@ import { AlertContext } from "../../contexts/AlertContext";
 import { useAuth } from "../../hooks/useAuth";
 import RoomList from "../rooms/RoomList";
 import HouseSettingList from "./settings/HouseSettingList";
+import StorageList from "../storages/StorageList";
 
 const HouseDetail = () => {
   const { id } = useParams();
@@ -204,9 +205,14 @@ const HouseDetail = () => {
 
         <hr className="my-4" />
 
-        {/* Nội quy nhà */}
         <div className="mt-4">
-          <HouseSettingList houseId={id} />
+          <HouseSettingList houseId={id} embedded={true} />
+        </div>
+
+        <hr className="my-4" />
+
+        <div className="mt-4">
+          <StorageList houseId={id} embedded={true} fromHouseDetail={true} />
         </div>
       </div>
     </div>
