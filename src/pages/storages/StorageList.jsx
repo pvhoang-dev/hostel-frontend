@@ -209,6 +209,10 @@ const StorageList = ({
           },
         ]
       : []),
+    {
+      accessorKey: "actions",
+      header: "Hành động",
+    },
   ];
 
   // Tải houses khi component được mount

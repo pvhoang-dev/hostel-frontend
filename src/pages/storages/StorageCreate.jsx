@@ -102,7 +102,7 @@ const StorageCreate = () => {
       <div className="d-flex justify-content-between align-items-center my-2">
         <h1 className="fs-2 fw-semibold">Thêm thiết bị vào kho</h1>
         <button
-          onClick={() => navigate(houseId ? `/houses/${houseId}` : "/storages")}
+          onClick={() => navigate(-1)}
           className="btn btn-light fw-semibold"
         >
           Quay lại

@@ -197,7 +197,7 @@ const HouseSettingList = ({ houseId }) => {
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center mb-3">
-        <h3 className="fs-5 fw-semibold">Nội quy nhà</h3>
+        <h4 className="fs-5 fw-semibold">Nội quy nhà</h4>
         {canManageSettings && (
           <Link
             to={`/houses/${houseId}/settings/create`}

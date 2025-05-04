@@ -51,7 +51,7 @@ const StorageDetail = () => {
         <h3 className="fs-2 fw-semibold">Chi tiết kho thiết bị</h3>
         <div className="d-flex gap-2">
           <button
-            onClick={() => navigate("/storages")}
+            onClick={() => navigate(-1)}
             className="btn btn-light fw-semibold mr-2"
           >
             Quay lại

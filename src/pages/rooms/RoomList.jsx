@@ -445,6 +445,17 @@ const RoomList = ({ houseId, embedded = false, fromHouseDetail = false }) => {
       )}
 
       <Card className={embedded ? "border-0 p-0" : ""}>
+        {embedded && (
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <h4 className="fs-5 fw-semibold mb-0">Phòng</h4>
+            <Link
+              to={`/rooms/create?house_id=${houseId}`}
+              className="btn btn-sm btn-primary"
+            >
+              Thêm phòng
+            </Link>
+          </div>
+        )}
         {isLoading ? (
           <Loader />
         ) : (

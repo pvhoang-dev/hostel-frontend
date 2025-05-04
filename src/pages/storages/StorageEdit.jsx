@@ -102,7 +102,7 @@ const StorageEdit = () => {
       <div className="d-flex justify-content-between align-items-center my-2">
         <h1 className="fs-2 fw-semibold">Chỉnh sửa thông tin kho thiết bị</h1>
         <button
-          onClick={() => navigate(`/storages/${id}`)}
+          onClick={() => navigate(-1)}
           className="btn btn-light fw-semibold"
         >
           Quay lại
