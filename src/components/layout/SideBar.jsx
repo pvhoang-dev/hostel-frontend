@@ -10,6 +10,7 @@ const SideBar = () => {
       label: "Trang chủ",
       roles: ["admin", "manager", "tenant"],
     },
+    { path: "#", label: "QL Doanh thu/Số liệu", roles: ["admin"] },
     { path: "/users", label: "QL Users", roles: ["admin", "manager"] },
     { path: "/roles", label: "QL Vai trò", roles: ["admin"] },
     {
@@ -22,6 +23,7 @@ const SideBar = () => {
     { path: "/houses", label: "QL Nhà trọ", roles: ["admin", "manager"] },
     { path: "/storages", label: "QL Kho", roles: ["admin", "manager"] },
     { path: "/rooms", label: "QL Phòng trọ", roles: ["admin", "manager"] },
+    { path: "#", label: "QL DV phòng/Tháng", roles: ["admin", "manager"] },
     { path: "/contracts", label: "QL Hợp đồng", roles: ["admin", "manager"] },
     {
       path: "/invoices",
@@ -29,12 +31,12 @@ const SideBar = () => {
       roles: ["admin", "manager", "tenant"],
     },
     {
-      path: "/requests",
+      path: "#",
       label: isTenant ? "Yêu cầu" : "QL Yêu cầu",
       roles: ["admin", "manager", "tenant"],
     },
     {
-      path: "/notifications",
+      path: "#",
       label: "QL Thông báo",
       roles: ["admin", "manager"],
     },
@@ -72,7 +74,11 @@ const SideBar = () => {
           <ul className="metismenu side-nav">
             {filteredMenuItems.map((item) => (
               <li className="side-nav-item" key={item.path}>
-                <NavLink to={item.path} className="side-nav-link">
+                <NavLink
+                  to={item.path}
+                  className="side-nav-link"
+                  style={{ padding: "10px 20px" }}
+                >
                   <i className="dripicons-chevron-right"></i>
                   <span className="h4 font-weight-normal">{item.label}</span>
                 </NavLink>
