@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { houseService } from "../../api/houses";
+import { equipmentService } from "../../api/equipments"; // Import equipment service
 import Input from "../common/Input";
 import Select from "../common/Select";
 import Button from "../common/Button";
@@ -16,15 +17,14 @@ const StorageForm = ({
   houseId = null,
 }) => {
   // Use initialData.house_id if available, otherwise fall back to houseId
-  const preselectedHouseId = initialData.house_id || houseId || "";
+  const preselectedHouseId = initialData.house?.id || houseId || "";
 
   const [formData, setFormData] = useState({
     house_id: preselectedHouseId,
-    equipment_id: "",
-    quantity: 1,
-    price: 0,
-    description: "",
-    ...initialData,
+    equipment_id: initialData.equipment?.id || "",
+    quantity: initialData.quantity || 1,
+    price: initialData.price || 0,
+    description: initialData.description || "",
   });
 
   const [houses, setHouses] = useState([]);
@@ -32,7 +32,6 @@ const StorageForm = ({
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Always load houses, even if houseId is provided
     loadHouses();
     loadEquipments();
   }, []);
@@ -58,28 +57,17 @@ const StorageForm = ({
     }
   };
 
-  // Hàm mô phỏng tải dữ liệu thiết bị
-  // Trong thực tế, bạn cần thay đổi để gọi API thiết bị thật
   const loadEquipments = async () => {
     try {
-      // Giả sử có API gọi thiết bị như equipmentService.getEquipments()
-      // const response = await equipmentService.getEquipments();
-
-      // Dữ liệu mẫu
-      const mockEquipments = [
-        { id: 1, name: "Tủ lạnh" },
-        { id: 2, name: "Máy giặt" },
-        { id: 3, name: "Điều hòa" },
-        { id: 4, name: "Bàn ghế" },
-        { id: 5, name: "TV" },
-      ];
-
-      setEquipments(
-        mockEquipments.map((equip) => ({
-          value: equip.id,
-          label: equip.name,
-        }))
-      );
+      const response = await equipmentService.getEquipments();
+      if (response.success) {
+        setEquipments(
+          response.data.data.map((equipment) => ({
+            value: equipment.id,
+            label: equipment.name,
+          }))
+        );
+      }
     } catch (error) {
       console.error("Lỗi khi tải danh sách thiết bị:", error);
     }
