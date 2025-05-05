@@ -36,9 +36,9 @@ const SideBar = () => {
       roles: ["admin", "manager", "tenant"],
     },
     {
-      path: "#",
-      label: "QL Thông báo",
-      roles: ["admin", "manager"],
+      path: "/notifications",
+      label: isTenant ? "Thông báo" : "QL Thông báo",
+      roles: ["admin", "manager", "tenant"],
     },
     { path: "/settings", label: "QL Nội quy chung", roles: ["admin"] },
   ];

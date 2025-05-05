@@ -139,7 +139,7 @@ const Header = () => {
                     </span>
                   )}
                   <span>
-                    <p className="text-white">
+                    <p className="text-white mb-0">
                       Thông báo {unreadCount > 0 && `(${unreadCount})`}
                     </p>
                   </span>
@@ -184,6 +184,14 @@ const Header = () => {
                           className={
                             !notification?.is_read ? "font-weight-bold" : ""
                           }
+                          style={{
+                            lineHeight: "1.3",
+                            marginBottom: "3px",
+                            fontWeight: !notification?.is_read
+                              ? "bold"
+                              : "normal",
+                            whiteSpace: "normal",
+                          }}
                         >
                           {notification?.content || "New notification"}
                         </span>

@@ -56,6 +56,10 @@ import RequestList from "./pages/requests/RequestList";
 import RequestCreate from "./pages/requests/RequestCreate";
 import RequestDetail from "./pages/requests/RequestDetail";
 import RequestEdit from "./pages/requests/RequestEdit";
+import NotificationList from "./pages/notifications/NotificationList";
+import NotificationCreate from "./pages/notifications/NotificationCreate";
+import NotificationDetail from "./pages/notifications/NotificationDetail";
+import NotificationEdit from "./pages/notifications/NotificationEdit";
 
 // Protected route wrapper component
 const ProtectedRoute = ({ element, allowedRoles = [] }) => {
@@ -582,6 +586,43 @@ const Routes = () => {
             <ProtectedRoute
               element={<RequestEdit />}
               allowedRoles={["admin", "manager", "tenant"]}
+            />
+          ),
+        },
+        // Notification routes
+        {
+          path: "notifications",
+          element: (
+            <ProtectedRoute
+              element={<NotificationList />}
+              allowedRoles={["admin", "manager", "tenant"]}
+            />
+          ),
+        },
+        {
+          path: "notifications/create",
+          element: (
+            <ProtectedRoute
+              element={<NotificationCreate />}
+              allowedRoles={["admin", "manager"]}
+            />
+          ),
+        },
+        {
+          path: "notifications/:id",
+          element: (
+            <ProtectedRoute
+              element={<NotificationDetail />}
+              allowedRoles={["admin", "manager", "tenant"]}
+            />
+          ),
+        },
+        {
+          path: "notifications/:id/edit",
+          element: (
+            <ProtectedRoute
+              element={<NotificationEdit />}
+              allowedRoles={["admin", "manager"]}
             />
           ),
         },
