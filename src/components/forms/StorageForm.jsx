@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
 import { houseService } from "../../api/houses";
-import { equipmentService } from "../../api/equipments"; // Import equipment service
+import { equipmentService } from "../../api/equipments";
 import Input from "../common/Input";
 import Select from "../common/Select";
 import Button from "../common/Button";
 import TextArea from "../common/TextArea";
-import useApi from "../../hooks/useApi";
 import Loader from "../common/Loader";
 
 const StorageForm = ({

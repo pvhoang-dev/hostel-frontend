@@ -220,7 +220,7 @@ const RequestDetail = () => {
           // Tạo thông báo
           await notificationService.createNotification({
             user_id: notificationRecipientId,
-            type: "new_comment",
+            type: "info",
             content: `${user.name} đã thêm một bình luận vào yêu cầu #${request.id}`,
             url: `/requests/${request.id}`,
           });
@@ -367,7 +367,7 @@ const RequestDetail = () => {
         for (const recipientId of notificationRecipients) {
           await notificationService.createNotification({
             user_id: recipientId,
-            type: "request_completed",
+            type: "success",
             content: `Yêu cầu #${request.id} đã được đánh dấu là hoàn thành bởi ${user.name}`,
             url: `/requests/${request.id}`,
           });
