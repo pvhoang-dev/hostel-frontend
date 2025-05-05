@@ -52,6 +52,10 @@ import StorageList from "./pages/storages/StorageList";
 import StorageCreate from "./pages/storages/StorageCreate";
 import StorageDetail from "./pages/storages/StorageDetail";
 import StorageEdit from "./pages/storages/StorageEdit";
+import RequestList from "./pages/requests/RequestList";
+import RequestCreate from "./pages/requests/RequestCreate";
+import RequestDetail from "./pages/requests/RequestDetail";
+import RequestEdit from "./pages/requests/RequestEdit";
 
 // Protected route wrapper component
 const ProtectedRoute = ({ element, allowedRoles = [] }) => {
@@ -541,6 +545,43 @@ const Routes = () => {
             <ProtectedRoute
               element={<StorageEdit />}
               allowedRoles={["admin", "manager"]}
+            />
+          ),
+        },
+        // Request routes
+        {
+          path: "requests",
+          element: (
+            <ProtectedRoute
+              element={<RequestList />}
+              allowedRoles={["admin", "manager", "tenant"]}
+            />
+          ),
+        },
+        {
+          path: "requests/create",
+          element: (
+            <ProtectedRoute
+              element={<RequestCreate />}
+              allowedRoles={["admin", "manager", "tenant"]}
+            />
+          ),
+        },
+        {
+          path: "requests/:id",
+          element: (
+            <ProtectedRoute
+              element={<RequestDetail />}
+              allowedRoles={["admin", "manager", "tenant"]}
+            />
+          ),
+        },
+        {
+          path: "requests/:id/edit",
+          element: (
+            <ProtectedRoute
+              element={<RequestEdit />}
+              allowedRoles={["admin", "manager", "tenant"]}
             />
           ),
         },
