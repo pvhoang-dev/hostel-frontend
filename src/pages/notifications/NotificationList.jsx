@@ -113,7 +113,7 @@ const FilterSection = ({
       <Button
         variant="secondary"
         onClick={onClearFilters}
-        className="me-2 mr-2"
+        className=" mr-2"
       >
         Xóa bộ lọc
       </Button>
@@ -446,7 +446,7 @@ const NotificationList = () => {
           <Button
             variant="secondary"
             onClick={handleMarkAllAsRead}
-            className="me-2 mr-2"
+            className=" mr-2"
           >
             Đánh dấu tất cả đã đọc
           </Button>

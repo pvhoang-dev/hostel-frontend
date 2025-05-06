@@ -124,7 +124,7 @@ const NotificationDetail = () => {
             variant="secondary"
             as={Link}
             to="/notifications"
-            className="me-2 mr-2"
+            className=" mr-2"
           >
             Quay lại
           </Button>
@@ -134,7 +134,7 @@ const NotificationDetail = () => {
                 variant="primary"
                 as={Link}
                 to={`/notifications/${id}/edit`}
-                className="me-2 mr-2"
+                className=" mr-2"
               >
                 Chỉnh sửa
               </Button>

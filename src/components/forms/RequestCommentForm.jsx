@@ -56,7 +56,7 @@ const RequestCommentForm = ({
             type="button"
             variant="secondary"
             onClick={() => onCancel && onCancel()}
-            className="me-2 mr-2"
+            className=" mr-2"
           >
             Hủy
           </Button>

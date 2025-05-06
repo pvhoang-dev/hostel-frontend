@@ -62,7 +62,7 @@ const NotFound = () => {
             to="/"
             className="btn btn-secondary d-flex align-items-center justify-content-center mr-3"
           >
-            <i className="mdi mdi-home me-2"></i>
+            <i className="mdi mdi-home mr-2"></i>
             Về trang chủ
           </Button>
           <Button
@@ -70,7 +70,7 @@ const NotFound = () => {
             onClick={() => window.history.back()}
             className="btn btn-primary d-flex align-items-center justify-content-center"
           >
-            <i className="mdi mdi-arrow-left me-2"></i>
+            <i className="mdi mdi-arrow-left mr-2"></i>
             Quay lại trang trước
           </Button>
         </div>
