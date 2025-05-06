@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { storageService } from "../../api/storages";
 import Loader from "../../components/common/Loader";
+import Card from "../../components/common/Card";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 import { useAuth } from "../../hooks/useAuth";
@@ -10,10 +11,7 @@ const StorageDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { showError } = useAlert();
-  const { user } = useAuth();
-
-  const isAdmin = user?.role === "admin";
-  const isManager = user?.role === "manager";
+  const { user, isAdmin, isManager } = useAuth();
 
   const {
     data: storage,
@@ -67,8 +65,8 @@ const StorageDetail = () => {
         </div>
       </div>
 
-      <div className="p-4 rounded shadow">
-        <div className="d-flex align-items-start">
+      <Card>
+        <div className="d-flex align-items-start mb-4">
           <div className="flex-grow-1">
             <h4 className="fs-4 fw-semibold">
               {storage.equipment?.name || "Thiết bị chưa xác định"} -{" "}
@@ -77,87 +75,113 @@ const StorageDetail = () => {
           </div>
         </div>
 
-        <hr className="my-4" />
-
-        <div className="row g-4">
-          <div className="col-12 col-md-6">
-            <h4 className="fs-5 fw-medium mb-2">Thông tin cơ bản</h4>
-            <div className="d-flex flex-column gap-2">
-              <div>
-                <span>Số lượng: </span>
-                <span className="ms-2 fw-medium">{storage.quantity}</span>
-              </div>
-              <div>
-                <span>Giá: </span>
-                <span className="ms-2 fw-medium">
-                  {storage.price
-                    ? new Intl.NumberFormat("vi-VN", {
-                        style: "currency",
-                        currency: "VND",
-                      }).format(storage.price)
-                    : "Không có"}
-                </span>
-              </div>
+        <div className="row">
+          <div className="col-md-6 mb-4">
+            <h5 className="mb-3">Thông tin cơ bản</h5>
+            <div className="table-responsive">
+              <table className="table table-bordered">
+                <thead style={{ backgroundColor: "rgba(0, 0, 0, .075)" }}>
+                  <tr>
+                    <th style={{ width: "40%" }}>Thông tin</th>
+                    <th>Chi tiết</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Số lượng:</td>
+                    <td>{storage.quantity}</td>
+                  </tr>
+                  <tr>
+                    <td>Giá:</td>
+                    <td className="text-primary">
+                      {storage.price
+                        ? new Intl.NumberFormat("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                          }).format(storage.price)
+                        : "Không có"}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
 
-          <div className="col-12 col-md-6">
-            <h4 className="fs-5 fw-medium mb-2">Thông tin nhà</h4>
-            <div className="d-flex flex-column gap-2">
-              <div>
-                <span>Nhà: </span>
-                <span className="ms-2">
-                  {storage.house?.name ? (
-                    <Link to={`/houses/${storage.house.id}`}>
-                      {storage.house.name}
-                    </Link>
-                  ) : (
-                    "Không có"
-                  )}
-                </span>
+          <div className="col-md-6 mb-4">
+            <h5 className="mb-3">Thông tin nhà</h5>
+            <div className="table-responsive">
+              <table className="table table-bordered">
+                <thead style={{ backgroundColor: "rgba(0, 0, 0, .075)" }}>
+                  <tr>
+                    <th style={{ width: "40%" }}>Thông tin</th>
+                    <th>Chi tiết</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Nhà:</td>
+                    <td>
+                      {storage.house?.name ? (
+                        <Link
+                          to={`/houses/${storage.house.id}`}
+                          className="text-info"
+                        >
+                          {storage.house.name}
+                        </Link>
+                      ) : (
+                        "Không có"
+                      )}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Địa chỉ:</td>
+                    <td>{storage.house?.address || "Không có"}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {storage.description && (
+            <div className="col-md-12 mb-4">
+              <h5 className="mb-3">Mô tả</h5>
+              <div className="p-3 border rounded">
+                <p style={{ whiteSpace: "pre-wrap" }} className="mb-0">
+                  {storage.description || "Không có mô tả"}
+                </p>
               </div>
-              <div>
-                <span>Địa chỉ: </span>
-                <span className="ms-2">
-                  {storage.house?.address || "Không có"}
-                </span>
-              </div>
+            </div>
+          )}
+
+          <div className="col-md-12 mb-4">
+            <h5 className="mb-3">Thông tin hệ thống</h5>
+            <div className="table-responsive">
+              <table className="table table-bordered">
+                <thead style={{ backgroundColor: "rgba(0, 0, 0, .075)" }}>
+                  <tr>
+                    <th style={{ width: "200px" }}>Thông tin</th>
+                    <th>Chi tiết</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>ID:</td>
+                    <td>{storage.id}</td>
+                  </tr>
+                  <tr>
+                    <td>Tạo:</td>
+                    <td>{storage.created_at}</td>
+                  </tr>
+                  <tr>
+                    <td>Lần cuối cập nhật:</td>
+                    <td>{storage.updated_at}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
-
-        {storage.description && (
-          <>
-            <hr className="my-4" />
-            <div>
-              <h4 className="fs-5 fw-medium mb-2">Mô tả</h4>
-              <p style={{ whiteSpace: "pre-wrap" }}>
-                {storage.description || "Không có mô tả"}
-              </p>
-            </div>
-          </>
-        )}
-
-        <hr className="my-4" />
-
-        <div>
-          <h4 className="fs-5 fw-medium mb-2">Thông tin hệ thống</h4>
-          <div className="d-flex flex-column gap-2">
-            <div>
-              <span>ID: </span>
-              <span className="ms-2">{storage.id}</span>
-            </div>
-            <div>
-              <span>Tạo: </span>
-              <span className="ms-2">{storage.created_at}</span>
-            </div>
-            <div>
-              <span>Lần cuối cập nhật: </span>
-              <span className="ms-2">{storage.updated_at}</span>
-            </div>
-          </div>
-        </div>
-      </div>
+      </Card>
     </div>
   );
 };

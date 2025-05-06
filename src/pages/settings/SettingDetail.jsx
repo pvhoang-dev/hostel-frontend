@@ -70,39 +70,80 @@ const SettingDetail = () => {
 
       <Card>
         <div className="mb-4">
-          <h2 className="fs-4 fw-semibold mb-3">
-            {setting.key}. {setting.value}
-          </h2>
-          <div className="mt-3">
-            <h3 className="fs-5 fw-medium mb-2">Mô tả</h3>
-            <p className="text-secondary">
-              {setting.description || "Không có mô tả"}
-            </p>
-          </div>
+          <h4 className="fs-4 fw-semibold mb-3">
+            {setting.key}: {setting.value}
+          </h4>
         </div>
 
-        <div className="mt-4 border-top pt-3">
-          <h3 className="fs-5 fw-medium mb-2">Thông tin hệ thống</h3>
-          <div className="row g-3">
-            <div className="col-12 col-md-6">
-              <span className="text-secondary">ID:</span>
-              <span className="ms-2">{setting.id}</span>
+        <div className="row">
+          {setting.description && (
+            <div className="col-md-12 mb-4">
+              <h5 className="mb-3">Mô tả</h5>
+              <div className="p-3 border rounded">
+                <p className="mb-0">
+                  {setting.description || "Không có mô tả"}
+                </p>
+              </div>
             </div>
-            <div className="col-12 col-md-6">
-              <span className="text-secondary">Người tạo:</span>
-              <span className="ms-2">{renderUserInfo(setting.created_by)}</span>
+          )}
+
+          <div className="col-md-12 mb-4">
+            <h5 className="mb-3">Thông tin cài đặt</h5>
+            <div className="table-responsive">
+              <table className="table table-bordered">
+                <thead style={{ backgroundColor: "rgba(0, 0, 0, .075)" }}>
+                  <tr>
+                    <th style={{ width: "200px" }}>Thông tin</th>
+                    <th>Chi tiết</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Key:</td>
+                    <td>{setting.key}</td>
+                  </tr>
+                  <tr>
+                    <td>Value:</td>
+                    <td>{setting.value}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
-            <div className="col-12 col-md-6">
-              <span className="text-secondary">Ngày tạo:</span>
-              <span className="ms-2">{setting.created_at}</span>
-            </div>
-            <div className="col-12 col-md-6">
-              <span className="text-secondary">Người cập nhật:</span>
-              <span className="ms-2">{renderUserInfo(setting.updated_by)}</span>
-            </div>
-            <div className="col-12 col-md-6">
-              <span className="text-secondary">Cập nhật lần cuối:</span>
-              <span className="ms-2">{setting.updated_at}</span>
+          </div>
+
+          <div className="col-md-12 mb-4">
+            <h5 className="mb-3">Thông tin hệ thống</h5>
+            <div className="table-responsive">
+              <table className="table table-bordered">
+                <thead style={{ backgroundColor: "rgba(0, 0, 0, .075)" }}>
+                  <tr>
+                    <th style={{ width: "200px" }}>Thông tin</th>
+                    <th>Chi tiết</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>ID:</td>
+                    <td>{setting.id}</td>
+                  </tr>
+                  <tr>
+                    <td>Người tạo:</td>
+                    <td>{renderUserInfo(setting.created_by)}</td>
+                  </tr>
+                  <tr>
+                    <td>Ngày tạo:</td>
+                    <td>{setting.created_at}</td>
+                  </tr>
+                  <tr>
+                    <td>Người cập nhật:</td>
+                    <td>{renderUserInfo(setting.updated_by)}</td>
+                  </tr>
+                  <tr>
+                    <td>Cập nhật lần cuối:</td>
+                    <td>{setting.updated_at}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>

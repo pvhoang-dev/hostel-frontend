@@ -12,14 +12,11 @@ import { formatDate, formatCurrency } from "../../utils/formatters";
 const InvoiceDetail = () => {
   const { id } = useParams();
   const [invoice, setInvoice] = useState(null);
-  const { user } = useAuth();
+  const { user, isAdmin, isManager } = useAuth();
   const { showError } = useAlert();
   const navigate = useNavigate();
 
   const { execute: fetchInvoice, loading } = useApi(invoiceService.getInvoice);
-
-  const isAdmin = user?.role?.code === "admin";
-  const isManager = user?.role?.code === "manager";
 
   useEffect(() => {
     if (user) {
@@ -81,7 +78,7 @@ const InvoiceDetail = () => {
       </div>
 
       <Card>
-        <div className="d-flex align-items-start justify-content-between">
+        <div className="d-flex align-items-start justify-content-between mb-4">
           <div>
             <h4 className="mb-2">
               Hóa đơn #{invoice.id} - {invoice.room?.house?.name || "N/A"} -
@@ -98,73 +95,140 @@ const InvoiceDetail = () => {
           </div>
         </div>
 
-        {invoice.description && (
-          <div className="mb-3">
-            <h5>Mô tả</h5>
-            <p>{invoice.description}</p>
-          </div>
-        )}
-
-        <div className="">
-          <h5>Chi tiết hóa đơn</h5>
-          <div className="table-responsive">
-            <table className="table table-bordered">
-              <thead className="table-light">
-                <tr>
-                  <th style={{ width: "5%" }}>#</th>
-                  <th style={{ width: "15%" }}>Loại</th>
-                  <th style={{ width: "65%" }}>Mô tả</th>
-                  <th style={{ width: "15%" }}>Số tiền</th>
-                </tr>
-              </thead>
-              <tbody>
-                {invoice.items &&
-                  invoice.items.map((item, index) => (
-                    <tr key={index}>
-                      <td>{index + 1}</td>
-                      <td>
-                        {item.source_type === "manual" ? "Nhập tay" : "Dịch vụ"}
-                      </td>
-                      <td>{item.description}</td>
-                      <td className="text-end">
-                        {formatCurrency(item.amount)}
-                      </td>
-                    </tr>
-                  ))}
-                <tr className="table-active fw-bold">
-                  <td colSpan="3" className="text-end">
-                    Tổng cộng:
-                  </td>
-                  <td className="text-end">
-                    {formatCurrency(invoice.total_amount)}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </Card>
-
-      <Card>
-        <div className="">
-          <h4 className="mb-3">Thông tin khác</h4>
-          <div className="row">
-            <div className="col-md-6">
-              <p>
-                <strong>Người tạo:</strong> {invoice.creator?.username || "N/A"}
-              </p>
-              <p>
-                <strong>Ngày tạo:</strong> {invoice.created_at}
-              </p>
+        <div className="row">
+          <div className="col-md-6 mb-4">
+            <h5 className="mb-3">Thông tin cơ bản</h5>
+            <div className="table-responsive">
+              <table className="table table-bordered">
+                <thead style={{ backgroundColor: "rgba(0, 0, 0, .075)" }}>
+                  <tr>
+                    <th style={{ width: "40%" }}>Thông tin</th>
+                    <th>Chi tiết</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Phòng:</td>
+                    <td>
+                      <Link
+                        to={`/rooms/${invoice.room?.id}`}
+                        className="text-info"
+                      >
+                        {invoice.room?.room_number || "N/A"}
+                      </Link>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Nhà:</td>
+                    <td>
+                      <Link
+                        to={`/houses/${invoice.room?.house?.id}`}
+                        className="text-info"
+                      >
+                        {invoice.room?.house?.name || "N/A"}
+                      </Link>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Loại hóa đơn:</td>
+                    <td>
+                      <span className="badge bg-info text-white">
+                        {getInvoiceTypeText(invoice.invoice_type)}
+                      </span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Thời gian:</td>
+                    <td>
+                      <span className="badge bg-primary text-white">
+                        Tháng {invoice.month}/{invoice.year}
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
-            <div className="col-md-6">
-              <p>
-                <strong>Người cập nhật:</strong>{" "}
-                {invoice.updater?.username || "N/A"}
-              </p>
-              <p>
-                <strong>Ngày cập nhật:</strong> {invoice.updated_at}
-              </p>
+          </div>
+
+          {invoice.description && (
+            <div className="col-md-6 mb-4">
+              <h5 className="mb-3">Mô tả</h5>
+              <div className="p-3 border rounded">
+                <p className="mb-0">{invoice.description}</p>
+              </div>
+            </div>
+          )}
+
+          <div className="col-md-12 mb-4">
+            <h5 className="mb-3">Chi tiết hóa đơn</h5>
+            <div className="table-responsive">
+              <table className="table table-bordered">
+                <thead style={{ backgroundColor: "rgba(0, 0, 0, .075)" }}>
+                  <tr>
+                    <th style={{ width: "5%" }}>#</th>
+                    <th style={{ width: "15%" }}>Loại</th>
+                    <th style={{ width: "65%" }}>Mô tả</th>
+                    <th style={{ width: "15%" }}>Số tiền</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {invoice.items &&
+                    invoice.items.map((item, index) => (
+                      <tr key={index}>
+                        <td>{index + 1}</td>
+                        <td>
+                          {item.source_type === "manual"
+                            ? "Nhập tay"
+                            : "Dịch vụ"}
+                        </td>
+                        <td>{item.description}</td>
+                        <td className="text-end">
+                          {formatCurrency(item.amount)}
+                        </td>
+                      </tr>
+                    ))}
+                  <tr className="table-active fw-bold">
+                    <td colSpan="3" className="text-end">
+                      Tổng cộng:
+                    </td>
+                    <td className="text-end">
+                      {formatCurrency(invoice.total_amount)}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div className="col-md-12 mb-4">
+            <h5 className="mb-3">Thông tin hệ thống</h5>
+            <div className="table-responsive">
+              <table className="table table-bordered">
+                <thead style={{ backgroundColor: "rgba(0, 0, 0, .075)" }}>
+                  <tr>
+                    <th style={{ width: "200px" }}>Thông tin</th>
+                    <th>Chi tiết</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Người tạo:</td>
+                    <td>{invoice.creator?.username || "N/A"}</td>
+                  </tr>
+                  <tr>
+                    <td>Ngày tạo:</td>
+                    <td>{invoice.created_at}</td>
+                  </tr>
+                  <tr>
+                    <td>Người cập nhật:</td>
+                    <td>{invoice.updater?.username || "N/A"}</td>
+                  </tr>
+                  <tr>
+                    <td>Ngày cập nhật:</td>
+                    <td>{invoice.updated_at}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>

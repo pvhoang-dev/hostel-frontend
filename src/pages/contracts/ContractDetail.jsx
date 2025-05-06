@@ -12,16 +12,13 @@ import { formatDate } from "../../utils/formatters";
 const ContractDetail = () => {
   const { id } = useParams();
   const [contract, setContract] = useState(null);
-  const { user } = useAuth();
+  const { user, isAdmin, isManager } = useAuth();
   const { showError } = useAlert();
   const navigate = useNavigate();
 
   const { execute: fetchContract, loading } = useApi(
     contractService.getContract
   );
-
-  const isAdmin = user?.role === "admin";
-  const isManager = user?.role === "manager";
 
   useEffect(() => {
     if (user) {
@@ -107,7 +104,7 @@ const ContractDetail = () => {
       </div>
 
       <Card>
-        <div className="d-flex align-items-start justify-content-between mb-3">
+        <div className="d-flex align-items-start justify-content-between mb-4">
           <div>
             <h4 className="mb-2">
               Hợp đồng #{contract.id} - {contract.room?.house?.name || "N/A"} -
@@ -119,17 +116,93 @@ const ContractDetail = () => {
               {getStatusText(contract.status)}
             </span>
           </div>
-          <div className="text-end">
-            <p className="text-muted mb-1">
-              Ngày tạo: {formatDate(contract.created_at)}
-            </p>
-            <p className="text-muted mb-0">
-              Cập nhật: {formatDate(contract.updated_at)}
-            </p>
-          </div>
         </div>
 
-        {/* You can add more contract details formatted with Bootstrap classes here */}
+        <div className="row">
+          <div className="col-md-6 mb-4">
+            <h5 className="mb-3">Thông tin hợp đồng</h5>
+            <div className="table-responsive">
+              <table className="table table-bordered">
+                <thead style={{ backgroundColor: "rgba(0, 0, 0, .075)" }}>
+                  <tr>
+                    <th style={{ width: "40%" }}>Thông tin</th>
+                    <th>Chi tiết</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Phòng:</td>
+                    <td>
+                      <Link
+                        to={`/rooms/${contract.room?.id}`}
+                        className="text-primary"
+                      >
+                        {contract.room?.room_number || "N/A"}
+                      </Link>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Nhà:</td>
+                    <td>
+                      <Link
+                        to={`/houses/${contract.room?.house?.id}`}
+                        className="text-primary"
+                      >
+                        {contract.room?.house?.name || "N/A"}
+                      </Link>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Ngày bắt đầu:</td>
+                    <td>{formatDate(contract.start_date)}</td>
+                  </tr>
+                  <tr>
+                    <td>Ngày kết thúc:</td>
+                    <td>{formatDate(contract.end_date)}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div className="col-md-6 mb-4">
+            <h5 className="mb-3">Thông tin hệ thống</h5>
+            <div className="table-responsive">
+              <table className="table table-bordered">
+                <thead style={{ backgroundColor: "rgba(0, 0, 0, .075)" }}>
+                  <tr>
+                    <th style={{ width: "40%" }}>Thông tin</th>
+                    <th>Chi tiết</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>ID:</td>
+                    <td>{contract.id}</td>
+                  </tr>
+                  <tr>
+                    <td>Trạng thái:</td>
+                    <td>
+                      <span
+                        className={`badge ${getStatusClass(contract.status)}`}
+                      >
+                        {getStatusText(contract.status)}
+                      </span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Ngày tạo:</td>
+                    <td>{formatDate(contract.created_at)}</td>
+                  </tr>
+                  <tr>
+                    <td>Ngày cập nhật:</td>
+                    <td>{formatDate(contract.updated_at)}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </Card>
     </div>
   );

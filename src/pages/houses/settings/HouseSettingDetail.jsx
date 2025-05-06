@@ -12,10 +12,7 @@ const HouseSettingDetail = () => {
   const [loading, setLoading] = useState(true);
   const { showError } = useAlert();
   const navigate = useNavigate();
-  const { user } = useAuth();
-
-  const isAdmin = user?.role === "admin";
-  const isManager = user?.role === "manager";
+  const { user, isAdmin, isManager } = useAuth();
 
   useEffect(() => {
     loadHouseSetting();

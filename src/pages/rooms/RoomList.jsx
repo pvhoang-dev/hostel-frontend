@@ -117,10 +117,7 @@ const RoomList = ({ houseId, embedded = false, fromHouseDetail = false }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { showSuccess, showError } = useAlert();
   const navigate = useNavigate();
-  const { user } = useAuth();
-
-  const isAdmin = user?.role === "admin";
-  const isManager = user?.role === "manager";
+  const { user, isAdmin, isManager } = useAuth();
 
   // Get current filters from URL
   const currentPage = Number(searchParams.get("page")) || 1;

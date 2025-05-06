@@ -282,7 +282,7 @@ const InvoiceForm = ({
           <h4 className="fs-5 fw-semibold mb-3">Chi tiết hóa đơn</h4>
           <div className="table-responsive">
             <table className="table table-bordered">
-              <thead className="table-light">
+              <thead style={{ backgroundColor: "rgba(0, 0, 0, .075)" }}>
                 <tr>
                   <th style={{ width: "20%" }}>Loại</th>
                   <th style={{ width: "40%" }}>Thông tin</th>

@@ -12,7 +12,7 @@ const RoomEdit = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { showSuccess, showError } = useAlert();
-  const { user } = useAuth();
+  const { user, isAdmin, isManager } = useAuth();
   const location = useLocation();
   const fromHouseDetail = location.state?.fromHouseDetail;
   const [roomData, setRoomData] = useState(null);
@@ -45,8 +45,6 @@ const RoomEdit = () => {
 
       // Check if user has permission to edit
       if (user) {
-        const isAdmin = user.role === "admin";
-        const isManager = user.role === "manager";
         const isHouseManager = response.data.house?.manager_id === user.id;
 
         if (!isAdmin && !(isManager && isHouseManager)) {

@@ -158,11 +158,8 @@ const FilterSection = ({
 const ContractList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { showSuccess, showError } = useAlert();
-  const { user } = useAuth();
+  const { user, isAdmin, isManager } = useAuth();
   const navigate = useNavigate();
-
-  const isAdmin = user?.role === "admin";
-  const isManager = user?.role === "manager";
 
   // Get current filters from URL
   const currentPage = Number(searchParams.get("page")) || 1;

@@ -10,8 +10,7 @@ const UserChangePassword = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { showSuccess, showError } = useAlert();
-  const { user } = useAuth();
-  const isAdmin = user?.role === "admin";
+  const { user, isAdmin } = useAuth();
   const isOwnAccount = user?.id === parseInt(id);
 
   const [formData, setFormData] = useState({

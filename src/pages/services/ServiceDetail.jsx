@@ -64,51 +64,69 @@ const ServiceDetail = () => {
 
       <Card>
         <div className="row g-4">
-          <div className="col-12 col-md-6">
-            <h4 className="fs-5 fw-medium mb-3">Thông tin dịch vụ</h4>
-            <div className="d-flex flex-column gap-2">
-              <div>
-                <span>Tên: </span>
-                <span className="ms-2 fw-medium">{service.name}</span>
-              </div>
-              <div>
-                <span>Giá mặc định: </span>
-                <span className="ms-2 fw-medium">
-                  {service.default_price?.toLocaleString()} VND
-                </span>
-              </div>
-              <div>
-                <span>Đơn vị: </span>
-                <span className="ms-2 fw-medium">{service.unit}</span>
-              </div>
-              <div>
-                <span>Được đo?: </span>
-                <span
-                  className={`ms-2 fw-medium ${
-                    service.is_metered ? "text-success" : "text-danger"
-                  }`}
-                >
-                  {service.is_metered ? "Có" : "Không"}
-                </span>
-              </div>
+          <div className="col-md-6 mb-4">
+            <h5 className="mb-3">Thông tin dịch vụ</h5>
+            <div className="table-responsive">
+              <table className="table table-bordered">
+                <thead style={{ backgroundColor: "rgba(0, 0, 0, .075)" }}>
+                  <tr>
+                    <th style={{ width: "40%" }}>Thông tin</th>
+                    <th>Chi tiết</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Tên:</td>
+                    <td>{service.name}</td>
+                  </tr>
+                  <tr>
+                    <td>Giá mặc định:</td>
+                    <td>{service.default_price?.toLocaleString()} VND</td>
+                  </tr>
+                  <tr>
+                    <td>Đơn vị:</td>
+                    <td>{service.unit}</td>
+                  </tr>
+                  <tr>
+                    <td>Được đo?:</td>
+                    <td
+                      className={
+                        service.is_metered ? "text-success" : "text-danger"
+                      }
+                    >
+                      {service.is_metered ? "Có" : "Không"}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
 
-          <div className="col-12 col-md-6">
-            <h4 className="fs-5 fw-medium mb-3">Thông tin hệ thống</h4>
-            <div className="d-flex flex-column gap-2">
-              <div>
-                <span>ID: </span>
-                <span className="ms-2">{service.id}</span>
-              </div>
-              <div>
-                <span>Tạo: </span>
-                <span className="ms-2">{service.created_at}</span>
-              </div>
-              <div>
-                <span>Sửa lần cuối: </span>
-                <span className="ms-2">{service.updated_at}</span>
-              </div>
+          <div className="col-md-6 mb-4">
+            <h5 className="mb-3">Thông tin hệ thống</h5>
+            <div className="table-responsive">
+              <table className="table table-bordered">
+                <thead style={{ backgroundColor: "rgba(0, 0, 0, .075)" }}>
+                  <tr>
+                    <th style={{ width: "40%" }}>Thông tin</th>
+                    <th>Chi tiết</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>ID:</td>
+                    <td>{service.id}</td>
+                  </tr>
+                  <tr>
+                    <td>Tạo:</td>
+                    <td>{service.created_at}</td>
+                  </tr>
+                  <tr>
+                    <td>Sửa lần cuối:</td>
+                    <td>{service.updated_at}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>

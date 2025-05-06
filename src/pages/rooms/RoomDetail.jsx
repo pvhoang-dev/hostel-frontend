@@ -5,16 +5,14 @@ import Loader from "../../components/common/Loader";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 import { useAuth } from "../../hooks/useAuth";
+import RoomEquipmentList from "./equipments/RoomEquipmentList";
 
 const RoomDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const { showError } = useAlert();
-  const { user } = useAuth();
-
-  const isAdmin = user?.role === "admin";
-  const isManager = user?.role === "manager";
+  const { user, isAdmin, isManager } = useAuth();
 
   const {
     data: room,
@@ -96,7 +94,6 @@ const RoomDetail = () => {
           )}
         </div>
       </div>
-
       <div className="p-4 rounded shadow">
         <div className="d-flex align-items-start">
           <div className="flex-grow-1">
@@ -201,6 +198,10 @@ const RoomDetail = () => {
             </div>
           </div>
         </div>
+      </div>
+      <hr className="my-4" />
+      <div className="mt-4">
+        <RoomEquipmentList roomId={id} houseId={room.house?.id} />
       </div>
     </div>
   );

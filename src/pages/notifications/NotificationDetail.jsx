@@ -148,68 +148,102 @@ const NotificationDetail = () => {
 
       <Card>
         <div className="row">
-          <div className="col-md-6">
-            <div className="mb-3">
-              <strong>ID:</strong> {notification.id}
-            </div>
-            {notification.user && (
-              <div className="mb-3">
-                <strong>Người nhận:</strong> {notification.user.name} (
-                {notification.user.email})
-              </div>
-            )}
-            <div className="mb-3">
-              <strong>Loại thông báo:</strong>{" "}
-              <span
-                className={`badge ${getBadgeClass(
-                  notification.type
-                )} text-white`}
-              >
-                {getTypeDisplayName(notification.type)}
-              </span>
-            </div>
-            <div className="mb-3">
-              <strong>Trạng thái:</strong>{" "}
-              {notification.is_read ? (
-                <span className="badge bg-success text-white">Đã đọc</span>
-              ) : (
-                <span className="badge bg-warning text-white">Chưa đọc</span>
-              )}
+          <div className="col-md-6 mb-4">
+            <h5 className="mb-3">Thông tin cơ bản</h5>
+            <div className="table-responsive">
+              <table className="table table-bordered">
+                <thead style={{ backgroundColor: "rgba(0, 0, 0, .075)" }}>
+                  <tr>
+                    <th style={{ width: "40%" }}>Thông tin</th>
+                    <th>Chi tiết</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>ID:</td>
+                    <td>{notification.id}</td>
+                  </tr>
+                  {notification.user && (
+                    <tr>
+                      <td>Người nhận:</td>
+                      <td>
+                        {notification.user.name} ({notification.user.email})
+                      </td>
+                    </tr>
+                  )}
+                  <tr>
+                    <td>Loại thông báo:</td>
+                    <td>
+                      <span
+                        className={`badge ${getBadgeClass(
+                          notification.type
+                        )} text-white`}
+                      >
+                        {getTypeDisplayName(notification.type)}
+                      </span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Trạng thái:</td>
+                    <td>
+                      {notification.is_read ? (
+                        <span className="badge bg-success text-white">
+                          Đã đọc
+                        </span>
+                      ) : (
+                        <span className="badge bg-warning text-white">
+                          Chưa đọc
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
-          <div className="col-md-6">
-            <div className="mb-3">
-              <strong>Ngày tạo:</strong>{" "}
-              {formatDateTime(notification.created_at)}
-            </div>
-            <div className="mb-3">
-              <strong>Cập nhật lần cuối:</strong>{" "}
-              {formatDateTime(notification.updated_at)}
-            </div>
-            {notification.url && (
-              <div className="mb-3">
-                <strong>URL:</strong>{" "}
-                <a
-                  href={notification.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {notification.url}
-                </a>
-              </div>
-            )}
-          </div>
-        </div>
 
-        <div className="row mt-4">
-          <div className="col-12">
-            <div className="card">
-              <div className="card-header bg-light">
-                <h5 className="mb-0">Nội dung thông báo</h5>
-              </div>
-              <div className="card-body">
-                <p className="mb-0">{notification.content}</p>
-              </div>
+          <div className="col-md-6 mb-4">
+            <h5 className="mb-3">Thông tin thời gian</h5>
+            <div className="table-responsive">
+              <table className="table table-bordered">
+                <thead style={{ backgroundColor: "rgba(0, 0, 0, .075)" }}>
+                  <tr>
+                    <th style={{ width: "40%" }}>Thông tin</th>
+                    <th>Chi tiết</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Ngày tạo:</td>
+                    <td>{formatDateTime(notification.created_at)}</td>
+                  </tr>
+                  <tr>
+                    <td>Cập nhật lần cuối:</td>
+                    <td>{formatDateTime(notification.updated_at)}</td>
+                  </tr>
+                  {notification.url && (
+                    <tr>
+                      <td>URL:</td>
+                      <td>
+                        <a
+                          href={notification.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {notification.url}
+                        </a>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div className="col-md-12 mb-4">
+            <h5 className="mb-3">Nội dung thông báo</h5>
+            <div className="p-3 border rounded">
+              <p className="mb-0">{notification.content}</p>
             </div>
           </div>
         </div>

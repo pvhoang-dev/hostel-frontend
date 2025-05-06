@@ -3,6 +3,8 @@ import { useNavigate, useParams, Link } from "react-router-dom";
 import { userService } from "../../api/users";
 import { useContext } from "react";
 import { AlertContext } from "../../contexts/AlertContext";
+import Card from "../../components/common/Card";
+import Loader from "../../components/common/Loader";
 
 const UserDetail = () => {
   const { id } = useParams();
@@ -36,7 +38,7 @@ const UserDetail = () => {
   };
 
   if (loading) {
-    return <div>Loading user data...</div>;
+    return <Loader />;
   }
 
   if (!user) {
@@ -63,8 +65,8 @@ const UserDetail = () => {
         </div>
       </div>
 
-      <div className="p-4 rounded shadow">
-        <div className="d-flex align-items-start">
+      <Card>
+        <div className="d-flex align-items-start mb-4">
           {user.avatar_url ? (
             <img
               src={user.avatar_url}
@@ -105,56 +107,84 @@ const UserDetail = () => {
           </div>
         </div>
 
-        <hr className="my-4" />
-
-        <div className="row g-4">
-          <div className="col-12 col-md-6">
-            <h4 className="fs-5 fw-medium mb-2">Thông tin liên hệ</h4>
-            <div className="d-flex flex-column gap-2">
-              <div>
-                <span>Email: </span>
-                <span className="ms-2">{user.email || "N/A"}</span>
-              </div>
-              <div>
-                <span>Số điện thoại: </span>
-                <span className="ms-2">{user.phone_number || "N/A"}</span>
-              </div>
-              <div>
-                <span>Quê quán: </span>
-                <span className="ms-2">{user.hometown || "N/A"}</span>
-              </div>
+        <div className="row">
+          <div className="col-md-6 mb-4">
+            <h5 className="mb-3">Thông tin liên hệ</h5>
+            <div className="table-responsive">
+              <table className="table table-bordered">
+                <thead style={{ backgroundColor: "rgba(0, 0, 0, .075)" }}>
+                  <tr>
+                    <th style={{ width: "40%" }}>Thông tin</th>
+                    <th>Chi tiết</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Email:</td>
+                    <td>{user.email || "N/A"}</td>
+                  </tr>
+                  <tr>
+                    <td>Số điện thoại:</td>
+                    <td>{user.phone_number || "N/A"}</td>
+                  </tr>
+                  <tr>
+                    <td>Quê quán:</td>
+                    <td>{user.hometown || "N/A"}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
 
-          <div className="col-12 col-md-6">
-            <h4 className="fs-5 fw-medium mb-2">Thông tin cá nhân</h4>
-            <div className="d-flex flex-column gap-2">
-              <div>
-                <span>Số CMND/CCCD: </span>
-                <span className="ms-2">{user.identity_card || "N/A"}</span>
-              </div>
-              <div>
-                <span>Biển số xe: </span>
-                <span className="ms-2">{user.vehicle_plate || "N/A"}</span>
-              </div>
+          <div className="col-md-6 mb-4">
+            <h5 className="mb-3">Thông tin cá nhân</h5>
+            <div className="table-responsive">
+              <table className="table table-bordered">
+                <thead style={{ backgroundColor: "rgba(0, 0, 0, .075)" }}>
+                  <tr>
+                    <th style={{ width: "40%" }}>Thông tin</th>
+                    <th>Chi tiết</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Số CMND/CCCD:</td>
+                    <td>{user.identity_card || "N/A"}</td>
+                  </tr>
+                  <tr>
+                    <td>Biển số xe:</td>
+                    <td>{user.vehicle_plate || "N/A"}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
-        </div>
 
-        <div className="mt-4">
-          <h4 className="fs-5 fw-medium mb-2">Thông tin hệ thống</h4>
-          <div className="d-flex flex-column gap-2">
-            <div>
-              <span>User ID: </span>
-              <span className="ms-2">{user.id}</span>
-            </div>
-            <div>
-              <span>Tạo: </span>
-              <span className="ms-2">{user.created_at}</span>
-            </div>
-            <div>
-              <span>Lần cuối cập nhật: </span>
-              <span className="ms-2">{user.updated_at}</span>
+          <div className="col-md-12 mb-4">
+            <h5 className="mb-3">Thông tin hệ thống</h5>
+            <div className="table-responsive">
+              <table className="table table-bordered">
+                <thead style={{ backgroundColor: "rgba(0, 0, 0, .075)" }}>
+                  <tr>
+                    <th style={{ width: "200px" }}>Thông tin</th>
+                    <th>Chi tiết</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>User ID:</td>
+                    <td>{user.id}</td>
+                  </tr>
+                  <tr>
+                    <td>Tạo:</td>
+                    <td>{user.created_at}</td>
+                  </tr>
+                  <tr>
+                    <td>Lần cuối cập nhật:</td>
+                    <td>{user.updated_at}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -167,7 +197,7 @@ const UserDetail = () => {
             Đổi mật khẩu
           </button>
         </div>
-      </div>
+      </Card>
     </div>
   );
 };

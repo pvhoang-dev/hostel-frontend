@@ -14,7 +14,7 @@ const ContractEdit = () => {
   const { id } = useParams();
   const [contract, setContract] = useState(null);
   const [errors, setErrors] = useState({});
-  const { user } = useAuth();
+  const { user, isAdmin, isManager } = useAuth();
   const { showSuccess, showError } = useAlert();
 
   const { execute: updateContract, loading: isSubmitting } = useApi(
@@ -38,8 +38,6 @@ const ContractEdit = () => {
 
       // Check permissions
       if (user) {
-        const isAdmin = user?.role === "admin";
-        const isManager = user?.role === "manager";
         const isHouseManager =
           response.data.room?.house?.manager_id === user?.id;
 

@@ -12,7 +12,7 @@ const HouseEdit = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { showSuccess, showError } = useAlert();
-  const { user } = useAuth();
+  const { user, isAdmin, isManager } = useAuth();
 
   const [houseData, setHouseData] = useState(null);
   const [errors, setErrors] = useState({});
@@ -37,8 +37,6 @@ const HouseEdit = () => {
       setHouseData(response.data);
 
       if (user) {
-        const isAdmin = user?.role === "admin";
-        const isManager = user?.role === "manager";
         const isHouseManager = response.data.manager?.id === user?.id;
 
         if (!isAdmin && !(isManager && isHouseManager)) {
