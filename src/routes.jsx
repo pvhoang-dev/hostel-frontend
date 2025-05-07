@@ -36,6 +36,9 @@ import RoomList from "./pages/rooms/RoomList";
 import RoomCreate from "./pages/rooms/RoomCreate";
 import RoomDetail from "./pages/rooms/RoomDetail";
 import RoomEdit from "./pages/rooms/RoomEdit";
+import RoomEquipmentCreate from "./pages/rooms/equipments/RoomEquipmentCreate";
+import RoomEquipmentDetail from "./pages/rooms/equipments/RoomEquipmentDetail";
+import RoomEquipmentEdit from "./pages/rooms/equipments/RoomEquipmentEdit";
 import ContractList from "./pages/contracts/ContractList";
 import ContractCreate from "./pages/contracts/ContractCreate";
 import ContractDetail from "./pages/contracts/ContractDetail";
@@ -292,6 +295,34 @@ const Routes = () => {
           element: (
             <ProtectedRoute
               element={<RoomEdit />}
+              allowedRoles={["admin", "manager"]}
+            />
+          ),
+        },
+        // Room Equipment routes
+        {
+          path: "rooms/:roomId/equipments/create",
+          element: (
+            <ProtectedRoute
+              element={<RoomEquipmentCreate />}
+              allowedRoles={["admin", "manager"]}
+            />
+          ),
+        },
+        {
+          path: "rooms/:roomId/equipments/:equipmentId",
+          element: (
+            <ProtectedRoute
+              element={<RoomEquipmentDetail />}
+              allowedRoles={["admin", "manager", "tenant"]}
+            />
+          ),
+        },
+        {
+          path: "rooms/:roomId/equipments/:equipmentId/edit",
+          element: (
+            <ProtectedRoute
+              element={<RoomEquipmentEdit />}
               allowedRoles={["admin", "manager"]}
             />
           ),
