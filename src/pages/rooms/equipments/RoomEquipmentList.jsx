@@ -92,13 +92,6 @@ const RoomEquipmentList = ({ roomId, houseId }) => {
       ),
     },
     {
-      accessorKey: "source",
-      header: "Nguồn",
-      cell: ({ row }) => (
-        <div>{row.original.source === "storage" ? "Kho" : "Tùy chỉnh"}</div>
-      ),
-    },
-    {
       accessorKey: "quantity",
       header: "Số lượng",
       cell: ({ row }) => <div>{row.original.quantity}</div>,
@@ -155,14 +148,8 @@ const RoomEquipmentList = ({ roomId, houseId }) => {
 
   const confirmDelete = () => {
     setShowDeleteModal(false);
-
-    // If equipment has a storage source, ask if they want to return to storage
-    if (equipmentToDelete?.source === "storage") {
-      setShowReturnToStorageModal(true);
-    } else {
-      // For custom equipment, just delete
-      performDelete();
-    }
+    // Always ask if user wants to return to storage, regardless of source
+    setShowReturnToStorageModal(true);
   };
 
   const handleReturnToStorageDecision = (returnToStorage) => {
@@ -172,7 +159,6 @@ const RoomEquipmentList = ({ roomId, houseId }) => {
 
   const performDelete = async (returnToStorage = false) => {
     if (!equipmentToDelete) return;
-    console.log("Deleting equipment:", equipmentToDelete);
 
     try {
       // If returning to storage, we need to check if storage exists and update/create it
@@ -385,7 +371,7 @@ const RoomEquipmentList = ({ roomId, houseId }) => {
         </div>
       </div>
 
-      {/* Return to storage modal */}
+      {/* Modal for asking if equipment should be returned to storage */}
       <div
         id="returnToStorageModal"
         className="modal fade"
@@ -406,12 +392,10 @@ const RoomEquipmentList = ({ roomId, houseId }) => {
               ></button>
             </div>
             <div className="modal-body">
-              {equipmentToDelete && (
-                <p>
-                  Bạn có muốn thêm {equipmentToDelete.quantity}{" "}
-                  {equipmentToDelete.equipment?.name} vào kho không?
-                </p>
-              )}
+              <p>
+                Bạn có muốn trả {equipmentToDelete?.quantity || 0}{" "}
+                {equipmentToDelete?.equipment?.name || "thiết bị"} về kho không?
+              </p>
             </div>
             <div className="modal-footer">
               <button
@@ -420,14 +404,14 @@ const RoomEquipmentList = ({ roomId, houseId }) => {
                 data-dismiss="modal"
                 onClick={() => handleReturnToStorageDecision(false)}
               >
-                Không
+                Không, chỉ xóa
               </button>
               <button
                 type="button"
                 className="btn btn-primary"
                 onClick={() => handleReturnToStorageDecision(true)}
               >
-                Có, thêm vào kho
+                Có, trả về kho
               </button>
             </div>
           </div>

@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { roomService } from "../../../api/rooms";
 import { roomEquipmentService } from "../../../api/roomEquipments";
-import { storageService } from "../../../api/storages";
 import RoomEquipmentForm from "../../../components/forms/RoomEquipmentForm";
 import Loader from "../../../components/common/Loader";
 import useAlert from "../../../hooks/useAlert";
@@ -28,9 +27,6 @@ const RoomEquipmentCreate = () => {
     roomEquipmentService.createRoomEquipment
   );
 
-  const { execute: getStorages } = useApi(storageService.getStorages);
-  const { execute: updateStorage } = useApi(storageService.updateStorage);
-
   // Load room data
   useEffect(() => {
     if (roomId) fetchRoom(roomId, { include: "house" });
@@ -49,32 +45,6 @@ const RoomEquipmentCreate = () => {
 
   const handleSubmit = async (formData) => {
     try {
-      // If equipment is from storage, update storage quantity
-      if (formData.source === "storage") {
-        const storageResponse = await getStorages({
-          equipment_id: formData.equipment_id,
-          house_id: houseId || room?.house?.id,
-        });
-
-        if (storageResponse.success && storageResponse.data.data.length > 0) {
-          const storage = storageResponse.data.data[0];
-          const newQuantity = Math.max(0, storage.quantity - formData.quantity);
-
-          // Update storage first
-          const updateResponse = await updateStorage(storage.id, {
-            quantity: newQuantity,
-          });
-
-          if (!updateResponse.success) {
-            showError("Có lỗi xảy ra khi cập nhật kho");
-            return;
-          }
-        } else {
-          showError("Không tìm thấy thiết bị trong kho");
-          return;
-        }
-      }
-
       // Create room equipment
       const response = await createRoomEquipment(formData);
 
