@@ -213,12 +213,15 @@ const HouseDetail = () => {
         </div>
       </Card>
 
+      <hr className="my-4" />
       <div className="mt-4">
         <RoomList houseId={id} embedded={true} fromHouseDetail={true} />
       </div>
+      <hr className="my-4" />
       <div className="mt-4">
         <StorageList houseId={id} embedded={true} fromHouseDetail={true} />
       </div>
+      <hr className="my-4" />
       <div className="mt-4">
         <HouseSettingList houseId={id} embedded={true} />
       </div>

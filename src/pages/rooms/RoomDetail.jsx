@@ -2,6 +2,7 @@ import { useEffect, useContext } from "react";
 import { useNavigate, useParams, Link, useLocation } from "react-router-dom";
 import { roomService } from "../../api/rooms";
 import Loader from "../../components/common/Loader";
+import Card from "../../components/common/Card";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 import { useAuth } from "../../hooks/useAuth";
@@ -59,15 +60,15 @@ const RoomDetail = () => {
   const getStatusClass = (status) => {
     switch (status) {
       case "available":
-        return "bg-success bg-opacity-10 text-white";
+        return "bg-success text-white";
       case "occupied":
-        return "bg-danger bg-opacity-10 text-white";
+        return "bg-danger text-white";
       case "maintenance":
-        return "bg-warning bg-opacity-10 text-white";
+        return "bg-warning text-white";
       case "reserved":
-        return "bg-info bg-opacity-10 text-white";
+        return "bg-info text-white";
       default:
-        return "bg-secondary bg-opacity-10 text-white";
+        return "bg-secondary text-white";
     }
   };
 
@@ -80,9 +81,9 @@ const RoomDetail = () => {
         <div className="d-flex gap-2">
           <button
             onClick={() => navigate("/rooms")}
-            className="btn btn-light fw-semibold mr-2"
+            className="btn btn-light fw-semibold mx-2"
           >
-            Back
+            Quay lại
           </button>
           {canEdit && (
             <Link
@@ -94,80 +95,102 @@ const RoomDetail = () => {
           )}
         </div>
       </div>
-      <div className="p-4 rounded shadow">
-        <div className="d-flex align-items-start">
-          <div className="flex-grow-1">
-            <h4 className="fs-4 fw-semibold">
+
+      <Card>
+        <div className="row">
+          <div className="col-md-12 mb-3">
+            <h4 className="fs-5 fw-semibold mb-3 text-primary">
               {room.room_number} - {room.house.name}
             </h4>
-            <span
+            <div
               className={`d-inline-block ${getStatusClass(
                 room.status
-              )} px-2 py-1 rounded small mt-2`}
+              )} px-2 py-1 rounded small mb-3`}
             >
               {getStatusText(room.status)}
-            </span>
-          </div>
-        </div>
-
-        <hr className="my-4" />
-
-        <div className="row g-4">
-          <div className="col-12 col-md-6">
-            <h4 className="fs-5 fw-medium mb-2">Thông tin cơ bản</h4>
-            <div className="d-flex flex-column gap-2">
-              <div>
-                <span>Giá thuê: </span>
-                <span className="ms-2 fw-medium">
-                  {new Intl.NumberFormat("vi-VN", {
-                    style: "currency",
-                    currency: "VND",
-                  }).format(room.base_price || 0)}
-                  /tháng
-                </span>
-              </div>
             </div>
           </div>
 
-          <div className="col-12 col-md-6">
-            <h4 className="fs-5 fw-medium mb-2">Thông tin bổ sung</h4>
-            <div className="d-flex flex-column gap-2">
-              <div>
-                <span>Tiền đặt cọc: </span>
-                <span className="ms-2 fw-medium">
-                  {new Intl.NumberFormat("vi-VN", {
-                    style: "currency",
-                    currency: "VND",
-                  }).format(room.deposit || 0)}
-                </span>
-              </div>
-              <div>
-                <span>Sức chứa: </span>
-                <span className="ms-2">
-                  {room.capacity || "Không giới hạn"}
-                </span>
-              </div>
+          <div className="col-md-6 mb-4">
+            <h5 className="mb-3">Thông tin cơ bản</h5>
+            <div className="table-responsive">
+              <table className="table table-bordered">
+                <thead style={{ backgroundColor: "rgba(0, 0, 0, .075)" }}>
+                  <tr>
+                    <th style={{ width: "40%" }}>Thông tin</th>
+                    <th>Chi tiết</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Giá thuê:</td>
+                    <td className="text-primary">
+                      {new Intl.NumberFormat("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                      }).format(room.base_price || 0)}
+                      /tháng
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Sức chứa:</td>
+                    <td>{room.capacity || "Không giới hạn"}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
-        </div>
 
-        {room.description && (
-          <>
-            <hr className="my-4" />
-            <div>
-              <h4 className="fs-5 fw-medium mb-2">Mô tả</h4>
-              <p style={{ whiteSpace: "pre-wrap" }}>
-                {room.description || "Không có mô tả"}
-              </p>
+          <div className="col-md-6 mb-4">
+            <h5 className="mb-3">Thông tin bổ sung</h5>
+            <div className="table-responsive">
+              <table className="table table-bordered">
+                <thead style={{ backgroundColor: "rgba(0, 0, 0, .075)" }}>
+                  <tr>
+                    <th style={{ width: "40%" }}>Thông tin</th>
+                    <th>Chi tiết</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Tiền đặt cọc:</td>
+                    <td className="text-primary">
+                      {new Intl.NumberFormat("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                      }).format(room.deposit || 0)}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Nhà:</td>
+                    <td>
+                      <Link
+                        to={`/houses/${room.house?.id}`}
+                        className="text-info"
+                      >
+                        {room.house?.name || ""}
+                      </Link>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
-          </>
-        )}
+          </div>
 
-        {room.amenities && room.amenities.length > 0 && (
-          <>
-            <hr className="my-4" />
-            <div>
-              <h4 className="fs-5 fw-medium mb-2">Tiện ích</h4>
+          {room.description && (
+            <div className="col-md-12 mb-4">
+              <h5 className="mb-3">Mô tả</h5>
+              <div className="p-3 border rounded">
+                <p style={{ whiteSpace: "pre-wrap" }} className="mb-0">
+                  {room.description || "Không có mô tả"}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {room.amenities && room.amenities.length > 0 && (
+            <div className="col-md-12 mb-4">
+              <h5 className="mb-3">Tiện ích</h5>
               <div className="d-flex flex-wrap gap-2">
                 {room.amenities.map((amenity, index) => (
                   <span key={index} className="bg-light px-3 py-1 rounded-pill">
@@ -176,29 +199,37 @@ const RoomDetail = () => {
                 ))}
               </div>
             </div>
-          </>
-        )}
+          )}
 
-        <hr className="my-4" />
-
-        <div>
-          <h4 className="fs-5 fw-medium mb-2">Thông tin hệ thống</h4>
-          <div className="d-flex flex-column gap-2">
-            <div>
-              <span>ID: </span>
-              <span className="ms-2">{room.id}</span>
-            </div>
-            <div>
-              <span>Tạo: </span>
-              <span className="ms-2">{room.created_at}</span>
-            </div>
-            <div>
-              <span>Lần cuối cập nhật: </span>
-              <span className="ms-2">{room.updated_at}</span>
+          <div className="col-md-12">
+            <h5 className="mb-3">Thông tin hệ thống</h5>
+            <div className="table-responsive">
+              <table className="table table-bordered">
+                <thead style={{ backgroundColor: "rgba(0, 0, 0, .075)" }}>
+                  <tr>
+                    <th style={{ width: "200px" }}>Thông tin</th>
+                    <th>Chi tiết</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>ID:</td>
+                    <td>{room.id}</td>
+                  </tr>
+                  <tr>
+                    <td>Tạo lúc:</td>
+                    <td>{room.created_at}</td>
+                  </tr>
+                  <tr>
+                    <td>Cập nhật lúc:</td>
+                    <td>{room.updated_at}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
-      </div>
+      </Card>
       <hr className="my-4" />
       <div className="mt-4">
         <RoomEquipmentList roomId={id} houseId={room.house?.id} />
