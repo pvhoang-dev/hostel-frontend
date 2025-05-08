@@ -59,10 +59,10 @@ const SideBar = () => {
       <div className="left-side-menu">
         <a href="/dashboard" className="logo text-center logo-light">
           <span className="logo-lg">
-            <img src="assets/images/logo_hostel.png" alt="" height="48" />
+            <img src="/assets/images/logo_hostel.png" alt="" height="48" />
           </span>
           <span className="logo-sm">
-            <img src="assets/images/logo_hostel_sm.png" alt="" height="48" />
+            <img src="/assets/images/logo_hostel_sm.png" alt="" height="48" />
           </span>
         </a>
 

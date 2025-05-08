@@ -233,7 +233,7 @@ const Header = () => {
             >
               <span className="account-user-avatar">
                 <img
-                  src="assets/images/users/avatar-1.jpg"
+                  src="/assets/images/users/avatar-1.jpg"
                   alt="user-image"
                   className="rounded-circle"
                 />
