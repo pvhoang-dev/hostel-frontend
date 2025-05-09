@@ -7,6 +7,7 @@ import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 import { useAuth } from "../../hooks/useAuth";
 import RoomEquipmentList from "./equipments/RoomEquipmentList";
+import RoomServiceList from "./services/RoomServiceList";
 
 const RoomDetail = () => {
   const { id } = useParams();
@@ -230,6 +231,12 @@ const RoomDetail = () => {
           </div>
         </div>
       </Card>
+      
+      <hr className="my-4" />
+      <div className="mt-4">
+        <RoomServiceList roomId={id} houseId={room.house?.id} embedded={true} />
+      </div>
+
       <hr className="my-4" />
       <div className="mt-4">
         <RoomEquipmentList roomId={id} houseId={room.house?.id} />
