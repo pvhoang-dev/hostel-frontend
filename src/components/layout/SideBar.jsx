@@ -23,7 +23,11 @@ const SideBar = () => {
     { path: "/houses", label: "QL Nhà trọ", roles: ["admin", "manager"] },
     { path: "/storages", label: "QL Kho", roles: ["admin", "manager"] },
     { path: "/rooms", label: "QL Phòng trọ", roles: ["admin", "manager"] },
-    { path: "#", label: "QL DV phòng/Tháng", roles: ["admin", "manager"] },
+    {
+      path: "/monthly-service-management",
+      label: "QL DV Tháng/Phòng",
+      roles: ["admin", "manager"],
+    },
     { path: "/contracts", label: "QL Hợp đồng", roles: ["admin", "manager"] },
     {
       path: "/invoices",

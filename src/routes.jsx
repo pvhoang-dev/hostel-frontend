@@ -42,6 +42,7 @@ import RoomEquipmentEdit from "./pages/rooms/equipments/RoomEquipmentEdit";
 import RoomServiceCreate from "./pages/rooms/services/RoomServiceCreate";
 import RoomServiceDetail from "./pages/rooms/services/RoomServiceDetail";
 import RoomServiceEdit from "./pages/rooms/services/RoomServiceEdit";
+import MonthlyServiceManagement from "./pages/rooms/services/MonthlyServiceManagement.jsx";
 import ContractList from "./pages/contracts/ContractList";
 import ContractCreate from "./pages/contracts/ContractCreate";
 import ContractDetail from "./pages/contracts/ContractDetail";
@@ -684,6 +685,15 @@ const Routes = () => {
           element: (
             <ProtectedRoute
               element={<NotificationEdit />}
+              allowedRoles={["admin", "manager"]}
+            />
+          ),
+        },
+        {
+          path: "monthly-service-management",
+          element: (
+            <ProtectedRoute
+              element={<MonthlyServiceManagement />}
               allowedRoles={["admin", "manager"]}
             />
           ),
