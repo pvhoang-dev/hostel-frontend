@@ -1,12 +1,76 @@
 import { useEffect, useState } from "react";
 import { roomService } from "../../api/rooms";
 import { userService } from "../../api/users";
+import { contractService } from "../../api/contracts";
 import Input from "../common/Input";
 import Select from "../common/Select";
 import Button from "../common/Button";
 import TextArea from "../common/TextArea";
 import DatePicker from "../common/DatePicker";
-import { USER_ROLES } from "../../utils/constants.js";
+import ReactSelect from "react-select";
+
+// Custom styles cho dark mode ReactSelect
+const darkModeSelectStyles = {
+  control: (baseStyles, state) => ({
+    ...baseStyles,
+    backgroundColor: '#404954',
+    borderColor: state.isFocused ? '#6c757d' : '#555',
+    boxShadow: state.isFocused ? '0 0 0 0.25rem rgba(130, 138, 145, 0.5)' : null,
+    '&:hover': {
+      borderColor: '#6c757d'
+    },
+    color: 'white'
+  }),
+  menu: (baseStyles) => ({
+    ...baseStyles,
+    backgroundColor: '#404954',
+  }),
+  option: (baseStyles, state) => ({
+    ...baseStyles,
+    backgroundColor: state.isSelected ? '#0d6efd' : 
+                     state.isFocused ? '#495057' : '#404954',
+    color: 'white',
+    '&:hover': {
+      backgroundColor: '#495057',
+    }
+  }),
+  singleValue: (baseStyles) => ({
+    ...baseStyles,
+    color: 'white',
+  }),
+  input: (baseStyles) => ({
+    ...baseStyles,
+    color: 'white',
+  }),
+  placeholder: (baseStyles) => ({
+    ...baseStyles,
+    color: '#adb5bd',
+  }),
+  loadingMessage: (baseStyles) => ({
+    ...baseStyles,
+    color: 'white',
+  }),
+  noOptionsMessage: (baseStyles) => ({
+    ...baseStyles,
+    color: 'white',
+  }),
+  multiValue: (baseStyles) => ({
+    ...baseStyles,
+    backgroundColor: '#495057',
+  }),
+  multiValueLabel: (baseStyles) => ({
+    ...baseStyles,
+    color: 'white',
+  }),
+  multiValueRemove: (baseStyles) => ({
+    ...baseStyles,
+    color: 'white',
+    '&:hover': {
+      backgroundColor: '#dc3545',
+      color: 'white',
+    }
+  }),
+};
 
 const ContractForm = ({
   initialData = {},
@@ -18,12 +82,12 @@ const ContractForm = ({
 }) => {
   const [formData, setFormData] = useState({
     room_id: roomId || "",
-    tenant_id: "",
+    user_ids: initialData.user_ids || [],
     start_date: new Date().toISOString().split("T")[0],
     end_date: new Date(new Date().setMonth(new Date().getMonth() + 6))
       .toISOString()
       .split("T")[0],
-    monthly_rent: 0,
+    monthly_price: 0,
     deposit_amount: 0,
     payment_day: 5,
     status: "active",
@@ -33,13 +97,37 @@ const ContractForm = ({
 
   const [rooms, setRooms] = useState([]);
   const [tenants, setTenants] = useState([]);
+  const [selectedTenants, setSelectedTenants] = useState([]);
+  const [loadingTenants, setLoadingTenants] = useState(false);
 
   useEffect(() => {
-    loadTenants();
     if (!roomId) {
       loadRooms();
     }
-  }, [roomId]);
+    
+    // Khởi tạo giá trị khi ở chế độ edit
+    if (mode === "edit" && initialData) {      
+      // Nếu có dữ liệu người dùng, khởi tạo danh sách người thuê đã chọn
+      if (initialData.users && initialData.users.length > 0) {
+        const selectedUsers = initialData.users.map(user => ({
+          value: user.id,
+          label: `${user.name} (${user.email})`
+        }));
+        setSelectedTenants(selectedUsers);
+      }
+      
+      // Nếu có room_id trong dữ liệu ban đầu, tải danh sách người thuê
+      if (initialData.room_id) {
+        loadTenants(initialData.room_id);
+      }
+    }
+  }, [initialData, mode, roomId]);
+
+  useEffect(() => {
+    if (formData.room_id) {
+      loadTenants(formData.room_id);
+    }
+  }, [formData.room_id]);
 
   const loadRooms = async () => {
     try {
@@ -60,33 +148,114 @@ const ContractForm = ({
     }
   };
 
-  const loadTenants = async () => {
+  const loadTenants = async (roomId) => {
     try {
-      const response = await userService.getUsers({
-        role_id: USER_ROLES.TENANT,
-      });
+      setLoadingTenants(true);
+      
+      const params = { room_id: roomId };
+      
+      // Nếu đang edit, thêm contract_id để bao gồm người thuê hiện tại trong danh sách
+      if (mode === "edit" && initialData.id) {
+        params.exclude_contract_id = initialData.id;
+      }
+      
+      const response = await contractService.getAvailableTenants(params);
+      
       if (response.success) {
-        setTenants(
-          response.data.data.map((user) => ({
-            value: user.id,
-            label: `${user.name} (${user.email})`,
-          }))
-        );
+        const tenantsData = response.data.map((user) => ({
+          value: user.id,
+          label: `${user.name} (${user.email})`,
+        }));
+                
+        // Kiểm tra nếu người thuê hiện tại không có trong danh sách API trả về (chỉ trong trường hợp edit)
+        if (mode === "edit" && initialData.users && initialData.users.length > 0) {
+          // Danh sách ID người thuê hiện tại
+          const currentTenantIds = tenantsData.map(t => t.value);
+          
+          // Thêm những người thuê trong hợp đồng hiện tại mà không có trong danh sách API
+          const additionalTenants = initialData.users
+            .filter(user => !currentTenantIds.includes(user.id))
+            .map(user => ({
+              value: user.id,
+              label: `${user.name} (${user.email})`,
+            }));
+          
+          if (additionalTenants.length > 0) {
+            setTenants([...tenantsData, ...additionalTenants]);
+          } else {
+            setTenants(tenantsData);
+          }
+        } else {
+          setTenants(tenantsData);
+        }
+      } else {
+        console.error("API getAvailableTenants không thành công:", response.message);
       }
     } catch (error) {
-      console.error("Error loading tenants:", error);
+      console.error("Lỗi khi gọi API getAvailableTenants:", error);
+    } finally {
+      setLoadingTenants(false);
     }
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // Convert numerical values
-    if (["monthly_rent", "deposit_amount", "payment_day"].includes(name)) {
+    if (["monthly_price", "deposit_amount", "payment_day"].includes(name)) {
       setFormData({ ...formData, [name]: parseInt(value) || 0 });
+    } else if (name === "tenant_select") {
+      const selectedTenant = tenants.find(tenant => tenant.value == value);
+      if (selectedTenant && !selectedTenants.some(t => t.value === selectedTenant.value)) {
+        const newSelectedTenants = [...selectedTenants, selectedTenant];
+        setSelectedTenants(newSelectedTenants);
+        setFormData({ 
+          ...formData, 
+          user_ids: newSelectedTenants.map(t => t.value) 
+        });
+      }
     } else {
       setFormData({ ...formData, [name]: value });
     }
+  };
+
+  // Hàm xử lý khi chọn phòng với react-select
+  const handleRoomChange = (selectedOption) => {
+    const roomId = selectedOption?.value || "";
+    
+    setFormData(prevState => {
+      const newFormData = {
+        ...prevState,
+        room_id: roomId,
+      };
+      
+      // Gọi trực tiếp loadTenants nếu có room_id
+      if (roomId) {
+        loadTenants(roomId);
+      }
+      
+      return newFormData;
+    });
+  };
+
+  // Hàm xử lý khi chọn người thuê với react-select
+  const handleTenantChange = (selectedOption) => {
+    if (selectedOption && !selectedTenants.some(t => t.value === selectedOption.value)) {
+      const newSelectedTenants = [...selectedTenants, selectedOption];
+      setSelectedTenants(newSelectedTenants);
+      setFormData({
+        ...formData,
+        user_ids: newSelectedTenants.map(t => t.value)
+      });
+    }
+  };
+
+  const removeTenant = (tenantId) => {
+    const newSelectedTenants = selectedTenants.filter(t => t.value !== tenantId);
+    setSelectedTenants(newSelectedTenants);
+    setFormData({ 
+      ...formData, 
+      user_ids: newSelectedTenants.map(t => t.value) 
+    });
   };
 
   const handleSubmit = (e) => {
@@ -94,35 +263,74 @@ const ContractForm = ({
     onSubmit(formData);
   };
 
+  // Hiển thị phòng đã chọn trong dropdown khi ở chế độ edit
+  const getSelectedRoomOption = () => {
+    if (formData.room_id && rooms.length > 0) {
+      const selectedRoom = rooms.find(room => room.value === formData.room_id);
+      return selectedRoom || null;
+    }
+    return null;
+  };
+
   return (
     <form onSubmit={handleSubmit}>
       <div className="row g-3">
         {!roomId && (
           <div className="col-md-6">
-            <Select
-              label="Phòng"
-              name="room_id"
-              value={formData.room_id}
-              onChange={handleChange}
-              error={errors.room_id}
-              options={[{ value: "", label: "Chọn phòng" }, ...rooms]}
-              placeholder="Chọn phòng"
-              required
-            />
+            <div className="mb-3">
+              <label className="form-label">Phòng</label>
+              <ReactSelect
+                options={rooms}
+                value={getSelectedRoomOption()}
+                onChange={handleRoomChange}
+                isDisabled={isSubmitting || mode === "edit"} // Disable nếu đang ở chế độ edit
+                placeholder={mode === "edit" ? "Không thể thay đổi phòng" : "Chọn phòng"}
+                className="basic-single"
+                classNamePrefix="select"
+                isClearable={mode !== "edit"}
+                styles={darkModeSelectStyles}
+              />
+              {errors.room_id && <div className="invalid-feedback d-block">{errors.room_id}</div>}
+            </div>
           </div>
         )}
 
         <div className="col-md-6">
-          <Select
-            label="Người thuê"
-            name="tenant_id"
-            value={formData.tenant_id}
-            onChange={handleChange}
-            error={errors.tenant_id}
-            options={[{ value: "", label: "Chọn người thuê" }, ...tenants]}
-            placeholder="Chọn người thuê"
-            required
-          />
+          <label className="form-label">Người thuê</label>
+            <ReactSelect
+              options={tenants}
+              onChange={handleTenantChange}
+              isDisabled={loadingTenants || isSubmitting}
+              placeholder={loadingTenants ? "Đang tải..." : "Chọn người thuê"}
+              className="basic-single"
+              classNamePrefix="select"
+              isSearchable
+              isClearable
+              styles={darkModeSelectStyles}
+            />
+          {errors.user_ids && <div className="invalid-feedback d-block">{errors.user_ids}</div>}
+          
+          <div className="mt-2">
+            {selectedTenants.length === 0 && (
+              <div className="text-muted">Chưa có người thuê nào được chọn</div>
+            )}
+            {selectedTenants.map(tenant => (
+              <div key={tenant.value} className="d-flex align-items-center mb-1 bg-light p-2 rounded">
+                <div className="flex-grow-1">{tenant.label}</div>
+                <button 
+                  type="button" 
+                  className="btn btn-sm btn-danger" 
+                  onClick={() => removeTenant(tenant.value)}
+                  style={{ width: '28px', height: '28px', padding: '0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                >
+                  <span style={{ fontSize: '18px', fontWeight: 'bold' }}>×</span>
+                </button>
+              </div>
+            ))}
+          </div>
+          {selectedTenants.length === 0 && mode === "create" && (
+            <div className="text-danger mt-1">Vui lòng chọn ít nhất một người thuê</div>
+          )}
         </div>
 
         <div className="col-md-6">
@@ -150,12 +358,12 @@ const ContractForm = ({
         <div className="col-md-6">
           <Input
             label="Tiền thuê hàng tháng"
-            name="monthly_rent"
+            name="monthly_price"
             type="number"
             min="0"
-            value={formData.monthly_rent}
+            value={formData.monthly_price}
             onChange={handleChange}
-            error={errors.monthly_rent}
+            error={errors.monthly_price}
             required
           />
         </div>
@@ -224,7 +432,7 @@ const ContractForm = ({
         >
           Hủy
         </Button>
-        <Button type="submit" disabled={isSubmitting}>
+        <Button type="submit" disabled={isSubmitting || selectedTenants.length === 0}>
           {isSubmitting
             ? `${mode === "create" ? "Đang tạo" : "Đang cập nhật"}...`
             : mode === "create"

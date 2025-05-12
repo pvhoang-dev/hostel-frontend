@@ -25,4 +25,9 @@ export const contractService = {
     const response = await api.delete(`/contracts/${id}`);
     return response.data;
   },
+
+  getAvailableTenants: async (params = {}) => {
+    const response = await api.get("/available-tenants", { params });
+    return response.data;
+  },
 }; 
