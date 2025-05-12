@@ -11,7 +11,6 @@ import {
   Col,
   Divider,
   Checkbox,
-  message,
   Alert,
 } from "antd";
 import {
@@ -23,6 +22,7 @@ import {
   CloseOutlined,
   CalculatorOutlined,
 } from "@ant-design/icons";
+import useAlert from "../../hooks/useAlert";
 
 const { Text } = Typography;
 
@@ -34,6 +34,7 @@ const RoomServiceForm = ({ roomId, month, year, onFinish, onCancel }) => {
   const [services, setServices] = useState([]);
   const [serviceApplied, setServiceApplied] = useState({});
   const [errors, setErrors] = useState({});
+  const { showSuccess, showError, showWarning } = useAlert();
 
   useEffect(() => {
     if (roomId && month && year) {
@@ -171,7 +172,7 @@ const RoomServiceForm = ({ roomId, month, year, onFinish, onCancel }) => {
     try {
       // Kiểm tra lỗi trước khi submit
       if (Object.keys(errors).length > 0) {
-        message.error("Vui lòng sửa các lỗi trước khi gửi");
+        showError("Vui lòng sửa các lỗi trước khi gửi");
         return;
       }
 
@@ -201,13 +202,17 @@ const RoomServiceForm = ({ roomId, month, year, onFinish, onCancel }) => {
       });
 
       setSubmitting(false);
+      
+      // Hiển thị thông báo thành công
+      showSuccess("Đã lưu dịch vụ thành công");
+      
       onFinish();
     } catch (error) {
       console.error("Failed to save service usage:", error);
-      message.error(
-        "Lỗi khi lưu dịch vụ: " +
-          (error.response?.data?.message || error.message)
-      );
+      const errorMessage = "Lỗi khi lưu dịch vụ: " + (error.response?.data?.message || error.message);
+      
+      showError(errorMessage);
+      
       setSubmitting(false);
     }
   };
@@ -233,9 +238,9 @@ const RoomServiceForm = ({ roomId, month, year, onFinish, onCancel }) => {
 
     if (updated > 0) {
       form.setFieldsValue(updates);
-      message.success(`Đã tính toán lại thành tiền cho ${updated} dịch vụ`);
+      showSuccess(`Đã tính toán lại thành tiền cho ${updated} dịch vụ`);
     } else {
-      message.warning("Không có dịch vụ nào được tính lại thành tiền");
+      showWarning("Không có dịch vụ nào được tính lại thành tiền");
     }
   };
 
@@ -256,6 +261,7 @@ const RoomServiceForm = ({ roomId, month, year, onFinish, onCancel }) => {
           onChange={(e) =>
             handleServiceAppliedChange(record.room_service_id, e.target.checked)
           }
+          style={{ color: "#fff" }}
         />
       ),
     },
@@ -291,6 +297,7 @@ const RoomServiceForm = ({ roomId, month, year, onFinish, onCancel }) => {
                   handleCalculateUsage(record.room_service_id);
                 }
               }}
+              className="dark-input"
             />
           </Form.Item>
         ) : null,
@@ -315,6 +322,7 @@ const RoomServiceForm = ({ roomId, month, year, onFinish, onCancel }) => {
                 min={0}
                 disabled={!serviceApplied[record.room_service_id]}
                 onChange={() => handleCalculateUsage(record.room_service_id)}
+                className="dark-input"
               />
             </Form.Item>
             {errors[`end_meter_${record.room_service_id}`] && (
@@ -345,6 +353,7 @@ const RoomServiceForm = ({ roomId, month, year, onFinish, onCancel }) => {
             min={0}
             disabled={!serviceApplied[record.room_service_id]}
             onChange={(value) => calculatePrice(record.room_service_id, value)}
+            className="dark-input"
           />
         </Form.Item>
       ),
@@ -378,6 +387,7 @@ const RoomServiceForm = ({ roomId, month, year, onFinish, onCancel }) => {
             parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
             min={0}
             disabled={!serviceApplied[record.room_service_id]}
+            className="dark-input"
           />
         </Form.Item>
       ),
@@ -392,6 +402,7 @@ const RoomServiceForm = ({ roomId, month, year, onFinish, onCancel }) => {
             style={{ width: "100%" }}
             placeholder="Ghi chú"
             disabled={!serviceApplied[record.room_service_id]}
+            className="dark-input"
           />
         </Form.Item>
       ),
@@ -400,20 +411,20 @@ const RoomServiceForm = ({ roomId, month, year, onFinish, onCancel }) => {
 
   return (
     <Spin spinning={loading || submitting} tip="Đang xử lý...">
-      <Form form={form} layout="vertical" onFinish={handleSubmit}>
+      <Form form={form} layout="vertical" onFinish={handleSubmit} style={{ backgroundColor: "#343a40", color: "#f8f9fa" }}>
         {roomData && (
           <Row gutter={16} className="mb-3">
             <Col span={8}>
-              <Text strong>Nhà: </Text>
-              <Text>{roomData.house.name}</Text>
+              <Text strong style={{ color: "#fff" }}>Nhà: </Text>
+              <Text style={{ color: "#fff" }}>{roomData.house.name}</Text>
             </Col>
             <Col span={8}>
-              <Text strong>Phòng: </Text>
-              <Text>{roomData.room_number}</Text>
+              <Text strong style={{ color: "#fff" }}>Phòng: </Text>
+              <Text style={{ color: "#fff" }}>{roomData.room_number}</Text>
             </Col>
             <Col span={8}>
-              <Text strong>Tháng/Năm: </Text>
-              <Text>
+              <Text strong style={{ color: "#fff" }}>Tháng/Năm: </Text>
+              <Text style={{ color: "#fff" }}>
                 {month}/{year}
               </Text>
             </Col>
@@ -441,6 +452,7 @@ const RoomServiceForm = ({ roomId, month, year, onFinish, onCancel }) => {
           size="middle"
           bordered
           scroll={{ x: "max-content" }}
+          className="custom-dark-table"
         />
 
         <Divider />
@@ -463,6 +475,50 @@ const RoomServiceForm = ({ roomId, month, year, onFinish, onCancel }) => {
           </Col>
         </Row>
       </Form>
+
+      <style jsx="true">{`
+        .dark-input {
+          background-color: #212529 !important;
+          color: #fff !important;
+          border-color: #495057 !important;
+        }
+        .dark-input input {
+          background-color: #212529 !important;
+          color: #fff !important;
+        }
+        .dark-input .ant-input-number-handler-wrap {
+          background-color: #212529 !important;
+          border-color: #495057 !important;
+        }
+        .custom-dark-table {
+          color: #fff;
+        }
+        .custom-dark-table .ant-table {
+          background-color: #343a40;
+          color: #fff;
+        }
+        .custom-dark-table .ant-table-thead > tr > th {
+          background-color: #212529;
+          color: #fff;
+          border-bottom: 1px solid #495057;
+        }
+        .custom-dark-table .ant-table-tbody > tr > td {
+          border-bottom: 1px solid #495057;
+          color: #fff;
+        }
+        .custom-dark-table .ant-table-tbody > tr:hover > td {
+          background-color: #2c3034 !important;
+        }
+        .custom-dark-table .ant-table-tbody > tr.ant-table-row:hover > td {
+          background-color: #2c3034 !important;
+        }
+        .custom-dark-table .ant-table-row:hover {
+          background-color: #2c3034 !important;
+        }
+        .ant-checkbox-wrapper {
+          color: #fff !important; 
+        }
+      `}</style>
     </Spin>
   );
 };

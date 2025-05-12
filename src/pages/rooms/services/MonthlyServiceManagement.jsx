@@ -4,7 +4,6 @@ import {
   Select,
   Button,
   Table,
-  message,
   Form,
   InputNumber,
   Spin,
@@ -24,6 +23,7 @@ import {
 } from "../../../api/monthlyServices";
 import RoomServiceUsageForm from "../../../components/forms/RoomServiceUsageForm";
 import moment from "moment";
+import useAlert from "../../../hooks/useAlert";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -39,6 +39,7 @@ const MonthlyServiceManagement = () => {
   const [roomServiceModalVisible, setRoomServiceModalVisible] = useState(false);
   const [showAllRooms, setShowAllRooms] = useState(false);
   const [totalRooms, setTotalRooms] = useState(0);
+  const { showSuccess, showError } = useAlert();
 
   useEffect(() => {
     fetchHouses();
@@ -58,7 +59,7 @@ const MonthlyServiceManagement = () => {
       setLoading(false);
     } catch (error) {
       console.error("Failed to fetch houses:", error);
-      message.error("Không thể tải danh sách nhà");
+      showError("Không thể tải danh sách nhà");
       setLoading(false);
     }
   };
@@ -77,7 +78,7 @@ const MonthlyServiceManagement = () => {
       setLoading(false);
     } catch (error) {
       console.error("Failed to fetch rooms:", error);
-      message.error("Không thể tải danh sách phòng cần cập nhật dịch vụ");
+      showError("Không thể tải danh sách phòng cần cập nhật dịch vụ");
       setLoading(false);
     }
   };
@@ -108,7 +109,7 @@ const MonthlyServiceManagement = () => {
     setSelectedRoom(null);
     if (updated) {
       fetchRoomsNeedingUpdate();
-      message.success("Đã cập nhật dịch vụ thành công");
+      showSuccess("Đã cập nhật dịch vụ thành công");
     }
   };
 
@@ -150,7 +151,7 @@ const MonthlyServiceManagement = () => {
       key: "status",
       render: (status) => {
         return (
-          <Tag color={status === "occupied" ? "green" : "default"}>
+          <Tag color={status === "occupied" ? "success" : "default"}>
             {status === "occupied" ? "Đã thuê" : status}
           </Tag>
         );
@@ -162,9 +163,9 @@ const MonthlyServiceManagement = () => {
       dataIndex: "needs_update",
       render: (needsUpdate) => {
         return needsUpdate ? (
-          <Tag color="orange">Cần cập nhật</Tag>
+          <Tag color="warning">Cần cập nhật</Tag>
         ) : (
-          <Tag color="green">Đã cập nhật</Tag>
+          <Tag color="success">Đã cập nhật</Tag>
         );
       },
     },
@@ -180,16 +181,23 @@ const MonthlyServiceManagement = () => {
   ];
 
   return (
-    <div>
-      <Card title="Quản lý dịch vụ hàng tháng">
+    <div className="mt-3" style={{ backgroundColor: "#212529", color: "#f8f9fa" }}>
+      <Card 
+        title="Quản lý dịch vụ hàng tháng" 
+        style={{ backgroundColor: "#343a40", color: "#f8f9fa", borderRadius: "0.25rem", boxShadow: "0 0.5rem 1rem rgba(0, 0, 0, 0.15)" }}
+        headStyle={{ color: "#f8f9fa", borderBottom: "1px solid #495057", padding: "1rem 1.5rem", fontSize: "1.25rem", fontWeight: 500 }}
+        bodyStyle={{ color: "#f8f9fa", padding: "1.5rem" }}
+      >
         <Row gutter={16} style={{ marginBottom: 16 }}>
           <Col span={8}>
-            <Text strong>Nhà:</Text>
+            <Text strong style={{ color: "#f8f9fa", display: "block", marginBottom: "0.5rem" }}>Nhà:</Text>
             <Select
               placeholder="Chọn nhà"
-              style={{ width: "100%", marginTop: 8 }}
+              style={{ width: "100%", color: "#fff" }}
               onChange={handleHouseChange}
               allowClear
+              dropdownStyle={{ backgroundColor: "#343a40" }}
+              className="dark-select white-placeholder"
             >
               {houses.map((house) => (
                 <Option key={house.id} value={house.id}>
@@ -199,11 +207,13 @@ const MonthlyServiceManagement = () => {
             </Select>
           </Col>
           <Col span={8}>
-            <Text strong>Tháng:</Text>
+            <Text strong style={{ color: "#f8f9fa", display: "block", marginBottom: "0.5rem" }}>Tháng:</Text>
             <Select
-              style={{ width: "100%", marginTop: 8 }}
+              style={{ width: "100%", color: "#fff" }}
               value={selectedMonth}
               onChange={handleMonthChange}
+              dropdownStyle={{ backgroundColor: "#343a40" }}
+              className="dark-select white-placeholder"
             >
               {months.map((month) => (
                 <Option key={month.value} value={month.value}>
@@ -213,11 +223,13 @@ const MonthlyServiceManagement = () => {
             </Select>
           </Col>
           <Col span={8}>
-            <Text strong>Năm:</Text>
+            <Text strong style={{ color: "#f8f9fa", display: "block", marginBottom: "0.5rem" }}>Năm:</Text>
             <Select
-              style={{ width: "100%", marginTop: 8 }}
+              style={{ width: "100%", color: "#fff" }}
               value={selectedYear}
               onChange={handleYearChange}
+              dropdownStyle={{ backgroundColor: "#343a40" }}
+              className="dark-select white-placeholder"
             >
               {years.map((year) => (
                 <Option key={year} value={year}>
@@ -233,17 +245,17 @@ const MonthlyServiceManagement = () => {
             <Checkbox
               checked={showAllRooms}
               onChange={handleShowAllChange}
-              style={{ marginRight: 8 }}
+              style={{ marginRight: 8, color: "#f8f9fa" }}
             >
               Hiển thị tất cả phòng đã thuê
             </Checkbox>
           </Col>
         </Row>
 
-        <Divider />
+        <Divider style={{ borderTop: "1px solid #495057", margin: "1.5rem 0" }} />
 
-        <div style={{ marginBottom: 16 }}>
-          <Title level={4}>Danh sách phòng</Title>
+        <div style={{ marginBottom: 24 }}>
+          <Title level={4} style={{ color: "#f8f9fa", fontWeight: 500, marginBottom: "1rem" }}>Danh sách phòng</Title>
           <Row gutter={16}>
             <Col span={24}>
               {!showAllRooms && (
@@ -259,7 +271,7 @@ const MonthlyServiceManagement = () => {
                   message="Không tìm thấy phòng nào"
                   type="warning"
                   showIcon
-                  style={{ marginBottom: 16 }}
+                  style={{ marginBottom: 16, backgroundColor: "#ffc107", borderColor: "#ffc107", color: "#212529", borderRadius: "0.25rem" }}
                 />
               )}
             </Col>
@@ -272,6 +284,7 @@ const MonthlyServiceManagement = () => {
             dataSource={roomsNeedingUpdate}
             rowKey="id"
             pagination={{ pageSize: 10 }}
+            className="bootstrap-dark-table"
           />
         </Spin>
       </Card>
@@ -282,6 +295,10 @@ const MonthlyServiceManagement = () => {
         onCancel={() => handleRoomServiceModalClose(false)}
         footer={null}
         width="90%"
+        style={{ top: 20, zIndex: 1003 }}
+        bodyStyle={{ backgroundColor: "#343a40", color: "#f8f9fa", padding: "1.5rem" }}
+        headStyle={{ backgroundColor: "#343a40", color: "#f8f9fa", borderBottom: "1px solid #495057", padding: "1rem" }}
+        wrapClassName="service-modal-custom"
       >
         {selectedRoom && (
           <RoomServiceUsageForm
@@ -293,6 +310,97 @@ const MonthlyServiceManagement = () => {
           />
         )}
       </Modal>
+
+      <style jsx="true">{`
+        .bootstrap-dark-table {
+          color: #f8f9fa;
+        }
+        .bootstrap-dark-table .ant-table {
+          background-color: #343a40;
+          color: #f8f9fa;
+        }
+        .bootstrap-dark-table .ant-table-thead > tr > th {
+          background-color: #212529;
+          color: #f8f9fa;
+          border-bottom: 1px solid #495057;
+          padding: 0.75rem;
+          font-weight: 500;
+        }
+        .bootstrap-dark-table .ant-table-tbody > tr > td {
+          border-bottom: 1px solid #495057;
+          color: #f8f9fa;
+          padding: 0.75rem;
+        }
+        .bootstrap-dark-table .ant-table-tbody > tr:hover > td {
+          background-color: #2c3034 !important;
+        }
+        .bootstrap-dark-table .ant-table-tbody > tr.ant-table-row:hover > td {
+          background-color: #2c3034 !important;
+        }
+        .bootstrap-dark-table .ant-pagination-item {
+          background-color: #343a40;
+          border-color: #495057;
+        }
+        .bootstrap-dark-table .ant-pagination-item a {
+          color: #f8f9fa;
+        }
+        .bootstrap-dark-table .ant-pagination-item-active {
+          background-color: #0d6efd;
+          border-color: #0d6efd;
+        }
+        .bootstrap-dark-table .ant-pagination-item-active a {
+          color: #fff;
+        }
+        .bootstrap-dark-table .ant-pagination-prev button, 
+        .bootstrap-dark-table .ant-pagination-next button {
+          color: #f8f9fa;
+          background-color: #343a40;
+          border-color: #495057;
+        }
+        .dark-select .ant-select-selector {
+          background-color: #343a40 !important;
+          color: #fff !important;
+          border-color: #495057 !important;
+        }
+        .dark-select .ant-select-selection-item {
+          color: #fff !important;
+        }
+        .dark-select .ant-select-arrow {
+          color: #adb5bd !important;
+        }
+        .ant-select-dropdown {
+          background-color: #343a40 !important;
+        }
+        .ant-select-item {
+          color: #f8f9fa !important;
+        }
+        .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+          background-color: #2c3034 !important;
+        }
+        .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+          background-color: #2c3034 !important;
+          color: #fff !important;
+        }
+        .ant-select-dropdown .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+          background-color: #2c3034 !important;
+          color: #fff !important;
+        }
+        .service-modal-custom {
+          z-index: 1003 !important;
+        }
+        .service-modal-custom .ant-modal {
+          z-index: 1003 !important;
+        }
+        .service-modal-custom .ant-modal-mask {
+          z-index: 1002 !important;
+        }
+        .service-modal-custom .ant-modal-wrap {
+          z-index: 1003 !important;
+        }
+        .white-placeholder .ant-select-selection-placeholder {
+          color: #fff !important;
+        }
+      `}</style>
     </div>
   );
 };
