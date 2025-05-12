@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { roomService } from "../../api/rooms";
 import { userService } from "../../api/users";
 import { useAuth } from "../../hooks/useAuth";
-import Input from "../common/Input";
 import Select from "../common/Select";
 import Button from "../common/Button";
 import TextArea from "../common/TextArea";
