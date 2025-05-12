@@ -20,9 +20,9 @@ const RequestForm = ({
 
   const [formData, setFormData] = useState({
     room_id: roomId || initialData.room_id || "",
-    creator_id: user?.id || initialData.creator_id || "",
-    assignee_id: initialData.assignee_id || "",
-    type: initialData.type || "maintenance",
+    sender_id: user?.id || initialData.sender_id || "",
+    recipient_id: initialData.recipient_id || "",
+    request_type: initialData.request_type || "maintenance",
     description: initialData.description || "",
     status: initialData.status || "pending",
     ...initialData,
@@ -60,25 +60,32 @@ const RequestForm = ({
 
   const loadPotentialRecipients = async () => {
     try {
-      let recipients;
+      let recipients = [];
+
       if (user.role === "admin") {
-        // Admin có thể gửi cho admin hoặc manager khác
+        // Admin có thể gửi cho admin khác, manager hoặc tenant
         const response = await userService.getUsers({
-          role: ["admin", "manager"],
+          role: "admin,manager,tenant",
+          for_requests: "true"
         });
         recipients = response.data.data || [];
       } else if (user.role === "manager") {
-        // Manager chỉ có thể gửi cho admin
+        // Manager có thể gửi cho admin hoặc tenant từ các nhà họ quản lý
+        // Sử dụng tham số for_requests để lấy được admin
         const response = await userService.getUsers({
-          role: ["admin"],
+          for_requests: "true"
         });
+        
         recipients = response.data.data || [];
+        console.log("Recipients from API:", recipients);
       } else if (user.role === "tenant") {
-        // Tenant chỉ có thể gửi cho manager quản lý nhà của họ hoặc admin
+        // Tenant chỉ có thể gửi cho manager quản lý nhà của họ
         const response = await userService.getUsers({
-          role: ["admin", "manager"],
+          for_requests: "true"
         });
+        
         recipients = response.data.data || [];
+        console.log("Managers for tenant:", recipients);
       }
 
       // Lọc bỏ người dùng hiện tại
@@ -87,7 +94,8 @@ const RequestForm = ({
         .map((r) => ({
           value: r.id,
           label: `${r.name} (${
-            r.role === "admin" ? "Quản trị viên" : "Quản lý"
+            r.role.code === "admin" ? "Quản trị viên" : 
+            r.role.code === "manager" ? "Quản lý" : "Người thuê"
           })`,
         }));
 
@@ -144,10 +152,10 @@ const RequestForm = ({
         <div className="col-md-6">
           <Select
             label="Người nhận"
-            name="assignee_id"
-            value={formData.assignee_id}
+            name="recipient_id"
+            value={formData.recipient_id}
             onChange={handleChange}
-            error={errors.assignee_id}
+            error={errors.recipient_id}
             options={[{ value: "", label: "Chọn người nhận" }, ...recipients]}
             required
           />
