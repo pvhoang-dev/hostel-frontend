@@ -32,6 +32,7 @@ const InvoiceForm = ({
   const [rooms, setRooms] = useState([]);
   const [serviceUsages, setServiceUsages] = useState([]);
   const [loadingServiceUsages, setLoadingServiceUsages] = useState(false);
+  const [duplicateInvoiceWarning, setDuplicateInvoiceWarning] = useState(false);
 
   const { execute: fetchRooms, loading: loadingRooms } = useApi(
     roomService.getRooms
@@ -91,6 +92,20 @@ const InvoiceForm = ({
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    
+    // Nếu thay đổi loại hóa đơn, kiểm tra warning
+    if (name === 'invoice_type') {
+      if (value === 'service_usage') {
+        setDuplicateInvoiceWarning(true);
+      } else {
+        setDuplicateInvoiceWarning(false);
+      }
+    }
+    
+    // Nếu thay đổi phòng, tháng, năm và loại hóa đơn là service_usage, cập nhật warning
+    if ((name === 'room_id' || name === 'month' || name === 'year') && formData.invoice_type === 'service_usage') {
+      setDuplicateInvoiceWarning(true);
+    }
   };
 
   const handleItemChange = (index, field, value) => {
@@ -214,14 +229,24 @@ const InvoiceForm = ({
             name="invoice_type"
             value={formData.invoice_type}
             onChange={handleInputChange}
-            error={errors.invoice_type}
+            error={errors.invoice_type || errors.invoice}
             required
             options={[
               { value: "custom", label: "Tùy chỉnh" },
-              { value: "service_usage", label: "Sử dụng dịch vụ" },
+              { value: "service_usage", label: "Dịch vụ / Tháng" },
             ]}
           />
         </div>
+
+        {duplicateInvoiceWarning && formData.invoice_type === "service_usage" && (
+          <div className="col-12">
+            <div className="alert alert-warning">
+              <strong>Lưu ý:</strong> Chỉ có thể tạo một hóa đơn loại "Dịch vụ / Tháng" cho mỗi phòng trong một tháng. 
+              Nếu đã tồn tại hóa đơn dịch vụ cho phòng và tháng này, việc tạo sẽ thất bại. 
+              Trong trường hợp đó, hãy sử dụng loại hóa đơn "Tùy chỉnh".
+            </div>
+          </div>
+        )}
 
         <div className="col-md-6">
           <Input

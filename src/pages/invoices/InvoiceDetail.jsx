@@ -51,7 +51,7 @@ const InvoiceDetail = () => {
       case "custom":
         return "Tùy chỉnh";
       case "service_usage":
-        return "Sử dụng dịch vụ";
+        return "Dịch vụ / Tháng";
       default:
         return type;
     }

@@ -42,7 +42,7 @@ const FilterSection = ({
             options={[
               { value: "", label: "Tất cả" },
               ...houses.map((house) => ({
-                value: house.id,
+                value: house.id.toString(),
                 label: house.name,
               })),
             ]}
@@ -58,7 +58,7 @@ const FilterSection = ({
             options={[
               { value: "", label: "Tất cả" },
               ...rooms.map((room) => ({
-                value: room.id,
+                value: room.id.toString(),
                 label: `Phòng ${room.room_number}`,
               })),
             ]}
@@ -74,7 +74,7 @@ const FilterSection = ({
             options={[
               { value: "", label: "Tất cả" },
               { value: "custom", label: "Tùy chỉnh" },
-              { value: "service_usage", label: "Sử dụng dịch vụ" },
+              { value: "service_usage", label: "Dịch vụ / Tháng" },
             ]}
           />
         </div>
@@ -221,7 +221,7 @@ const InvoiceList = () => {
       cell: ({ row }) =>
         row.original.invoice_type === "custom"
           ? "Tùy chỉnh"
-          : "Sử dụng dịch vụ",
+          : "Dịch vụ / Tháng",
     },
     {
       accessorKey: "total_amount",
