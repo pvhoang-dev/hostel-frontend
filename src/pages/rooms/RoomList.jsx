@@ -33,7 +33,7 @@ const FilterSection = ({
             options={[
               { value: "", label: "Tất cả" },
               ...houses.map((house) => ({
-                value: house.id,
+                value: house.id.toString(),
                 label: house.name,
               })),
             ]}

@@ -60,12 +60,6 @@ const RoomServiceDetail = () => {
           >
             Chỉnh sửa
           </Link>
-          <Link
-            to={`/room-services/${id}/usages`}
-            className="btn btn-info text-white"
-          >
-            Lịch sử sử dụng
-          </Link>
         </div>
       </div>
 

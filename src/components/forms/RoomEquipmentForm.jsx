@@ -217,9 +217,6 @@ const RoomEquipmentForm = ({
 
     let submitData = { ...formData };
 
-    // Store the updated form data for later use in modals
-    setUpdatedFormData(submitData);
-
     // In edit mode, check for quantity changes and handle them
     if (mode === "edit") {
       const newQuantity = parseInt(formData.quantity);
@@ -412,7 +409,6 @@ const RoomEquipmentForm = ({
 
   // Handle source selection for additional quantity
   const handleSourceSelection = (useStorage) => {
-    setUseStorageSource(useStorage);
     setShowSourceModal(false);
 
     const submitData = { ...formData };

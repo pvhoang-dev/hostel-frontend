@@ -14,31 +14,16 @@ const Table = ({
   const tableId = useRef(`table-${Math.random().toString(36).substring(2, 9)}`);
 
   // Xử lý các nút hành động
-  const bindActionButtons = () => {
-    if (!tableRef.current || !actionColumn) return;
-    
-    // Xoá tất cả event listeners cũ để tránh duplicate
-    $(document).off('click', `#${tableId.current} .action-btn`);
-    
-    // Sử dụng event delegation cho bảng hiện tại
-    $(document).on('click', `#${tableId.current} .action-btn`, function(e) {
-      e.preventDefault();
-      const $button = $(this);
-      const itemId = $button.data('item-id');
-      const actionType = $button.data('action-type');
-      
-      // Tìm item tương ứng với ID
-      const item = data.find(item => item.id.toString() === itemId.toString());
-      
-      if (item && actionColumn.actions[actionType]) {
-        try {
-          actionColumn.actions[actionType].handler(item);
-        } catch (error) {
-          console.error('Error in action handler:', error);
-          alert(`Lỗi khi thực hiện hành động: ${error.message}`);
-        }
+  const handleActionClick = (e, item, action) => {
+    e.preventDefault();
+    if (action && action.handler) {
+      try {
+        action.handler(item);
+      } catch (error) {
+        console.error('Error in action handler:', error);
+        alert(`Lỗi khi thực hiện hành động: ${error.message}`);
       }
-    });
+    }
   };
 
   // Khởi tạo DataTable khi data thay đổi
@@ -92,16 +77,11 @@ const Table = ({
             }
           }
         });
-
-        // Đăng ký event handlers
-        bindActionButtons();
       }, 600);
     }
 
     // Cleanup khi unmount
     return () => {
-      $(document).off('click', `#${tableId.current} .action-btn`);
-      
       if (dataTableRef.current) {
         try {
           dataTableRef.current.destroy();
@@ -111,7 +91,7 @@ const Table = ({
         dataTableRef.current = null;
       }
     };
-  }, [data, actionColumn]);
+  }, [data]);
 
   if (loading) {
     return (
@@ -140,10 +120,9 @@ const Table = ({
                 <button
                   key={index}
                   type="button"
-                  className="btn btn-link p-0 mx-1 action-icon action-btn"
+                  className="btn btn-link p-0 mx-1 action-icon"
                   style={{ border: 'none', background: 'none', cursor: 'pointer' }}
-                  data-item-id={item.id}
-                  data-action-type={index}
+                  onClick={(e) => handleActionClick(e, item, action)}
                 >
                   <i className={`mdi ${action.icon}`}></i>
                 </button>

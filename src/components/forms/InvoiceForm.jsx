@@ -20,25 +20,21 @@ const InvoiceForm = ({
 }) => {
   const [formData, setFormData] = useState({
     room_id: initialData.room_id || "",
-    invoice_type: initialData.invoice_type || "custom",
+    invoice_type: mode === "create" ? "custom" : (initialData.invoice_type || "custom"),
     month: initialData.month || new Date().getMonth() + 1,
     year: initialData.year || new Date().getFullYear(),
     description: initialData.description || "",
     items: initialData.items || [
       { source_type: "manual", amount: 0, description: "" },
     ],
+    deleted_service_usage_ids: [], // Để lưu danh sách service_usage_id cần xóa
   });
 
   const [rooms, setRooms] = useState([]);
-  const [serviceUsages, setServiceUsages] = useState([]);
-  const [loadingServiceUsages, setLoadingServiceUsages] = useState(false);
-  const [duplicateInvoiceWarning, setDuplicateInvoiceWarning] = useState(false);
+  const [loadingRooms, setLoadingRooms] = useState(false);
 
-  const { execute: fetchRooms, loading: loadingRooms } = useApi(
+  const { execute: fetchRooms } = useApi(
     roomService.getRooms
-  );
-  const { execute: fetchServiceUsages } = useApi(
-    serviceUsageService.getServiceUsages
   );
 
   // Load rooms based on houseId (if provided)
@@ -48,121 +44,42 @@ const InvoiceForm = ({
     }
   }, [houseId]);
 
-  // Load service usages when room_id, month, and year are selected
-  useEffect(() => {
-    if (formData.room_id && formData.month && formData.year) {
-      loadServiceUsages();
-    }
-  }, [formData.room_id, formData.month, formData.year]);
-
   const loadRooms = async () => {
+    setLoadingRooms(true);
     const params = {};
     if (houseId) params.house_id = houseId;
 
-    const response = await fetchRooms({
-      ...params,
-      include: "currentContract",
-    });
-    if (response.success) {
-      setRooms(response.data.data);
-    }
-  };
-
-  const loadServiceUsages = async () => {
-    setLoadingServiceUsages(true);
     try {
-      const response = await fetchServiceUsages({
-        room_id: formData.room_id,
-        month: formData.month,
-        year: formData.year,
-        include:
-          "roomService.service,roomService.room,roomService.room.house,roomService",
+      const response = await fetchRooms({
+        ...params,
+        include: "currentContract",
       });
-
       if (response.success) {
-        setServiceUsages(response.data.data);
+        setRooms(response.data.data);
       }
     } catch (error) {
-      console.error("Error loading service usages:", error);
+      console.error("Error loading rooms:", error);
     } finally {
-      setLoadingServiceUsages(false);
+      setLoadingRooms(false);
     }
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    
-    // Nếu thay đổi loại hóa đơn, kiểm tra warning
-    if (name === 'invoice_type') {
-      if (value === 'service_usage') {
-        setDuplicateInvoiceWarning(true);
-      } else {
-        setDuplicateInvoiceWarning(false);
-      }
-    }
-    
-    // Nếu thay đổi phòng, tháng, năm và loại hóa đơn là service_usage, cập nhật warning
-    if ((name === 'room_id' || name === 'month' || name === 'year') && formData.invoice_type === 'service_usage') {
-      setDuplicateInvoiceWarning(true);
-    }
   };
 
   const handleItemChange = (index, field, value) => {
+    // Chỉ cho phép thay đổi các item có source_type là manual
     const updatedItems = [...formData.items];
-
-    if (field === "source_type") {
-      // When changing source type, reset all related fields
-      if (value === "manual") {
-        updatedItems[index] = {
-          ...updatedItems[index],
-          source_type: value,
-          service_usage_id: null, // Clear service usage id
-          description: "", // Reset description
-          amount: 0, // Reset amount
-        };
-      } else if (value === "service_usage") {
-        updatedItems[index] = {
-          ...updatedItems[index],
-          source_type: value,
-          service_usage_id: null, // Clear any previous selection
-          description: "", // Will be filled when service is selected
-          amount: 0, // Will be calculated when service is selected
-        };
-      }
-    } else {
-      // Normal field update for other fields
+    if (updatedItems[index].source_type === "manual") {
       updatedItems[index] = { ...updatedItems[index], [field]: value };
-    }
-
-    setFormData((prev) => ({ ...prev, items: updatedItems }));
-  };
-
-  const handleServiceUsageSelect = (index, serviceUsageId) => {
-    const serviceUsage = serviceUsages.find(
-      (su) => su.id === parseInt(serviceUsageId)
-    );
-    if (serviceUsage) {
-      // Calculate amount based on price_used and usage_value
-      const amount = serviceUsage.price_used * serviceUsage.usage_value;
-
-      const updatedItems = [...formData.items];
-      updatedItems[index] = {
-        ...updatedItems[index],
-        service_usage_id: serviceUsage.id,
-        amount,
-        description: `${serviceUsage.room_service.service.name} - ${
-          serviceUsage.usage_value
-        } ${serviceUsage.room_service.service.unit} x ${formatCurrency(
-          serviceUsage.price_used
-        )}`,
-      };
-
       setFormData((prev) => ({ ...prev, items: updatedItems }));
     }
   };
 
   const addItem = () => {
+    // Chỉ thêm item với source_type là manual
     setFormData((prev) => ({
       ...prev,
       items: [
@@ -174,7 +91,23 @@ const InvoiceForm = ({
 
   const removeItem = (index) => {
     const updatedItems = [...formData.items];
+    const itemToRemove = updatedItems[index];
+    
+    if (mode === "edit" && itemToRemove.source_type === "service_usage" && itemToRemove.service_usage_id) {
+      // Lưu service_usage_id để xóa
+      setFormData(prev => ({
+        ...prev,
+        deleted_service_usage_ids: [...prev.deleted_service_usage_ids, itemToRemove.service_usage_id]
+      }));
+    }
+    
     updatedItems.splice(index, 1);
+    
+    // Đảm bảo luôn có ít nhất một item
+    if (updatedItems.length === 0) {
+      updatedItems.push({ source_type: "manual", amount: 0, description: "" });
+    }
+    
     setFormData((prev) => ({ ...prev, items: updatedItems }));
   };
 
@@ -223,28 +156,13 @@ const InvoiceForm = ({
           </div>
         )}
 
-        <div className="col-md-6">
-          <Select
-            label="Loại hóa đơn"
-            name="invoice_type"
-            value={formData.invoice_type}
-            onChange={handleInputChange}
-            error={errors.invoice_type || errors.invoice}
-            required
-            options={[
-              { value: "custom", label: "Tùy chỉnh" },
-              { value: "service_usage", label: "Dịch vụ / Tháng" },
-            ]}
-          />
-        </div>
-
-        {duplicateInvoiceWarning && formData.invoice_type === "service_usage" && (
-          <div className="col-12">
-            <div className="alert alert-warning">
-              <strong>Lưu ý:</strong> Chỉ có thể tạo một hóa đơn loại "Dịch vụ / Tháng" cho mỗi phòng trong một tháng. 
-              Nếu đã tồn tại hóa đơn dịch vụ cho phòng và tháng này, việc tạo sẽ thất bại. 
-              Trong trường hợp đó, hãy sử dụng loại hóa đơn "Tùy chỉnh".
-            </div>
+        {mode === "edit" && formData.invoice_type && (
+          <div className="col-md-6">
+            <Input
+              label="Loại hóa đơn"
+              value={formData.invoice_type === "custom" ? "Tùy chỉnh" : "Dịch vụ / Tháng"}
+              disabled={true}
+            />
           </div>
         )}
 
@@ -320,52 +238,25 @@ const InvoiceForm = ({
                   formData.items.map((item, index) => (
                     <tr key={index}>
                       <td>
-                        <Select
-                          name={`item-${index}-source_type`}
-                          value={item.source_type}
-                          onChange={(e) =>
-                            handleItemChange(
-                              index,
-                              "source_type",
-                              e.target.value
-                            )
-                          }
-                          error={errors[`items.${index}.source_type`]}
-                          options={[
-                            { value: "manual", label: "Nhập tay" },
-                            { value: "service_usage", label: "Dịch vụ" },
-                          ]}
-                          inline
-                        />
+                        {item.source_type === "service_usage" ? (
+                          <Input
+                            value="Dịch vụ"
+                            disabled={true}
+                            inline
+                          />
+                        ) : (
+                          <Input
+                            value="Nhập tay"
+                            disabled={true}
+                            inline
+                          />
+                        )}
                       </td>
                       <td>
                         {item.source_type === "service_usage" ? (
-                          <Select
-                            name={`item-${index}-service_usage_id`}
-                            value={item.service_usage_id || ""}
-                            onChange={(e) =>
-                              handleServiceUsageSelect(index, e.target.value)
-                            }
-                            error={errors[`items.${index}.service_usage_id`]}
-                            options={[
-                              {
-                                value: "",
-                                label: loadingServiceUsages
-                                  ? "Đang tải..."
-                                  : "-- Chọn dịch vụ --",
-                              },
-                              ...serviceUsages.map((su) => ({
-                                value: su.id,
-                                label: `${
-                                  su.room_service.service.name
-                                } - ${formatCurrency(
-                                  su.price_used * su.usage_value
-                                )} - (${su.price_used} x ${su.usage_value})`,
-                              })),
-                            ]}
-                            disabled={
-                              loadingServiceUsages || serviceUsages.length === 0
-                            }
+                          <Input
+                            value={item.description || ""}
+                            disabled={true}
                             inline
                           />
                         ) : (
@@ -399,10 +290,7 @@ const InvoiceForm = ({
                           }
                           error={errors[`items.${index}.amount`]}
                           min="0"
-                          disabled={
-                            item.source_type === "service_usage" &&
-                            item.service_usage_id
-                          }
+                          disabled={item.source_type === "service_usage"}
                           inline
                         />
                       </td>
@@ -411,7 +299,7 @@ const InvoiceForm = ({
                           type="button"
                           className="btn btn-outline-danger btn-sm"
                           onClick={() => removeItem(index)}
-                          disabled={formData.items.length === 1}
+                          disabled={formData.items.length === 1 && item.source_type === "manual"}
                         >
                           <i className="mdi mdi-delete"></i>
                         </button>

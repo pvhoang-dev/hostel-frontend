@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Form,
   Input,
@@ -12,6 +12,7 @@ import {
   Divider,
   Checkbox,
   Alert,
+  message,
 } from "antd";
 import {
   getRoomServices,
@@ -35,6 +36,13 @@ const RoomServiceForm = ({ roomId, month, year, onFinish, onCancel }) => {
   const [serviceApplied, setServiceApplied] = useState({});
   const [errors, setErrors] = useState({});
   const { showSuccess, showError, showWarning } = useAlert();
+  const [formattedServices, setFormattedServices] = useState(null);
+  
+  // Sử dụng useRef để lưu trữ dữ liệu mà không gây re-render
+  const apiDataRef = useRef({
+    hasInvoice: false,
+    invoiceId: null
+  });
 
   useEffect(() => {
     if (roomId && month && year) {
@@ -50,6 +58,19 @@ const RoomServiceForm = ({ roomId, month, year, onFinish, onCancel }) => {
 
       const servicesData = response.data.services;
       setServices(servicesData);
+
+      // Lưu thông tin về hóa đơn trực tiếp vào ref
+      apiDataRef.current.hasInvoice = response.data.has_invoice || false;
+      apiDataRef.current.invoiceId = response.data.invoice_id || null;
+      
+      console.log("API response:", response.data);
+      console.log("Có hóa đơn cho phòng này trong tháng này?", response.data.has_invoice ? "Có" : "Không");
+      console.log("Giá trị lưu trong ref:", apiDataRef.current);
+
+      // Kiểm tra xem có hóa đơn tồn tại cho phòng này trong tháng/năm này
+      setTimeout(() => {
+        console.log("hasExistingInvoice sau khi set:", apiDataRef.current.hasInvoice);
+      }, 0);
 
       // Set initial service applied state
       const initialServiceApplied = {};
@@ -143,7 +164,7 @@ const RoomServiceForm = ({ roomId, month, year, onFinish, onCancel }) => {
     } else {
       // Nếu áp dụng, đặt giá trị mặc định
       if (service.is_metered) {
-        // Nếu là dịch vụ đo số, kiểm tra và tính số lượng nếu đã có số đầu/cuối
+        // Nếu là dịch vụ đo số, tự động tính toán nếu đã có số đầu/cuối
         const startMeter = form.getFieldValue(`start_meter_${serviceId}`);
         const endMeter = form.getFieldValue(`end_meter_${serviceId}`);
 
@@ -152,6 +173,7 @@ const RoomServiceForm = ({ roomId, month, year, onFinish, onCancel }) => {
           endMeter !== undefined &&
           endMeter >= startMeter
         ) {
+          // Nếu có đủ số đầu và số cuối hợp lệ, tính toán usage_value và price_used
           const usage = endMeter - startMeter;
           form.setFieldsValue({
             [`usage_value_${serviceId}`]: usage,
@@ -170,6 +192,51 @@ const RoomServiceForm = ({ roomId, month, year, onFinish, onCancel }) => {
 
   const handleSubmit = async () => {
     try {
+      // Kiểm tra hợp lệ trước khi submit
+      let hasValidationError = false;
+      let validationErrors = { ...errors };
+
+      // Duyệt qua từng dịch vụ để kiểm tra
+      for (const service of services) {
+        const serviceId = service.room_service_id;
+        const isApplied = serviceApplied[serviceId];
+        
+        // Nếu dịch vụ được áp dụng và là loại đo đếm
+        if (isApplied && service.is_metered) {
+          const startMeter = form.getFieldValue(`start_meter_${serviceId}`);
+          const endMeter = form.getFieldValue(`end_meter_${serviceId}`);
+          
+          if (startMeter === undefined || startMeter === null || startMeter === '') {
+            validationErrors[`start_meter_${serviceId}`] = "Vui lòng nhập số đầu";
+            hasValidationError = true;
+          }
+          
+          if (endMeter === undefined || endMeter === null || endMeter === '') {
+            validationErrors[`end_meter_${serviceId}`] = "Vui lòng nhập số cuối";
+            hasValidationError = true;
+          }
+          
+          if (startMeter !== undefined && endMeter !== undefined && endMeter < startMeter) {
+            validationErrors[`end_meter_${serviceId}`] = "Số cuối phải lớn hơn hoặc bằng số đầu";
+            hasValidationError = true;
+          }
+        } 
+        // Nếu dịch vụ được áp dụng và không phải là loại đo đếm
+        else if (isApplied && !service.is_metered) {
+          const usageValue = form.getFieldValue(`usage_value_${serviceId}`);
+          if (usageValue === undefined || usageValue === null || usageValue === '') {
+            validationErrors[`usage_value_${serviceId}`] = "Vui lòng nhập số lượng";
+            hasValidationError = true;
+          }
+        }
+      }
+      
+      if (hasValidationError) {
+        setErrors(validationErrors);
+        showError("Vui lòng điền đầy đủ thông tin cho các dịch vụ được chọn");
+        return;
+      }
+
       // Kiểm tra lỗi trước khi submit
       if (Object.keys(errors).length > 0) {
         showError("Vui lòng sửa các lỗi trước khi gửi");
@@ -178,33 +245,92 @@ const RoomServiceForm = ({ roomId, month, year, onFinish, onCancel }) => {
 
       setSubmitting(true);
       const formValues = form.getFieldsValue();
-
-      // Format the data for API
-      const formattedServices = services.map((service) => {
-        const serviceId = service.room_service_id;
-        const isApplied = serviceApplied[serviceId];
-
-        return {
-          room_service_id: serviceId,
-          start_meter: formValues[`start_meter_${serviceId}`],
-          end_meter: formValues[`end_meter_${serviceId}`],
-          usage_value: isApplied ? formValues[`usage_value_${serviceId}`] : 0,
-          price_used: isApplied ? formValues[`price_used_${serviceId}`] : 0,
-          description: formValues[`description_${serviceId}`] || "",
-        };
+      
+      // Đảm bảo tính toán lại usage_value cho các dịch vụ đo đếm
+      services.forEach(service => {
+        if (service.is_metered && serviceApplied[service.room_service_id]) {
+          const serviceId = service.room_service_id;
+          const startMeter = formValues[`start_meter_${serviceId}`];
+          const endMeter = formValues[`end_meter_${serviceId}`];
+          
+          if (startMeter !== undefined && endMeter !== undefined) {
+            formValues[`usage_value_${serviceId}`] = endMeter - startMeter;
+            formValues[`price_used_${serviceId}`] = service.price * (endMeter - startMeter);
+          }
+        }
       });
 
-      await saveRoomServiceUsage({
+      // Format the data for API
+      const formattedServicesData = services
+        .filter((service) => serviceApplied[service.room_service_id]) // Chỉ lấy các dịch vụ được chọn
+        .map((service) => {
+          const serviceId = service.room_service_id;
+
+          return {
+            room_service_id: serviceId,
+            start_meter: formValues[`start_meter_${serviceId}`],
+            end_meter: formValues[`end_meter_${serviceId}`],
+            usage_value: formValues[`usage_value_${serviceId}`] || 0,
+            price_used: formValues[`price_used_${serviceId}`] || 0,
+            description: formValues[`description_${serviceId}`] || "",
+          };
+        });
+
+      // Tạo danh sách các dịch vụ bị bỏ chọn
+      const uncheckedServices = services
+        .filter((service) => !serviceApplied[service.room_service_id])
+        .map((service) => service.room_service_id);
+
+      // Lưu dữ liệu để sử dụng trong modal
+      setFormattedServices(formattedServicesData);
+      
+      // Kiểm tra hóa đơn từ ref
+      console.log("Kiểm tra hóa đơn từ ref:", apiDataRef.current);
+      console.log("Danh sách dịch vụ bị bỏ chọn:", uncheckedServices);
+      
+      if (apiDataRef.current.hasInvoice) {
+        // Sử dụng confirm thông thường thay vì Modal
+        const confirmResult = window.confirm(`Đã tồn tại hóa đơn cho phòng này trong tháng ${month}/${year}. Bạn có muốn cập nhật hóa đơn dựa trên những thay đổi về dịch vụ không?`);
+        
+        if (confirmResult) {
+          // Người dùng chọn "OK"
+          await saveServicesAndInvoice(formattedServicesData, true, uncheckedServices);
+        } else {
+          // Người dùng chọn "Cancel"
+          await saveServicesAndInvoice(formattedServicesData, false, uncheckedServices);
+        }
+      } else {
+        // Nếu chưa có hóa đơn, tiến hành lưu bình thường
+        await saveServicesAndInvoice(formattedServicesData, true, uncheckedServices);
+      }
+    } catch (error) {
+      console.error("Failed to save service usage:", error);
+      const errorMessage = "Lỗi khi lưu dịch vụ: " + (error.response?.data?.message || error.message);
+      
+      showError(errorMessage);
+      
+      setSubmitting(false);
+    }
+  };
+
+  // Hàm xử lý việc lưu dịch vụ và hóa đơn
+  const saveServicesAndInvoice = async (services, updateInvoice = true, uncheckedServices = []) => {
+    try {
+      setSubmitting(true);
+      
+      const response = await saveRoomServiceUsage({
         room_id: roomId,
         month: month,
         year: year,
-        services: formattedServices,
+        services: services,
+        unchecked_services: uncheckedServices,
+        update_invoice: updateInvoice // Thêm tham số để API biết có cập nhật hóa đơn hay không
       });
 
       setSubmitting(false);
       
       // Hiển thị thông báo thành công
-      showSuccess("Đã lưu dịch vụ thành công");
+      showSuccess("Đã lưu dịch vụ thành công" + (updateInvoice ? " và cập nhật hóa đơn" : ""));
       
       onFinish();
     } catch (error) {
@@ -282,7 +408,16 @@ const RoomServiceForm = ({ roomId, month, year, onFinish, onCancel }) => {
       width: 130,
       render: (_, record) =>
         record.is_metered ? (
-          <Form.Item name={`start_meter_${record.room_service_id}`} noStyle>
+          <Form.Item 
+            name={`start_meter_${record.room_service_id}`} 
+            rules={[
+              {
+                required: record.is_metered && serviceApplied[record.room_service_id],
+                message: "Vui lòng nhập số đầu",
+              },
+            ]}
+            noStyle
+          >
             <InputNumber
               disabled={
                 record.has_usage && serviceApplied[record.room_service_id]
@@ -315,6 +450,12 @@ const RoomServiceForm = ({ roomId, month, year, onFinish, onCancel }) => {
                 errors[`end_meter_${record.room_service_id}`] ? "error" : ""
               }
               help={errors[`end_meter_${record.room_service_id}`]}
+              rules={[
+                {
+                  required: record.is_metered && serviceApplied[record.room_service_id],
+                  message: "Vui lòng nhập số cuối",
+                },
+              ]}
               noStyle
             >
               <InputNumber
@@ -338,24 +479,35 @@ const RoomServiceForm = ({ roomId, month, year, onFinish, onCancel }) => {
       key: "usage_value",
       width: 120,
       render: (_, record) => (
-        <Form.Item
-          name={`usage_value_${record.room_service_id}`}
-          rules={[
-            {
-              required: serviceApplied[record.room_service_id],
-              message: "Vui lòng nhập số lượng",
-            },
-          ]}
-          noStyle
-        >
-          <InputNumber
-            style={{ width: "100%" }}
-            min={0}
-            disabled={!serviceApplied[record.room_service_id]}
-            onChange={(value) => calculatePrice(record.room_service_id, value)}
-            className="dark-input"
-          />
-        </Form.Item>
+        <div>
+          <Form.Item
+            name={`usage_value_${record.room_service_id}`}
+            validateStatus={
+              errors[`usage_value_${record.room_service_id}`] ? "error" : ""
+            }
+            help={errors[`usage_value_${record.room_service_id}`]}
+            rules={[
+              {
+                required: serviceApplied[record.room_service_id],
+                message: "Vui lòng nhập số lượng",
+              },
+            ]}
+            noStyle
+          >
+            <InputNumber
+              style={{ width: "100%" }}
+              min={0}
+              disabled={!serviceApplied[record.room_service_id] || record.is_metered}
+              onChange={(value) => calculatePrice(record.room_service_id, value)}
+              className="dark-input"
+            />
+          </Form.Item>
+          {errors[`usage_value_${record.room_service_id}`] && (
+            <div style={{ color: "red", fontSize: "12px" }}>
+              {errors[`usage_value_${record.room_service_id}`]}
+            </div>
+          )}
+        </div>
       ),
     },
     {
@@ -434,14 +586,24 @@ const RoomServiceForm = ({ roomId, month, year, onFinish, onCancel }) => {
         <Divider />
 
         <Row justify="end" style={{ marginBottom: 16 }}>
-          <Button
-            icon={<CalculatorOutlined />}
-            onClick={calculateAllPrices}
-            type="primary"
-            ghost
-          >
-            Tính lại thành tiền
-          </Button>
+          <Col span={24} style={{ marginBottom: 10 }}>
+            <Alert
+              message="Lưu ý: Chỉ những dịch vụ được đánh dấu ở cột 'Áp dụng' mới được lưu và tính vào hóa đơn. Nếu không muốn sử dụng dịch vụ nào, hãy bỏ đánh dấu ở cột đó. Khi bỏ đánh dấu và lưu, dịch vụ đó sẽ bị xóa khỏi hệ thống."
+              type="info"
+              showIcon
+              style={{ marginBottom: 10 }}
+            />
+          </Col>
+          <Col>
+            <Button
+              icon={<CalculatorOutlined />}
+              onClick={calculateAllPrices}
+              type="primary"
+              ghost
+            >
+              Tính lại thành tiền
+            </Button>
+          </Col>
         </Row>
 
         <Table

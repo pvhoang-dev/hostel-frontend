@@ -80,8 +80,10 @@ const ContractForm = ({
   mode = "create",
   roomId = null,
 }) => {
+  console.log("ContractForm initialData:", initialData);
+
   const [formData, setFormData] = useState({
-    room_id: roomId || "",
+    room_id: roomId || initialData?.room?.id || "",
     user_ids: initialData.user_ids || [],
     start_date: new Date().toISOString().split("T")[0],
     end_date: new Date(new Date().setMonth(new Date().getMonth() + 6))
@@ -101,19 +103,56 @@ const ContractForm = ({
   const [loadingTenants, setLoadingTenants] = useState(false);
 
   useEffect(() => {
+    console.log("useEffect chính được gọi với initialData:", initialData);
+    
     if (!roomId) {
       loadRooms();
     }
     
     // Khởi tạo giá trị khi ở chế độ edit
-    if (mode === "edit" && initialData) {      
-      // Nếu có dữ liệu người dùng, khởi tạo danh sách người thuê đã chọn
-      if (initialData.users && initialData.users.length > 0) {
+    if (mode === "edit" && initialData) {
+      console.log("Kiểm tra tenants trong initialData:", initialData.tenants);
+      console.log("Kiểm tra users trong initialData:", initialData.users);
+      
+      // Nếu có tenants (từ API trả về)
+      if (initialData.tenants && initialData.tenants.length > 0) {
+        const selectedUsers = initialData.tenants.map(tenant => ({
+          value: tenant.id,
+          label: `${tenant.name} (${tenant.email})`
+        }));
+        console.log("Khởi tạo selectedTenants từ tenants:", selectedUsers);
+        setSelectedTenants(selectedUsers);
+        
+        // Đưa danh sách tenants vào danh sách người thuê có sẵn
+        setTenants(currentTenants => {
+          const newList = [...currentTenants];
+          selectedUsers.forEach(user => {
+            if (!newList.some(t => t.value === user.value)) {
+              newList.push(user);
+            }
+          });
+          return newList;
+        });
+      }
+      // Nếu không có tenants nhưng có users (từ cấu trúc dữ liệu cũ)
+      else if (initialData.users && initialData.users.length > 0) {
         const selectedUsers = initialData.users.map(user => ({
           value: user.id,
           label: `${user.name} (${user.email})`
         }));
+        console.log("Khởi tạo selectedTenants từ users:", selectedUsers);
         setSelectedTenants(selectedUsers);
+        
+        // Đưa danh sách users vào danh sách người thuê có sẵn
+        setTenants(currentTenants => {
+          const newList = [...currentTenants];
+          selectedUsers.forEach(user => {
+            if (!newList.some(t => t.value === user.value)) {
+              newList.push(user);
+            }
+          });
+          return newList;
+        });
       }
       
       // Nếu có room_id trong dữ liệu ban đầu, tải danh sách người thuê
@@ -151,43 +190,35 @@ const ContractForm = ({
   const loadTenants = async (roomId) => {
     try {
       setLoadingTenants(true);
+      console.log("Đang tải danh sách người thuê cho phòng:", roomId);
       
       const params = { room_id: roomId };
       
-      // Nếu đang edit, thêm contract_id để bao gồm người thuê hiện tại trong danh sách
-      if (mode === "edit" && initialData.id) {
-        params.exclude_contract_id = initialData.id;
-      }
-      
+      console.log("Params gửi đến API getAvailableTenants:", params);
       const response = await contractService.getAvailableTenants(params);
+      console.log("Kết quả API getAvailableTenants:", response);
       
       if (response.success) {
         const tenantsData = response.data.map((user) => ({
           value: user.id,
           label: `${user.name} (${user.email})`,
         }));
+        
+        console.log("Tenants data từ API:", tenantsData);
+        console.log("Selected tenants hiện tại:", selectedTenants);
                 
-        // Kiểm tra nếu người thuê hiện tại không có trong danh sách API trả về (chỉ trong trường hợp edit)
-        if (mode === "edit" && initialData.users && initialData.users.length > 0) {
-          // Danh sách ID người thuê hiện tại
-          const currentTenantIds = tenantsData.map(t => t.value);
-          
-          // Thêm những người thuê trong hợp đồng hiện tại mà không có trong danh sách API
-          const additionalTenants = initialData.users
-            .filter(user => !currentTenantIds.includes(user.id))
-            .map(user => ({
-              value: user.id,
-              label: `${user.name} (${user.email})`,
-            }));
-          
-          if (additionalTenants.length > 0) {
-            setTenants([...tenantsData, ...additionalTenants]);
-          } else {
-            setTenants(tenantsData);
+        // Kết hợp danh sách từ API với danh sách người thuê đã chọn
+        const combinedTenants = [...tenantsData];
+        
+        // Thêm những người thuê đã chọn vào danh sách nếu chưa có
+        selectedTenants.forEach(selected => {
+          if (!combinedTenants.some(t => t.value === selected.value)) {
+            combinedTenants.push(selected);
           }
-        } else {
-          setTenants(tenantsData);
-        }
+        });
+        
+        console.log("Danh sách người thuê kết hợp cuối cùng:", combinedTenants);
+        setTenants(combinedTenants);
       } else {
         console.error("API getAvailableTenants không thành công:", response.message);
       }
@@ -272,6 +303,8 @@ const ContractForm = ({
     return null;
   };
 
+  console.log("formData.room:", formData.room);
+
   return (
     <form onSubmit={handleSubmit}>
       <div className="row g-3">
@@ -284,7 +317,7 @@ const ContractForm = ({
                 value={getSelectedRoomOption()}
                 onChange={handleRoomChange}
                 isDisabled={isSubmitting || mode === "edit"} // Disable nếu đang ở chế độ edit
-                placeholder={mode === "edit" ? "Không thể thay đổi phòng" : "Chọn phòng"}
+                placeholder={mode === "edit" ? formData.room.room_number + " - " + formData.room.house.name : "Chọn phòng"}
                 className="basic-single"
                 classNamePrefix="select"
                 isClearable={mode !== "edit"}
