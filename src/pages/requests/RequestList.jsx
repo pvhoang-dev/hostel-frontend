@@ -141,9 +141,7 @@ const RequestList = () => {
   const requestStatuses = [
     { value: "", label: "Tất cả trạng thái" },
     { value: "pending", label: "Đang chờ" },
-    { value: "in_progress", label: "Đang xử lý" },
     { value: "completed", label: "Đã hoàn thành" },
-    { value: "rejected", label: "Đã từ chối" },
   ];
 
   // Define table columns
@@ -213,11 +211,6 @@ const RequestList = () => {
           {getStatusText(row.original.status)}
         </span>
       ),
-    },
-    {
-      header: "Phòng",
-      accessorKey: "room",
-      cell: ({ row }) => row.original.room?.room_number || "N/A",
     },
     {
       header: "Ngày tạo",
@@ -375,13 +368,9 @@ const RequestList = () => {
   const getStatusText = (status) => {
     switch (status) {
       case "pending":
-        return "Đang chờ";
-      case "in_progress":
         return "Đang xử lý";
       case "completed":
         return "Đã hoàn thành";
-      case "rejected":
-        return "Đã từ chối";
       default:
         return "Không xác định";
     }
