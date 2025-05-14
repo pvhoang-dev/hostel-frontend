@@ -14,6 +14,18 @@ export const formatDate = (dateString, options = {}) => {
   return date.toLocaleDateString(undefined, { ...defaultOptions, ...options });
 };
 
+export const formatDateWithoutTime = (dateString, options = {}) => {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  const defaultOptions = {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+  };
+
+  return date.toLocaleDateString(undefined, { ...defaultOptions, ...options });
+};
+
 export const formatCurrency = (amount, currency = "VND") => {
   if (amount === null || amount === undefined) return "";
 

@@ -173,7 +173,13 @@ const RoomList = ({ houseId, embedded = false, fromHouseDetail = false }) => {
           {
             accessorKey: "house.name",
             header: "Nhà",
-            cell: ({ row }) => row.original.house?.name || "N/A",
+            cell: ({ row }) => {
+              return (
+                <Link to={`/houses/${row.original.house?.id}`}>
+                  {row.original.house?.name || "N/A"}
+                </Link>
+              );
+            },
           },
         ]
       : []),

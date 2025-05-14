@@ -13,7 +13,7 @@ import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 import { useAuth } from "../../hooks/useAuth";
 import DatePicker from "../../components/common/DatePicker";
-import { formatDate, formatCurrency } from "../../utils/formatters";
+import { formatCurrency, formatDateWithoutTime } from "../../utils/formatters";
 
 // Component con hiển thị phần filter
 const FilterSection = ({
@@ -221,27 +221,34 @@ const ContractList = () => {
     {
       accessorKey: "room.house.name",
       header: "Nhà",
-      cell: ({ row }) => row.original.room?.house?.name || "N/A",
+      cell: ({ row }) => {
+        return (
+          <Link to={`/houses/${row.original.room?.house?.id}`}>
+            {row.original.room?.house?.name || "N/A"}
+          </Link>
+        );
+      },
     },
     {
       accessorKey: "room.room_number",
       header: "Phòng",
-      cell: ({ row }) => row.original.room?.room_number || "N/A",
-    },
-    {
-      accessorKey: "tenant.name",
-      header: "Người thuê",
-      cell: ({ row }) => row.original.tenant?.name || "N/A",
+      cell: ({ row }) => {
+        return (
+          <Link to={`/rooms/${row.original.room?.id}`}>
+            {row.original.room?.room_number || "N/A"}
+          </Link>
+        );
+      },
     },
     {
       accessorKey: "start_date",
       header: "Ngày bắt đầu",
-      cell: ({ row }) => formatDate(row.original.start_date),
+      cell: ({ row }) => formatDateWithoutTime(row.original.start_date),
     },
     {
       accessorKey: "end_date",
       header: "Ngày kết thúc",
-      cell: ({ row }) => formatDate(row.original.end_date),
+      cell: ({ row }) => formatDateWithoutTime(row.original.end_date),
     },
     {
       accessorKey: "monthly_price",

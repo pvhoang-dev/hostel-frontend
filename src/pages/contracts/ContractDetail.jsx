@@ -192,11 +192,11 @@ const ContractDetail = () => {
                   </tr>
                   <tr>
                     <td>Ngày tạo:</td>
-                    <td>{formatDate(contract.created_at)}</td>
+                    <td>{contract.created_at}</td>
                   </tr>
                   <tr>
                     <td>Ngày cập nhật:</td>
-                    <td>{formatDate(contract.updated_at)}</td>
+                    <td>{contract.updated_at}</td>
                   </tr>
                 </tbody>
               </table>

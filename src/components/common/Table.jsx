@@ -11,36 +11,107 @@ const Table = ({
 }) => {
   const tableRef = useRef(null);
   const dataTableRef = useRef(null);
+  const tableId = useRef(`table-${Math.random().toString(36).substring(2, 9)}`);
 
-  // Initialize DataTable when data changes
+  // Xử lý các nút hành động
+  const bindActionButtons = () => {
+    if (!tableRef.current || !actionColumn) return;
+    
+    // Xoá tất cả event listeners cũ để tránh duplicate
+    $(document).off('click', `#${tableId.current} .action-btn`);
+    
+    // Sử dụng event delegation cho bảng hiện tại
+    $(document).on('click', `#${tableId.current} .action-btn`, function(e) {
+      e.preventDefault();
+      const $button = $(this);
+      const itemId = $button.data('item-id');
+      const actionType = $button.data('action-type');
+      
+      // Tìm item tương ứng với ID
+      const item = data.find(item => item.id.toString() === itemId.toString());
+      
+      if (item && actionColumn.actions[actionType]) {
+        try {
+          actionColumn.actions[actionType].handler(item);
+        } catch (error) {
+          console.error('Error in action handler:', error);
+          alert(`Lỗi khi thực hiện hành động: ${error.message}`);
+        }
+      }
+    });
+  };
+
+  // Khởi tạo DataTable khi data thay đổi
   useEffect(() => {
     if (tableRef.current && data.length > 0) {
-      // Destroy existing DataTable instance if it exists
+      // Đảm bảo bảng có ID duy nhất
+      $(tableRef.current).attr('id', tableId.current);
+      
+      // Xóa bảng DataTable cũ nếu tồn tại
       if (dataTableRef.current) {
-        dataTableRef.current.destroy();
+        try {
+          dataTableRef.current.destroy();
+          // Xóa thuộc tính DataTable
+          $(tableRef.current)
+            .removeClass('dataTable')
+            .removeClass('no-footer')
+            .removeClass('nowrap')
+            .removeAttr('aria-describedby')
+            .find('tbody tr').removeClass('child');
+        } catch (error) {
+          console.error("Error destroying DataTable:", error);
+        }
       }
 
-      // Initialize a new DataTable instance
-      dataTableRef.current = $(tableRef.current).DataTable({
-        responsive: true,
-        paging: false, // We'll use our own pagination component
-        ordering: true,
-        info: false,
-        searching: false, // Using custom filter above
-        language: {
-          emptyTable: "Không có dữ liệu",
-        },
-      });
+      // Khởi tạo lại DataTable sau khi DOM cập nhật
+      setTimeout(() => {
+        dataTableRef.current = $(tableRef.current).DataTable({
+          destroy: true,
+          responsive: true,
+          paging: false,
+          ordering: true,
+          info: false,
+          searching: false,
+          language: {
+            emptyTable: "Không có dữ liệu",
+          },
+          responsive: {
+            details: {
+              display: $.fn.dataTable.Responsive.display.childRow,
+              renderer: function(api, rowIdx, columns) {
+                var data = $.map(columns, function(col, i) {
+                  return col.hidden ?
+                    '<li data-dtr-index="' + i + '">' +
+                      '<span class="dtr-title">' + col.title + '</span> ' +
+                      '<span class="dtr-data">' + col.data + '</span>' +
+                    '</li>' : '';
+                }).join('');
+                
+                return data ? $('<ul class="dtr-details"/>').append(data) : false;
+              }
+            }
+          }
+        });
+
+        // Đăng ký event handlers
+        bindActionButtons();
+      }, 600);
     }
 
-    // Cleanup on component unmount
+    // Cleanup khi unmount
     return () => {
+      $(document).off('click', `#${tableId.current} .action-btn`);
+      
       if (dataTableRef.current) {
-        dataTableRef.current.destroy();
+        try {
+          dataTableRef.current.destroy();
+        } catch (error) {
+          console.error("Error during cleanup:", error);
+        }
         dataTableRef.current = null;
       }
     };
-  }, [data]);
+  }, [data, actionColumn]);
 
   if (loading) {
     return (
@@ -52,34 +123,36 @@ const Table = ({
     );
   }
 
-  // Generate table headers from columns
+  // Tạo header từ columns
   const headers = columns.map((column) => (
     <th key={column.accessorKey}>{column.header}</th>
   ));
 
-  // Generate table rows from data
+  // Tạo rows từ data
   const rows = data.map((item) => (
     <tr key={item.id}>
       {columns.map((column) => {
-        // For action column, render the action buttons
+        // Cột hành động
         if (actionColumn && column.accessorKey === actionColumn.key) {
           return (
             <td key={column.accessorKey} className="table-action">
               {actionColumn.actions.map((action, index) => (
-                <a
+                <button
                   key={index}
-                  href="javascript: void(0);"
-                  className="action-icon"
-                  onClick={() => action.handler(item)}
+                  type="button"
+                  className="btn btn-link p-0 mx-1 action-icon action-btn"
+                  style={{ border: 'none', background: 'none', cursor: 'pointer' }}
+                  data-item-id={item.id}
+                  data-action-type={index}
                 >
                   <i className={`mdi ${action.icon}`}></i>
-                </a>
+                </button>
               ))}
             </td>
           );
         }
 
-        // For other columns, use cell renderer if provided, otherwise access data directly
+        // Các cột khác
         return (
           <td key={column.accessorKey}>
             {column.cell

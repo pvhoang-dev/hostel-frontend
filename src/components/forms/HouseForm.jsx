@@ -19,13 +19,25 @@ const HouseForm = ({
     status: "active",
     description: "",
     ...initialData,
+    manager_id: initialData.manager_id || (initialData.manager ? initialData.manager.id : ""),
   });
 
   const [managers, setManagers] = useState([]);
+  const [originalManagerId, setOriginalManagerId] = useState(
+    initialData.manager_id || (initialData.manager ? initialData.manager.id : "")
+  );
 
   useEffect(() => {
     loadManagers();
   }, []);
+
+  useEffect(() => {
+    if (initialData) {
+      setOriginalManagerId(
+        initialData.manager_id || (initialData.manager ? initialData.manager.id : "")
+      );
+    }
+  }, [initialData]);
 
   const loadManagers = async () => {
     try {
@@ -52,7 +64,13 @@ const HouseForm = ({
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(formData);
+    const dataToSubmit = { ...formData };
+    
+    if (mode === "edit" && dataToSubmit.manager_id === "" && originalManagerId) {
+      dataToSubmit.manager_id = originalManagerId;
+    }
+    
+    onSubmit(dataToSubmit);
   };
 
   return (
@@ -84,7 +102,7 @@ const HouseForm = ({
           <Select
             label="Quản lý"
             name="manager_id"
-            value={formData.manager_id || formData.manager?.id || ""}
+            value={formData.manager_id || ""}
             onChange={handleChange}
             error={errors.manager_id}
             options={[{ value: "", label: "Chọn quản lý" }, ...managers]}

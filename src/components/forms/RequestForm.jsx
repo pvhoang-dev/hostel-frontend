@@ -6,6 +6,54 @@ import Select from "../common/Select";
 import Button from "../common/Button";
 import TextArea from "../common/TextArea";
 import Loader from "../common/Loader";
+import ReactSelect from "react-select";
+
+// Custom styles cho ReactSelect trong dark mode
+const darkModeSelectStyles = {
+  control: (baseStyles, state) => ({
+    ...baseStyles,
+    backgroundColor: '#404954',
+    borderColor: state.isFocused ? '#6c757d' : '#555',
+    boxShadow: state.isFocused ? '0 0 0 0.25rem rgba(130, 138, 145, 0.5)' : null,
+    '&:hover': {
+      borderColor: '#6c757d'
+    },
+    color: 'white'
+  }),
+  menu: (baseStyles) => ({
+    ...baseStyles,
+    backgroundColor: '#404954',
+  }),
+  option: (baseStyles, state) => ({
+    ...baseStyles,
+    backgroundColor: state.isSelected ? '#0d6efd' : 
+                     state.isFocused ? '#495057' : '#404954',
+    color: 'white',
+    '&:hover': {
+      backgroundColor: '#495057',
+    }
+  }),
+  singleValue: (baseStyles) => ({
+    ...baseStyles,
+    color: 'white',
+  }),
+  input: (baseStyles) => ({
+    ...baseStyles,
+    color: 'white',
+  }),
+  placeholder: (baseStyles) => ({
+    ...baseStyles,
+    color: '#adb5bd',
+  }),
+  loadingMessage: (baseStyles) => ({
+    ...baseStyles,
+    color: 'white',
+  }),
+  noOptionsMessage: (baseStyles) => ({
+    ...baseStyles,
+    color: 'white',
+  }),
+};
 
 const RequestForm = ({
   initialData = {},
@@ -18,7 +66,6 @@ const RequestForm = ({
   const { user } = useAuth();
 
   const [formData, setFormData] = useState({
-    room_id: roomId || initialData.room_id || "",
     sender_id: user?.id || initialData.sender_id || "",
     recipient_id: initialData.recipient_id || "",
     request_type: initialData.request_type || "maintenance",
@@ -27,86 +74,78 @@ const RequestForm = ({
     ...initialData,
   });
 
-  const [rooms, setRooms] = useState([]);
   const [recipients, setRecipients] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setLoading(true);
-    loadRooms();
     loadPotentialRecipients();
   }, [user?.id]);
-
-  const loadRooms = async () => {
-    try {
-      const response = await roomService.getRooms({
-        per_page: 100, // Load more rooms
-        include: "house",
-      });
-      if (response.success) {
-        const roomsList = response.data.data.map((room) => ({
-          value: room.id,
-          label: `${room.room_number} - ${room.house?.name || ""}`,
-        }));
-        setRooms(roomsList);
-      }
-    } catch (error) {
-      console.error("Lỗi khi tải danh sách phòng:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const loadPotentialRecipients = async () => {
     try {
       let recipients = [];
 
+      // Thêm tham số include để lấy thêm thông tin về phòng và nhà
       if (user.role === "admin") {
-        // Admin có thể gửi cho admin khác, manager hoặc tenant
         const response = await userService.getUsers({
-          role: "admin,manager,tenant",
-          for_requests: "true"
+          for_requests: "true",
+          include: "house,room,role"
         });
         recipients = response.data.data || [];
       } else if (user.role === "manager") {
-        // Manager có thể gửi cho admin hoặc tenant từ các nhà họ quản lý
-        // Sử dụng tham số for_requests để lấy được admin
         const response = await userService.getUsers({
-          for_requests: "true"
+          for_requests: "true",
+          include: "house,room,role"
         });
-        
         recipients = response.data.data || [];
-        console.log("Recipients from API:", recipients);
       } else if (user.role === "tenant") {
-        // Tenant chỉ có thể gửi cho manager quản lý nhà của họ
         const response = await userService.getUsers({
-          for_requests: "true"
+          for_requests: "true",
+          include: "house,room,role"
         });
-        
         recipients = response.data.data || [];
-        console.log("Managers for tenant:", recipients);
       }
 
-      // Lọc bỏ người dùng hiện tại
       const filteredRecipients = recipients
         .filter((r) => r.id !== user.id)
-        .map((r) => ({
-          value: r.id,
-          label: `${r.name} (${
-            r.role.code === "admin" ? "Quản trị viên" : 
-            r.role.code === "manager" ? "Quản lý" : "Người thuê"
-          })`,
-        }));
+        .map((r) => {
+          let label = "";
+          
+          if (r.role.code === "admin") {
+            label = `${r.name} (Quản trị viên)`;
+          } else if (r.role.code === "manager") {
+            label = `${r.name} (Quản lý${r.house ? ` - ${r.house.name}` : ""})`;
+          } else if (r.role.code === "tenant") {
+            const roomInfo = r.room ? ` - ${r.room.room_number}` : " - Chưa có phòng";
+            const houseInfo = r.house ? ` - ${r.house.name}` : "";
+            label = `${r.name} (Người thuê${roomInfo}${houseInfo})`;
+          } else {
+            label = r.name;
+          }
+          
+          return {
+            value: r.id,
+            label: label,
+          };
+        });
 
       setRecipients(filteredRecipients);
     } catch (error) {
       console.error("Lỗi khi tải danh sách người nhận:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+  };
+
+  // Xử lý change cho ReactSelect
+  const handleSelectChange = (selectedOption, { name }) => {
+    setFormData({ ...formData, [name]: selectedOption ? selectedOption.value : "" });
   };
 
   const handleSubmit = (e) => {
@@ -136,53 +175,76 @@ const RequestForm = ({
     <form onSubmit={handleSubmit}>
       <div className="row g-3">
         <div className="col-md-6">
-          <Select
-            label="Phòng"
-            name="room_id"
-            value={formData.room_id}
-            onChange={handleChange}
-            error={errors.room_id}
-            options={[{ value: "", label: "Chọn phòng" }, ...rooms]}
-            required
-            disabled={!!roomId || mode === "edit"}
-          />
+          <div className="form-group mb-3">
+            <label htmlFor="recipient_id" className="form-label">
+              Người nhận <span className="text-danger">*</span>
+            </label>
+            <ReactSelect
+              id="recipient_id"
+              name="recipient_id"
+              value={recipients.find(option => option.value === formData.recipient_id) || null}
+              onChange={(option) => handleSelectChange(option, { name: "recipient_id" })}
+              options={recipients}
+              placeholder="Chọn người nhận"
+              isSearchable
+              isDisabled={isSubmitting}
+              className="basic-single"
+              classNamePrefix="select"
+              styles={darkModeSelectStyles}
+            />
+            {errors.recipient_id && (
+              <div className="text-danger mt-1">{errors.recipient_id}</div>
+            )}
+          </div>
         </div>
 
         <div className="col-md-6">
-          <Select
-            label="Người nhận"
-            name="recipient_id"
-            value={formData.recipient_id}
-            onChange={handleChange}
-            error={errors.recipient_id}
-            options={[{ value: "", label: "Chọn người nhận" }, ...recipients]}
-            required
-          />
-        </div>
-
-        <div className="col-md-6">
-          <Select
-            label="Loại yêu cầu"
-            name="type"
-            value={formData.type}
-            onChange={handleChange}
-            error={errors.type}
-            options={requestTypes}
-            required
-          />
+          <div className="form-group mb-3">
+            <label htmlFor="request_type" className="form-label">
+              Loại yêu cầu <span className="text-danger">*</span>
+            </label>
+            <ReactSelect
+              id="request_type"
+              name="request_type"
+              value={requestTypes.find(option => option.value === formData.request_type) || null}
+              onChange={(option) => handleSelectChange(option, { name: "request_type" })}
+              options={requestTypes}
+              placeholder="Chọn loại yêu cầu"
+              isSearchable
+              isDisabled={isSubmitting}
+              className="basic-single"
+              classNamePrefix="select"
+              styles={darkModeSelectStyles}
+            />
+            {errors.request_type && (
+              <div className="text-danger mt-1">{errors.request_type}</div>
+            )}
+          </div>
         </div>
 
         {mode === "edit" && (
           <div className="col-md-6">
-            <Select
-              label="Trạng thái"
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-              error={errors.status}
-              options={requestStatuses}
-              required
-            />
+            <div className="form-group mb-3">
+              <label htmlFor="status" className="form-label">
+                Trạng thái
+              </label>
+              <ReactSelect
+                id="status"
+                name="status"
+                value={requestStatuses.find(option => option.value === formData.status) || null}
+                onChange={(option) => handleSelectChange(option, { name: "status" })}
+                options={requestStatuses}
+                placeholder="Chọn trạng thái"
+                isSearchable
+                isDisabled={isSubmitting}
+                className="basic-single"
+                classNamePrefix="select"
+                styles={darkModeSelectStyles}
+              />
+              {errors.status && (
+                <div className="text-danger mt-1">{errors.status}</div>
+              )}
+            </div>
           </div>
         )}
 
@@ -193,28 +255,37 @@ const RequestForm = ({
             value={formData.description}
             onChange={handleChange}
             error={errors.description}
-            rows={5}
+            rows={4}
+            placeholder="Nhập mô tả chi tiết về yêu cầu của bạn..."
             required
           />
         </div>
-      </div>
 
-      <div className="mt-4 d-flex justify-content-end">
-        <Button
-          type="button"
-          variant="secondary"
-          onClick={() => window.history.back()}
-          className=" mr-2"
-        >
-          Hủy
-        </Button>
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting
-            ? `${mode === "create" ? "Đang tạo" : "Đang cập nhật"}...`
-            : mode === "create"
-            ? "Tạo yêu cầu"
-            : "Cập nhật yêu cầu"}
-        </Button>
+        <div className="col-12 mt-4">
+          <div className="d-flex justify-content-end gap-2">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => window.history.back()}
+            >
+              Hủy
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <>
+                  <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  {mode === "create" ? "Đang tạo..." : "Đang cập nhật..."}
+                </>
+              ) : (
+                mode === "create" ? "Tạo yêu cầu" : "Cập nhật yêu cầu"
+              )}
+            </Button>
+          </div>
+        </div>
       </div>
     </form>
   );
