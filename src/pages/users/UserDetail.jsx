@@ -5,12 +5,13 @@ import { useContext } from "react";
 import { AlertContext } from "../../contexts/AlertContext";
 import Card from "../../components/common/Card";
 import Loader from "../../components/common/Loader";
+import { useAuth } from "../../hooks/useAuth";
 
 const UserDetail = () => {
   const { id } = useParams();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const { isTenant } = useAuth();
   const { showError } = useContext(AlertContext);
   const navigate = useNavigate();
 
@@ -56,12 +57,14 @@ const UserDetail = () => {
           >
             Back
           </button>
-          <Link
-            to={`/users/${id}/edit`}
-            className="btn btn-primary fw-semibold"
-          >
-            Sửa
-          </Link>
+          {!isTenant && (
+            <Link
+              to={`/users/${id}/edit`}
+              className="btn btn-primary fw-semibold"
+            >
+              Sửa
+            </Link>
+          )}
         </div>
       </div>
 

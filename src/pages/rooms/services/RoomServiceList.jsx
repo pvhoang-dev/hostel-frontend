@@ -63,7 +63,7 @@ DeleteConfirmModal.propTypes = {
   onConfirm: PropTypes.func.isRequired
 };
 
-const RoomServiceList = ({ roomId, houseId, embedded = false }) => {
+const RoomServiceList = ({ roomId, houseId, embedded = false, tenantView = false }) => {
   const { showSuccess, showError } = useAlert();
   const { user, isAdmin, isManager, isTenant } = useAuth();
   const [currentPage, setCurrentPage] = useState(1);
@@ -148,6 +148,32 @@ const RoomServiceList = ({ roomId, houseId, embedded = false }) => {
     {
       accessorKey: "actions",
       header: "Hành động",
+      cell: ({ row }) => (
+        <div className="d-flex gap-2">
+          <Link
+            to={`/room-services/${row.original.id}`}
+            className="btn btn-sm btn-info"
+          >
+            Chi tiết
+          </Link>
+          {canEdit && (
+            <Link
+              to={`/room-services/${row.original.id}/edit`}
+              className="btn btn-sm btn-primary"
+            >
+              Sửa
+            </Link>
+          )}
+          {canDelete && (
+            <button
+              onClick={() => handleDelete(row.original.id)}
+              className="btn btn-sm btn-danger"
+            >
+              Xóa
+            </button>
+          )}
+        </div>
+      ),
     },
   ];
 
@@ -225,6 +251,11 @@ const RoomServiceList = ({ roomId, houseId, embedded = false }) => {
   const canManageServices =
     isAdmin || (isManager && user?.managed_houses?.includes(parseInt(houseId)));
 
+  // Thêm logic để kiểm tra xem có thể thêm/sửa/xóa dịch vụ không
+  const canAdd = !tenantView && (isAdmin || (isManager && user?.managed_houses?.includes(parseInt(houseId))));
+  const canEdit = !tenantView && (isAdmin || (isManager && user?.managed_houses?.includes(parseInt(houseId))));
+  const canDelete = !tenantView && (isAdmin || (isManager && user?.managed_houses?.includes(parseInt(houseId))));
+
   const handleViewClick = (service) => {
     navigate(`/room-services/${service.id}`);
   };
@@ -240,7 +271,7 @@ const RoomServiceList = ({ roomId, houseId, embedded = false }) => {
           <h4 className="card-title mb-0">
             {embedded ? "Dịch vụ phòng" : `Dịch vụ phòng - ${roomId}`}
           </h4>
-          {canManageServices && (
+          {canAdd && (
             <Link
               to={`/rooms/${roomId}/services/create`}
               className="btn btn-primary btn-sm"
@@ -304,6 +335,7 @@ RoomServiceList.propTypes = {
   roomId: PropTypes.string.isRequired,
   houseId: PropTypes.number,
   embedded: PropTypes.bool,
+  tenantView: PropTypes.bool,
 };
 
 export default RoomServiceList;

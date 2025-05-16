@@ -128,7 +128,7 @@ const HouseList = () => {
 
   const managers = managersData?.data || [];
 
-  const { isAdmin } = useAuth();
+  const { isAdmin, isTenant, isManager } = useAuth();
 
   // Column definitions for the table
   const columns = [
@@ -309,14 +309,16 @@ const HouseList = () => {
         )}
       </div>
 
-      <FilterSection
-        filters={{ name, address, manager_id, status }}
-        managers={managers}
-        onFilterChange={handleFilterChange}
-        onClearFilters={clearFilters}
-        onApplyFilters={loadHouses}
-        isAdmin={isAdmin}
-      />
+      {!isTenant && (
+        <FilterSection
+          filters={{ name, address, manager_id, status }}
+          managers={managers}
+          onFilterChange={handleFilterChange}
+          onClearFilters={clearFilters}
+          onApplyFilters={loadHouses}
+          isAdmin={isAdmin}
+        />
+      )}
 
       <Card>
         {isLoading ? (
@@ -337,10 +339,14 @@ const HouseList = () => {
                   icon: "mdi-eye",
                   handler: (house) => navigate(`/houses/${house.id}`),
                 },
-                {
-                  icon: "mdi-pencil",
-                  handler: (house) => navigate(`/houses/${house.id}/edit`),
-                },
+                ...(isAdmin && isManager
+                  ? [
+                      {
+                        icon: "mdi-pencil",
+                        handler: (house) => navigate(`/houses/${house.id}/edit`),
+                      },
+                    ]
+                  : []),
                 ...(isAdmin
                   ? [
                       {

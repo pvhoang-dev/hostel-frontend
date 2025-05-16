@@ -117,7 +117,7 @@ const RoomList = ({ houseId, embedded = false, fromHouseDetail = false }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { showSuccess, showError } = useAlert();
   const navigate = useNavigate();
-  const { user, isAdmin, isManager } = useAuth();
+  const { user, isAdmin, isManager, isTenant } = useAuth();
 
   // Get current filters from URL
   const currentPage = Number(searchParams.get("page")) || 1;
@@ -429,7 +429,7 @@ const RoomList = ({ houseId, embedded = false, fromHouseDetail = false }) => {
         </div>
       )}
 
-      {!embedded && (
+      {!embedded && !isTenant && (
         <FilterSection
           filters={{
             house_id,

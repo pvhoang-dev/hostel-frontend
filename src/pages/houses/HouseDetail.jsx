@@ -10,11 +10,14 @@ import StorageList from "../storages/StorageList";
 import Card from "../../components/common/Card";
 import Loader from "../../components/common/Loader";
 
-const HouseDetail = () => {
+const HouseDetail = ({ tenantView = false }) => {
   const { id } = useParams();
   const [house, setHouse] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { isAdmin } = useAuth();
+  const { isAdmin, isTenant } = useAuth();
+
+  // Nếu được truyền vào tenantView hoặc người dùng là tenant, áp dụng chế độ xem cho tenant
+  const isInTenantView = tenantView || isTenant;
 
   const { showError } = useContext(AlertContext);
   const navigate = useNavigate();
@@ -87,7 +90,7 @@ const HouseDetail = () => {
           >
             Back
           </button>
-          {isAdmin && (
+          {isAdmin && !isInTenantView && (
             <Link
               to={`/houses/${id}/edit`}
               className="btn btn-primary fw-semibold"
@@ -115,6 +118,7 @@ const HouseDetail = () => {
         </div>
 
         <div className="row">
+          {/* Hiển thị thông tin quản lý dù ở chế độ tenant hay không */}
           <div className="col-md-6 mb-4">
             <h5 className="mb-3">Thông tin quản lý</h5>
             {house.manager ? (
@@ -213,18 +217,25 @@ const HouseDetail = () => {
         </div>
       </Card>
 
-      <hr className="my-4" />
-      <div className="mt-4">
-        <RoomList houseId={id} embedded={true} fromHouseDetail={true} />
-      </div>
-      <hr className="my-4" />
-      <div className="mt-4">
-        <StorageList houseId={id} embedded={true} fromHouseDetail={true} />
-      </div>
+      {/* Chỉ hiển thị nội quy nhà cho tenant */}
       <hr className="my-4" />
       <div className="mt-4">
         <HouseSettingList houseId={id} embedded={true} />
       </div>
+
+      {/* Các phần sau chỉ hiển thị khi không ở chế độ tenant */}
+      {!isInTenantView && (
+        <>
+          <hr className="my-4" />
+          <div className="mt-4">
+            <RoomList houseId={id} embedded={true} fromHouseDetail={true} />
+          </div>
+          <hr className="my-4" />
+          <div className="mt-4">
+            <StorageList houseId={id} embedded={true} fromHouseDetail={true} />
+          </div>
+        </>
+      )}
     </div>
   );
 };

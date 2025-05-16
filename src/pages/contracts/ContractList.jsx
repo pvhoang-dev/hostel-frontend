@@ -156,7 +156,7 @@ const FilterSection = ({
 const ContractList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { showSuccess, showError } = useAlert();
-  const { user, isAdmin, isManager } = useAuth();
+  const { user, isAdmin, isManager, isTenant } = useAuth();
   const navigate = useNavigate();
 
   // State cho rooms và houses
@@ -485,12 +485,13 @@ const ContractList = () => {
         )}
       </div>
 
-      <FilterSection
-        filters={{
-          house_id,
-          room_id,
-          status,
-          start_date_from,
+      {!isTenant && (
+        <FilterSection
+          filters={{
+            house_id,
+            room_id,
+            status,
+            start_date_from,
           start_date_to,
           end_date_from,
           end_date_to,
@@ -504,9 +505,10 @@ const ContractList = () => {
           // House filter được xử lý riêng vì liên quan đến việc load rooms
           console.log("Đã chọn house:", value);
         }}
-        onClearFilters={clearFilters}
-        onApplyFilters={applyFilters}
-      />
+          onClearFilters={clearFilters}
+          onApplyFilters={applyFilters}
+        />
+      )}
 
       <Card>
         {isLoading ? (

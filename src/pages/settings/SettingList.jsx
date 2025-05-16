@@ -8,6 +8,7 @@ import Input from "../../components/common/Input";
 import Loader from "../../components/common/Loader";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
+import { useAuth } from "../../hooks/useAuth";
 
 // Filter section component
 const FilterSection = ({
@@ -63,6 +64,10 @@ const SettingList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { showSuccess, showError } = useAlert();
   const navigate = useNavigate();
+  const { user, isAdmin, isManager, isTenant } = useAuth();
+
+  // Xác định nếu người dùng là tenant
+  const isInTenantView = isTenant;
 
   // Get current filters from URL
   const currentPage = Number(searchParams.get("page")) || 1;
@@ -199,18 +204,22 @@ const SettingList = () => {
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center my-2">
-        <h3>Cài đặt hệ thống</h3>
-        <Button as={Link} to="/settings/create">
-          Thêm
-        </Button>
+        <h3>Nội quy chung</h3>
+        {!isInTenantView && (
+          <Button as={Link} to="/settings/create">
+            Thêm
+          </Button>
+        )}
       </div>
 
-      <FilterSection
-        filters={{ key, value, description }}
-        onFilterChange={handleFilterChange}
-        onClearFilters={clearFilters}
-        onApplyFilters={loadSettings}
-      />
+      {!isInTenantView && (
+        <FilterSection
+          filters={{ key, value, description }}
+          onFilterChange={handleFilterChange}
+          onClearFilters={clearFilters}
+          onApplyFilters={loadSettings}
+        />
+      )}
 
       <Card>
         {loadingSettings ? (
@@ -226,21 +235,28 @@ const SettingList = () => {
             loading={loadingSettings}
             actionColumn={{
               key: "actions",
-              actions: [
-                {
-                  icon: "mdi-eye",
-                  handler: (setting) => navigate(`/settings/${setting.id}`),
-                },
-                {
-                  icon: "mdi-pencil",
-                  handler: (setting) =>
-                    navigate(`/settings/${setting.id}/edit`),
-                },
-                {
-                  icon: "mdi-delete",
-                  handler: handleDeleteSetting,
-                },
-              ],
+              actions: isInTenantView
+                ? [
+                    {
+                      icon: "mdi-eye",
+                      handler: (setting) => navigate(`/settings/${setting.id}`),
+                    },
+                  ]
+                : [
+                    {
+                      icon: "mdi-eye",
+                      handler: (setting) => navigate(`/settings/${setting.id}`),
+                    },
+                    {
+                      icon: "mdi-pencil",
+                      handler: (setting) =>
+                        navigate(`/settings/${setting.id}/edit`),
+                    },
+                    {
+                      icon: "mdi-delete",
+                      handler: handleDeleteSetting,
+                    },
+                  ],
             }}
           />
         )}

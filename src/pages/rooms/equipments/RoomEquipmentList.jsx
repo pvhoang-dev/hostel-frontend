@@ -10,7 +10,7 @@ import { useAuth } from "../../../hooks/useAuth";
 import { roomEquipmentService } from "../../../api/roomEquipments";
 import { storageService } from "../../../api/storages";
 
-const RoomEquipmentList = ({ roomId, houseId }) => {
+const RoomEquipmentList = ({ roomId, houseId, embedded = false, tenantView = false }) => {
   const { showSuccess, showError } = useAlert();
   const { user, isAdmin, isManager, isTenant } = useAuth();
   const [currentPage, setCurrentPage] = useState(1);
@@ -253,15 +253,18 @@ const RoomEquipmentList = ({ roomId, houseId }) => {
       houseId &&
       user?.managed_house_ids?.includes(parseInt(houseId)));
 
+  // Tìm phần khai báo component
+  const canAdd = !tenantView && (isAdmin || (isManager && room?.house?.manager_id === user?.id));
+
   return (
     <>
       <Card>
         <div className="d-flex justify-content-between align-items-center mb-3">
           <h4 className="fs-5 fw-semibold">Thiết bị trong phòng</h4>
-          {canManageEquipments && roomId && houseId && (
+          {canAdd && (
             <Link
-              to={`/rooms/${roomId}/equipments/create?house_id=${houseId}`}
-              className="btn btn-primary btn-sm"
+              to={`/rooms/${roomId}/equipments/create${houseId ? `?house_id=${houseId}` : ""}`}
+              className="btn btn-primary"
             >
               Thêm thiết bị
             </Link>
@@ -424,6 +427,8 @@ const RoomEquipmentList = ({ roomId, houseId }) => {
 RoomEquipmentList.propTypes = {
   roomId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   houseId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  embedded: PropTypes.bool,
+  tenantView: PropTypes.bool,
 };
 
 export default RoomEquipmentList;

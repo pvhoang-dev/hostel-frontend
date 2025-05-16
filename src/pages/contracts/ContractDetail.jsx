@@ -12,7 +12,7 @@ import { formatDate } from "../../utils/formatters";
 const ContractDetail = () => {
   const { id } = useParams();
   const [contract, setContract] = useState(null);
-  const { user, isAdmin, isManager } = useAuth();
+  const { user, isAdmin, isManager, isTenant } = useAuth();
   const { showError } = useAlert();
   const navigate = useNavigate();
 
@@ -51,7 +51,8 @@ const ContractDetail = () => {
   // Check if user is manager of this house
   const canManage = isManager && contract.room?.house?.manager_id === user?.id;
 
-  const canEdit = isAdmin || canManage;
+  // Tenant chỉ có thể xem, không thể sửa
+  const canEdit = (isAdmin || canManage) && !isTenant;
 
   const getStatusText = (status) => {
     switch (status) {
