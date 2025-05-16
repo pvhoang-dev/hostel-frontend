@@ -28,6 +28,7 @@ import SettingList from "./pages/settings/SettingList.jsx";
 import SettingCreate from "./pages/settings/SettingCreate.jsx";
 import SettingDetail from "./pages/settings/SettingDetail.jsx";
 import SettingEdit from "./pages/settings/SettingEdit.jsx";
+import PayosSettingsPage from "./pages/payos/PayosSettingsPage.jsx";
 import HouseList from "./pages/houses/HouseList";
 import HouseCreate from "./pages/houses/HouseCreate";
 import HouseDetail from "./pages/houses/HouseDetail";
@@ -541,6 +542,15 @@ const Routes = () => {
             <ProtectedRoute
               element={<SettingList />}
               allowedRoles={["admin", "manager", "tenant"]}
+            />
+          ),
+        },
+        {
+          path: "settings/payos",
+          element: (
+            <ProtectedRoute
+              element={<PayosSettingsPage />}
+              allowedRoles={["admin"]}
             />
           ),
         },

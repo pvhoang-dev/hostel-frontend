@@ -66,6 +66,11 @@ const SideBar = () => {
       label: isTenant ? "Nội quy chung" : "QL Nội quy chung", 
       roles: ["admin", "manager", "tenant"] 
     },
+    {
+      path: "/settings/payos",
+      label: "Cài đặt PayOS",
+      roles: ["admin"],
+    },
   ];
 
   const filteredMenuItems = menuItems.filter((item) => {
