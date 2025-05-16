@@ -5,11 +5,13 @@ import Loader from "../../../components/common/Loader";
 import useAlert from "../../../hooks/useAlert";
 import useApi from "../../../hooks/useApi";
 import { roomServiceService } from "../../../api/roomServices";
+import { useAuth } from "../../../hooks/useAuth";
 
 const RoomServiceDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { showError } = useAlert();
+  const { user, isAdmin, isManager } = useAuth();
 
   const {
     data: roomService,
@@ -40,6 +42,9 @@ const RoomServiceDetail = () => {
     return <div>Không tìm thấy dịch vụ phòng</div>;
   }
 
+  // Xác định nếu người dùng có thể chỉnh sửa
+  const canEdit = isAdmin || (isManager && roomService.room?.house?.manager_id === user?.id);
+
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center mb-4">
@@ -54,18 +59,14 @@ const RoomServiceDetail = () => {
           >
             Quay lại
           </button>
-          <Link
-            to={`/room-services/${id}/edit`}
-            className="btn btn-primary mr-2"
-          >
-            Chỉnh sửa
-          </Link>
-          <Link
-            to={`/room-services/${id}/usages`}
-            className="btn btn-info text-white"
-          >
-            Lịch sử sử dụng
-          </Link>
+          {canEdit && (
+            <Link
+              to={`/room-services/${id}/edit`}
+              className="btn btn-primary mr-2"
+            >
+              Chỉnh sửa
+            </Link>
+          )}
         </div>
       </div>
 

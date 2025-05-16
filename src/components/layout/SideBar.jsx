@@ -20,15 +20,36 @@ const SideBar = () => {
     },
     { path: "/equipments", label: "QL Thiết bị", roles: ["admin", "manager"] },
     { path: "/services", label: "QL Dịch vụ", roles: ["admin", "manager"] },
-    { path: "/houses", label: "QL Nhà trọ", roles: ["admin", "manager"] },
+    { 
+      path: "/houses", 
+      label: isTenant ? "Nhà trọ" : "QL Nhà trọ", 
+      roles: ["admin", "manager", "tenant"] 
+    },
     { path: "/storages", label: "QL Kho", roles: ["admin", "manager"] },
-    { path: "/rooms", label: "QL Phòng trọ", roles: ["admin", "manager"] },
-    { path: "#", label: "QL DV phòng/Tháng", roles: ["admin", "manager"] },
-    { path: "/contracts", label: "QL Hợp đồng", roles: ["admin", "manager"] },
+    { 
+      path: "/rooms", 
+      label: isTenant ? "Phòng trọ" : "QL Phòng trọ", 
+      roles: ["admin", "manager", "tenant"] 
+    },
+    {
+      path: "/monthly-service-management",
+      label: "QL DV Tháng/Phòng",
+      roles: ["admin", "manager"],
+    },
+    { 
+      path: "/contracts", 
+      label: isTenant ? "Hợp đồng" : "QL Hợp đồng", 
+      roles: ["admin", "manager", "tenant"] 
+    },
     {
       path: "/invoices",
       label: isTenant ? "Hóa đơn" : "QL Hóa đơn",
       roles: ["admin", "manager", "tenant"],
+    },
+    {
+      path: "/invoice-payment",
+      label: "Thanh toán hóa đơn",
+      roles: ["tenant"],
     },
     {
       path: "/requests",
@@ -40,7 +61,11 @@ const SideBar = () => {
       label: isTenant ? "Thông báo" : "QL Thông báo",
       roles: ["admin", "manager", "tenant"],
     },
-    { path: "/settings", label: "QL Nội quy chung", roles: ["admin"] },
+    { 
+      path: "/settings", 
+      label: isTenant ? "Nội quy chung" : "QL Nội quy chung", 
+      roles: ["admin", "manager", "tenant"] 
+    },
   ];
 
   const filteredMenuItems = menuItems.filter((item) => {

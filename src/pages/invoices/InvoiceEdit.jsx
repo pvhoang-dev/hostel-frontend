@@ -52,11 +52,31 @@ const InvoiceEdit = () => {
   };
 
   const handleSubmit = async (formData) => {
-    const response = await updateInvoice(id, formData);
+    // Chỉ gửi các trường payment nếu được chọn thanh toán ngay
+    const dataToSubmit = { ...formData };
+    
+    // Nếu payment_method_id trống, có nghĩa là không chọn thanh toán ngay
+    if (!dataToSubmit.payment_method_id) {
+      delete dataToSubmit.payment_method_id;
+      delete dataToSubmit.payment_status;
+      delete dataToSubmit.payment_date;
+      delete dataToSubmit.transaction_code;
+    } else if (dataToSubmit.payment_status !== 'completed') {
+      // Nếu trạng thái không phải là completed, đặt ngày thanh toán thành null
+      dataToSubmit.payment_date = null;
+    }
+    
+    const response = await updateInvoice(id, dataToSubmit);
 
     if (response.success) {
-      showSuccess("Cập nhật hóa đơn thành công");
-      navigate(`/invoices/${id}`);
+      // Nếu không có dữ liệu trả về, có nghĩa là hóa đơn đã bị xóa do không còn mục nào
+      if (!response.data || Object.keys(response.data).length === 0) {
+        showSuccess("Hóa đơn đã bị xóa do không còn mục nào");
+        navigate("/invoices");
+      } else {
+        showSuccess("Cập nhật hóa đơn thành công");
+        navigate(`/invoices/${id}`);
+      }
     } else {
       if (response.data && typeof response.data === "object") {
         setErrors(response.data);

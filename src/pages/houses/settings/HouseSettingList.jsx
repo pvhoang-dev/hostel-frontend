@@ -51,11 +51,14 @@ const FilterSection = ({
   </Card>
 );
 
-const HouseSettingList = ({ houseId }) => {
+const HouseSettingList = ({ houseId, embedded = false, tenantView = false }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { showSuccess, showError } = useAlert();
   const navigate = useNavigate();
-  const { user, isAdmin, isManager } = useAuth();
+  const { user, isAdmin, isManager, isTenant } = useAuth();
+
+  // Xác định nếu đang ở chế độ xem cho tenant
+  const isInTenantView = tenantView || isTenant;
 
   // Get current filters from URL
   const currentPage = Number(searchParams.get("page")) || 1;
@@ -192,7 +195,7 @@ const HouseSettingList = ({ houseId }) => {
     loadHouseSettings();
   };
 
-  const canManageSettings = isAdmin || isManager;
+  const canManageSettings = !isInTenantView && (isAdmin || isManager);
 
   return (
     <div>
@@ -208,12 +211,14 @@ const HouseSettingList = ({ houseId }) => {
         )}
       </div>
 
-      <FilterSection
-        filters={{ key, value }}
-        onFilterChange={handleFilterChange}
-        onClearFilters={clearFilters}
-        onApplyFilters={loadHouseSettings}
-      />
+      {!isInTenantView && (
+        <FilterSection
+          filters={{ key, value }}
+          onFilterChange={handleFilterChange}
+          onClearFilters={clearFilters}
+          onApplyFilters={loadHouseSettings}
+        />
+      )}
 
       <Card>
         {loadingHouseSettings ? (
@@ -234,15 +239,17 @@ const HouseSettingList = ({ houseId }) => {
                   handler: (setting) =>
                     navigate(`/houses/${houseId}/settings/${setting.id}`),
                 },
-                {
-                  icon: "mdi-pencil",
-                  handler: (setting) =>
-                    navigate(`/houses/${houseId}/settings/${setting.id}/edit`),
-                },
-                {
-                  icon: "mdi-delete",
-                  handler: handleDeleteHouseSetting,
-                },
+                ...(!isInTenantView ? [
+                  {
+                    icon: "mdi-pencil",
+                    handler: (setting) =>
+                      navigate(`/houses/${houseId}/settings/${setting.id}/edit`),
+                  },
+                  {
+                    icon: "mdi-delete",
+                    handler: handleDeleteHouseSetting,
+                  }
+                ] : [])
               ],
             }}
           />

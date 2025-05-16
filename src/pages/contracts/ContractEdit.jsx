@@ -34,7 +34,19 @@ const ContractEdit = () => {
   const loadContract = async () => {
     const response = await fetchContract(id);
     if (response.success) {
-      setContract(response.data);
+      // Chuyển đổi dữ liệu tenants thành users cho ContractForm
+      const contractData = {...response.data};
+      
+      // Kiểm tra nếu có tenants trong response, đưa vào users
+      if (contractData.tenants && contractData.tenants.length > 0) {
+        contractData.users = contractData.tenants;
+        
+        // Chuyển đổi mảng users thành mảng user_ids cho form
+        contractData.user_ids = contractData.tenants.map(tenant => tenant.id);
+      }
+      
+      console.log("Contract data after transformation:", contractData);
+      setContract(contractData);
 
       // Check permissions
       if (user) {

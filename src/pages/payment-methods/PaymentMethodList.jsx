@@ -98,11 +98,6 @@ const PaymentMethodList = () => {
     { accessorKey: "id", header: "ID" },
     { accessorKey: "name", header: "Tên" },
     {
-      accessorKey: "description",
-      header: "Mô tả",
-      cell: ({ row }) => row.original.description || "N/A",
-    },
-    {
       accessorKey: "status",
       header: "Trạng thái",
       cell: ({ row }) => (

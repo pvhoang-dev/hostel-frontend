@@ -33,10 +33,10 @@ const RequestEdit = () => {
       const hasPermission =
         user.role === "admin" ||
         (user.role === "manager" &&
-          (response.creator_id === user.id ||
-            response.assignee_id === user.id)) ||
+          (response.sender_id === user.id ||
+            response.recipient_id === user.id)) ||
         (user.role === "tenant" &&
-          response.creator_id === user.id &&
+          response.sender_id === user.id &&
           response.status === "pending");
 
       if (!hasPermission) {

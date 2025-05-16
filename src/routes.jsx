@@ -42,6 +42,7 @@ import RoomEquipmentEdit from "./pages/rooms/equipments/RoomEquipmentEdit";
 import RoomServiceCreate from "./pages/rooms/services/RoomServiceCreate";
 import RoomServiceDetail from "./pages/rooms/services/RoomServiceDetail";
 import RoomServiceEdit from "./pages/rooms/services/RoomServiceEdit";
+import MonthlyServiceManagement from "./pages/rooms/services/MonthlyServiceManagement.jsx";
 import ContractList from "./pages/contracts/ContractList";
 import ContractCreate from "./pages/contracts/ContractCreate";
 import ContractDetail from "./pages/contracts/ContractDetail";
@@ -51,6 +52,8 @@ import InvoiceList from "./pages/invoices/InvoiceList";
 import InvoiceCreate from "./pages/invoices/InvoiceCreate";
 import InvoiceDetail from "./pages/invoices/InvoiceDetail";
 import InvoiceEdit from "./pages/invoices/InvoiceEdit";
+import TenantInvoiceList from "./pages/invoices/TenantInvoiceList";
+import TenantPaymentList from "./pages/invoices/TenantPaymentList";
 import HouseSettingCreate from "./pages/houses/settings/HouseSettingCreate";
 import HouseSettingDetail from "./pages/houses/settings/HouseSettingDetail";
 import HouseSettingEdit from "./pages/houses/settings/HouseSettingEdit";
@@ -99,6 +102,32 @@ const PublicRoute = ({ element }) => {
   }
 
   return element;
+};
+
+// Component trung gian để chọn component hiển thị dựa trên role
+const InvoiceListWrapper = () => {
+  const { isTenant } = useAuth();
+  return isTenant ? <TenantInvoiceList /> : <InvoiceList />;
+};
+
+// Component trung gian để hiển thị InvoiceList hoặc TenantPaymentList
+const InvoicePaymentListWrapper = () => {
+  const { isTenant } = useAuth();
+  return isTenant ? <TenantPaymentList /> : <InvoiceList />;
+};
+
+// Component trung gian để hiển thị HouseDetail cho tenant (chỉ thông tin nhà và nội quy)
+const HouseDetailWrapper = () => {
+  const { isTenant } = useAuth();
+  // Truyền prop tenantView={true} để HouseDetail component biết rằng người xem là tenant
+  return <HouseDetail tenantView={isTenant} />;
+};
+
+// Component trung gian để hiển thị RoomDetail cho tenant (chỉ cho phép xem)
+const RoomDetailWrapper = () => {
+  const { isTenant } = useAuth();
+  // Truyền prop tenantView={true} để RoomDetail component biết rằng người xem là tenant
+  return <RoomDetail tenantView={isTenant} />;
 };
 
 // Router configuration
@@ -197,7 +226,7 @@ const Routes = () => {
           element: (
             <ProtectedRoute
               element={<HouseList />}
-              allowedRoles={["admin", "manager"]}
+              allowedRoles={["admin", "manager", "tenant"]}
             />
           ),
         },
@@ -214,8 +243,8 @@ const Routes = () => {
           path: "houses/:id",
           element: (
             <ProtectedRoute
-              element={<HouseDetail />}
-              allowedRoles={["admin", "manager"]}
+              element={<HouseDetailWrapper />}
+              allowedRoles={["admin", "manager", "tenant"]}
             />
           ),
         },
@@ -243,7 +272,7 @@ const Routes = () => {
           element: (
             <ProtectedRoute
               element={<HouseSettingDetail />}
-              allowedRoles={["admin", "manager"]}
+              allowedRoles={["admin", "manager", "tenant"]}
             />
           ),
         },
@@ -262,7 +291,7 @@ const Routes = () => {
           element: (
             <ProtectedRoute
               element={<RoomList />}
-              allowedRoles={["admin", "manager"]}
+              allowedRoles={["admin", "manager", "tenant"]}
             />
           ),
         },
@@ -288,8 +317,8 @@ const Routes = () => {
           path: "rooms/:id",
           element: (
             <ProtectedRoute
-              element={<RoomDetail />}
-              allowedRoles={["admin", "manager"]}
+              element={<RoomDetailWrapper />}
+              allowedRoles={["admin", "manager", "tenant"]}
             />
           ),
         },
@@ -345,7 +374,7 @@ const Routes = () => {
           element: (
             <ProtectedRoute
               element={<RoomServiceDetail />}
-              allowedRoles={["admin", "manager"]}
+              allowedRoles={["admin", "manager", "tenant"]}
             />
           ),
         },
@@ -508,26 +537,55 @@ const Routes = () => {
         // Setting routes
         {
           path: "settings",
-          element: <SettingList />,
+          element: (
+            <ProtectedRoute
+              element={<SettingList />}
+              allowedRoles={["admin", "manager", "tenant"]}
+            />
+          ),
         },
         {
           path: "settings/create",
-          element: <SettingCreate />,
+          element: (
+            <ProtectedRoute
+              element={<SettingCreate />}
+              allowedRoles={["admin", "manager"]}
+            />
+          ),
         },
         {
           path: "settings/:id",
-          element: <SettingDetail />,
+          element: (
+            <ProtectedRoute
+              element={<SettingDetail />}
+              allowedRoles={["admin", "manager", "tenant"]}
+            />
+          ),
         },
         {
           path: "settings/:id/edit",
-          element: <SettingEdit />,
+          element: (
+            <ProtectedRoute
+              element={<SettingEdit />}
+              allowedRoles={["admin", "manager"]}
+            />
+          ),
         },
         // Invoice routes
         {
           path: "invoices",
           element: (
             <ProtectedRoute
-              element={<InvoiceList />}
+              element={<InvoiceListWrapper />}
+              allowedRoles={["admin", "manager", "tenant"]}
+            />
+          ),
+        },
+        {
+          path: "invoice-payment",
+          element: (
+            <ProtectedRoute
+              element={<InvoicePaymentListWrapper />}
               allowedRoles={["admin", "manager", "tenant"]}
             />
           ),
@@ -684,6 +742,15 @@ const Routes = () => {
           element: (
             <ProtectedRoute
               element={<NotificationEdit />}
+              allowedRoles={["admin", "manager"]}
+            />
+          ),
+        },
+        {
+          path: "monthly-service-management",
+          element: (
+            <ProtectedRoute
+              element={<MonthlyServiceManagement />}
               allowedRoles={["admin", "manager"]}
             />
           ),

@@ -33,7 +33,7 @@ const FilterSection = ({
             options={[
               { value: "", label: "Tất cả" },
               ...houses.map((house) => ({
-                value: house.id,
+                value: house.id.toString(),
                 label: house.name,
               })),
             ]}
@@ -120,7 +120,7 @@ const StorageList = ({
 
   // Get current filters from URL
   const currentPage = Number(searchParams.get("page")) || 1;
-  const perPage = Number(searchParams.get("per_page")) || (embedded ? 10 : 5);
+  const perPage = Number(searchParams.get("per_page")) || 10;
   const sortBy = searchParams.get("sort_by") || "id";
   const sortDir = searchParams.get("sort_dir") || "asc";
 
@@ -173,7 +173,13 @@ const StorageList = ({
           {
             accessorKey: "house.name",
             header: "Nhà",
-            cell: ({ row }) => row.original.house?.name || "N/A",
+            cell: ({ row }) => {
+              return (
+                <Link to={`/houses/${row.original.house?.id}`}>
+                  {row.original.house?.name || "N/A"}
+                </Link>
+              );
+            },
           },
         ]
       : []),

@@ -9,12 +9,15 @@ import { useAuth } from "../../hooks/useAuth";
 import RoomEquipmentList from "./equipments/RoomEquipmentList";
 import RoomServiceList from "./services/RoomServiceList";
 
-const RoomDetail = () => {
+const RoomDetail = ({ tenantView = false }) => {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const { showError } = useAlert();
-  const { user, isAdmin, isManager } = useAuth();
+  const { user, isAdmin, isManager, isTenant } = useAuth();
+
+  // Xác định nếu đang ở chế độ xem cho tenant
+  const isInTenantView = tenantView || isTenant;
 
   const {
     data: room,
@@ -42,6 +45,9 @@ const RoomDetail = () => {
   if (!room) {
     return <div>Room not found</div>;
   }
+
+  // Xác định quyền chỉnh sửa phòng
+  const canEdit = !isInTenantView && (isAdmin || (isManager && room.house?.manager_id === user?.id));
 
   const getStatusText = (status) => {
     switch (status) {
@@ -72,8 +78,6 @@ const RoomDetail = () => {
         return "bg-secondary text-white";
     }
   };
-
-  const canEdit = isAdmin || (isManager && room.house?.manager_id === user?.id);
 
   return (
     <div>
@@ -234,12 +238,12 @@ const RoomDetail = () => {
       
       <hr className="my-4" />
       <div className="mt-4">
-        <RoomServiceList roomId={id} houseId={room.house?.id} embedded={true} />
+        <RoomServiceList roomId={id} houseId={room.house?.id} embedded={true} tenantView={isInTenantView} />
       </div>
 
       <hr className="my-4" />
       <div className="mt-4">
-        <RoomEquipmentList roomId={id} houseId={room.house?.id} />
+        <RoomEquipmentList roomId={id} houseId={room.house?.id} tenantView={isInTenantView} />
       </div>
     </div>
   );

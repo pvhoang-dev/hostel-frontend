@@ -13,10 +13,13 @@ const InvoiceDetail = () => {
   const { id } = useParams();
   const [invoice, setInvoice] = useState(null);
   const { user, isAdmin, isManager } = useAuth();
-  const { showError } = useAlert();
+  const { showError, showSuccess } = useAlert();
   const navigate = useNavigate();
 
   const { execute: fetchInvoice, loading } = useApi(invoiceService.getInvoice);
+  const { execute: updatePaymentStatus, loading: updatingPayment } = useApi(
+    invoiceService.updatePaymentStatus
+  );
 
   useEffect(() => {
     if (user) {
@@ -31,6 +34,50 @@ const InvoiceDetail = () => {
     } else {
       showError("Lỗi khi tải thông tin hóa đơn");
       navigate("/invoices");
+    }
+  };
+
+  const getPaymentStatusBadge = (status) => {
+    if (!status) return null;
+    
+    const badgeColors = {
+      pending: "warning",
+      completed: "success",
+      failed: "danger",
+      refunded: "info"
+    };
+    
+    const statusText = {
+      pending: "Chờ thanh toán",
+      completed: "Đã thanh toán",
+      failed: "Thanh toán thất bại",
+      refunded: "Đã hoàn tiền"
+    };
+    
+    return (
+      <span className={`badge bg-${badgeColors[status]} text-white p-1`}>
+        {statusText[status] || status}
+      </span>
+    );
+  };
+
+  const handleMarkAsPaid = async () => {
+    if (!window.confirm("Bạn có chắc chắn muốn đánh dấu hóa đơn này là đã thanh toán?")) {
+      return;
+    }
+    
+    const paymentData = {
+      payment_method_id: invoice.payment_method?.id || 1,
+      payment_status: "completed",
+      payment_date: new Date().toISOString().split("T")[0]
+    };
+    
+    const response = await updatePaymentStatus(id, paymentData);
+    if (response.success) {
+      showSuccess("Đã cập nhật trạng thái thanh toán thành công");
+      setInvoice(response.data);
+    } else {
+      showError("Lỗi khi cập nhật trạng thái thanh toán");
     }
   };
 
@@ -51,7 +98,7 @@ const InvoiceDetail = () => {
       case "custom":
         return "Tùy chỉnh";
       case "service_usage":
-        return "Sử dụng dịch vụ";
+        return "Dịch vụ / Tháng";
       default:
         return type;
     }
@@ -69,6 +116,16 @@ const InvoiceDetail = () => {
           >
             Back
           </Button>
+          {canEdit && invoice.payment_status !== "completed" && (
+            <Button 
+              variant="success" 
+              onClick={handleMarkAsPaid}
+              disabled={updatingPayment}
+              className="mr-2"
+            >
+              {updatingPayment ? "Đang xử lý..." : "Đánh dấu đã thanh toán"}
+            </Button>
+          )}
           {canEdit && (
             <Button variant="primary" as={Link} to={`/invoices/${id}/edit`}>
               Sửa
@@ -88,10 +145,14 @@ const InvoiceDetail = () => {
               <span className="badge bg-info text-white mr-2 p-1">
                 Loại: {getInvoiceTypeText(invoice.invoice_type)}
               </span>
-              <span className="badge bg-primary text-white p-1">
+              <span className="badge bg-primary text-white p-1 mr-2">
                 Tháng {invoice.month}/{invoice.year}
               </span>
+              {getPaymentStatusBadge(invoice.payment_status)}
             </div>
+          </div>
+          <div className="text-end">
+            <h4 className="mb-0">{formatCurrency(invoice.total_amount)}</h4>
           </div>
         </div>
 
@@ -150,8 +211,40 @@ const InvoiceDetail = () => {
             </div>
           </div>
 
+          <div className="col-md-6 mb-4">
+            <h5 className="mb-3">Thông tin thanh toán</h5>
+            <div className="table-responsive">
+              <table className="table table-bordered">
+                <thead style={{ backgroundColor: "rgba(0, 0, 0, .075)" }}>
+                  <tr>
+                    <th style={{ width: "40%" }}>Thông tin</th>
+                    <th>Chi tiết</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Trạng thái:</td>
+                    <td>{getPaymentStatusBadge(invoice.payment_status)}</td>
+                  </tr>
+                  <tr>
+                    <td>Mã giao dịch:</td>
+                    <td>{invoice.transaction_code || "Chưa có"}</td>
+                  </tr>
+                  <tr>
+                    <td>Phương thức:</td>
+                    <td>{invoice.payment_method?.name || "Chưa thiết lập"}</td>
+                  </tr>
+                  <tr>
+                    <td>Ngày thanh toán:</td>
+                    <td>{invoice.payment_date ? formatDate(new Date(invoice.payment_date)) : "Chưa thanh toán"}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
           {invoice.description && (
-            <div className="col-md-6 mb-4">
+            <div className="col-md-12 mb-4">
               <h5 className="mb-3">Mô tả</h5>
               <div className="p-3 border rounded">
                 <p className="mb-0">{invoice.description}</p>

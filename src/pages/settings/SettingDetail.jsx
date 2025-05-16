@@ -5,11 +5,13 @@ import Card from "../../components/common/Card";
 import Loader from "../../components/common/Loader";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
+import { useAuth } from "../../hooks/useAuth";
 
 const SettingDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { showError } = useAlert();
+  const { isTenant } = useAuth();
 
   const {
     data: setting,
@@ -51,7 +53,7 @@ const SettingDetail = () => {
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center my-2">
-        <h1 className="fs-2 fw-semibold">Chi tiết cài đặt</h1>
+        <h1 className="fs-2 fw-semibold">Chi tiết nội quy</h1>
         <div className="d-flex gap-2">
           <button
             onClick={() => navigate("/settings")}
@@ -59,12 +61,14 @@ const SettingDetail = () => {
           >
             Back
           </button>
-          <Link
-            to={`/settings/${id}/edit`}
-            className="btn btn-primary fw-semibold"
-          >
-            Sửa
-          </Link>
+          {!isTenant && (
+            <Link
+              to={`/settings/${id}/edit`}
+              className="btn btn-primary fw-semibold"
+            >
+              Sửa
+            </Link>
+          )}
         </div>
       </div>
 
@@ -88,7 +92,7 @@ const SettingDetail = () => {
           )}
 
           <div className="col-md-12 mb-4">
-            <h5 className="mb-3">Thông tin cài đặt</h5>
+            <h5 className="mb-3">Thông tin nội quy</h5>
             <div className="table-responsive">
               <table className="table table-bordered">
                 <thead style={{ backgroundColor: "rgba(0, 0, 0, .075)" }}>
@@ -99,11 +103,11 @@ const SettingDetail = () => {
                 </thead>
                 <tbody>
                   <tr>
-                    <td>Key:</td>
+                    <td>Số thứ tự:</td>
                     <td>{setting.key}</td>
                   </tr>
                   <tr>
-                    <td>Value:</td>
+                    <td>Nội dung:</td>
                     <td>{setting.value}</td>
                   </tr>
                 </tbody>

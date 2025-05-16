@@ -50,7 +50,7 @@ const EquipmentList = () => {
 
   // Get current filters from URL
   const currentPage = Number(searchParams.get("page")) || 1;
-  const perPage = Number(searchParams.get("per_page")) || 5;
+  const perPage = Number(searchParams.get("per_page")) || 10;
   const sortBy = searchParams.get("sort_by") || "name";
   const sortDir = searchParams.get("sort_dir") || "asc";
   const name = searchParams.get("name") || "";

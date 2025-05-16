@@ -10,7 +10,60 @@ import { useAuth } from "../../../hooks/useAuth";
 import { roomServiceService } from "../../../api/roomServices";
 import { useNavigate } from "react-router-dom";
 
-const RoomServiceList = ({ roomId, houseId, embedded = false }) => {
+const DeleteConfirmModal = ({ show, service, onCancel, onConfirm }) => {
+  if (!show) return null;
+
+  return (
+    <div 
+      className="modal fade show" 
+      style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)' }}
+      onClick={onCancel}
+    >
+      <div className="modal-dialog" onClick={e => e.stopPropagation()}>
+        <div className="modal-content">
+          <div className="modal-header">
+            <h5 className="modal-title">Xác nhận xóa</h5>
+            <button
+              type="button"
+              className="btn-close"
+              onClick={onCancel}
+              aria-label="Close"
+            ></button>
+          </div>
+          <div className="modal-body">
+            Bạn có chắc chắn muốn xóa dịch vụ{" "}
+            <strong>{service?.service?.name}</strong> khỏi phòng này?
+          </div>
+          <div className="modal-footer">
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={onCancel}
+            >
+              Hủy
+            </button>
+            <button
+              type="button"
+              className="btn btn-danger"
+              onClick={onConfirm}
+            >
+              Xóa
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+DeleteConfirmModal.propTypes = {
+  show: PropTypes.bool.isRequired,
+  service: PropTypes.object,
+  onCancel: PropTypes.func.isRequired,
+  onConfirm: PropTypes.func.isRequired
+};
+
+const RoomServiceList = ({ roomId, houseId, embedded = false, tenantView = false }) => {
   const { showSuccess, showError } = useAlert();
   const { user, isAdmin, isManager, isTenant } = useAuth();
   const [currentPage, setCurrentPage] = useState(1);
@@ -19,6 +72,7 @@ const RoomServiceList = ({ roomId, houseId, embedded = false }) => {
   const [serviceToDelete, setServiceToDelete] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const navigate = useNavigate();
+  
   // API hooks
   const {
     data: roomServicesData,
@@ -30,27 +84,23 @@ const RoomServiceList = ({ roomId, houseId, embedded = false }) => {
     roomServiceService.deleteRoomService
   );
 
-  // Handle modal visibility
+  // Prevent scrolling when modal is open
   useEffect(() => {
     if (showDeleteModal) {
-      window.$("#deleteConfirmModal").modal("show");
+      document.body.style.overflow = 'hidden';
     } else {
-      window.$("#deleteConfirmModal").modal("hide");
+      document.body.style.overflow = '';
     }
+    
+    return () => {
+      document.body.style.overflow = '';
+    };
   }, [showDeleteModal]);
 
-  // Modal event handlers for cleanup
+  // Fetch room services
   useEffect(() => {
-    const handleDeleteHidden = () => setShowDeleteModal(false);
-
-    window.$("#deleteConfirmModal").on("hidden.bs.modal", handleDeleteHidden);
-
-    return () => {
-      window
-        .$("#deleteConfirmModal")
-        .off("hidden.bs.modal", handleDeleteHidden);
-    };
-  }, []);
+    loadRoomServices();
+  }, [roomId, currentPage, sortBy, sortDir]);
 
   // Derived state
   const roomServices = roomServicesData?.data || [];
@@ -98,12 +148,34 @@ const RoomServiceList = ({ roomId, houseId, embedded = false }) => {
     {
       accessorKey: "actions",
       header: "Hành động",
+      cell: ({ row }) => (
+        <div className="d-flex gap-2">
+          <Link
+            to={`/room-services/${row.original.id}`}
+            className="btn btn-sm btn-info"
+          >
+            Chi tiết
+          </Link>
+          {canEdit && (
+            <Link
+              to={`/room-services/${row.original.id}/edit`}
+              className="btn btn-sm btn-primary"
+            >
+              Sửa
+            </Link>
+          )}
+          {canDelete && (
+            <button
+              onClick={() => handleDelete(row.original.id)}
+              className="btn btn-sm btn-danger"
+            >
+              Xóa
+            </button>
+          )}
+        </div>
+      ),
     },
   ];
-
-  useEffect(() => {
-    loadRoomServices();
-  }, [roomId, currentPage, sortBy, sortDir]);
 
   const loadRoomServices = async () => {
     if (!roomId) return;
@@ -125,16 +197,29 @@ const RoomServiceList = ({ roomId, houseId, embedded = false }) => {
   };
 
   const handleDeleteClick = (service) => {
+    console.log("Attempting to delete service:", service);
     setServiceToDelete(service);
     setShowDeleteModal(true);
   };
 
-  const confirmDelete = async () => {
+  const handleCancelDelete = () => {
+    console.log("Cancel delete");
     setShowDeleteModal(false);
+    setServiceToDelete(null);
+  };
 
-    if (!serviceToDelete) return;
+  const handleConfirmDelete = async () => {
+    console.log("Confirm delete for service:", serviceToDelete);
+    
+    if (!serviceToDelete) {
+      console.error("No service selected for deletion");
+      return;
+    }
 
     try {
+      // Đóng modal và reset state
+      setShowDeleteModal(false);
+      
       const response = await deleteRoomService(serviceToDelete.id);
 
       if (response.success) {
@@ -143,17 +228,12 @@ const RoomServiceList = ({ roomId, houseId, embedded = false }) => {
       } else {
         showError(response.message || "Có lỗi xảy ra khi xóa dịch vụ phòng");
       }
-
-      setServiceToDelete(null);
     } catch (error) {
       console.error("Error deleting room service:", error);
       showError("Có lỗi xảy ra khi xóa dịch vụ phòng");
+    } finally {
+      setServiceToDelete(null);
     }
-  };
-
-  const cancelDelete = () => {
-    setShowDeleteModal(false);
-    setServiceToDelete(null);
   };
 
   const handlePageChange = (page) => {
@@ -171,6 +251,19 @@ const RoomServiceList = ({ roomId, houseId, embedded = false }) => {
   const canManageServices =
     isAdmin || (isManager && user?.managed_houses?.includes(parseInt(houseId)));
 
+  // Thêm logic để kiểm tra xem có thể thêm/sửa/xóa dịch vụ không
+  const canAdd = !tenantView && (isAdmin || (isManager && user?.managed_houses?.includes(parseInt(houseId))));
+  const canEdit = !tenantView && (isAdmin || (isManager && user?.managed_houses?.includes(parseInt(houseId))));
+  const canDelete = !tenantView && (isAdmin || (isManager && user?.managed_houses?.includes(parseInt(houseId))));
+
+  const handleViewClick = (service) => {
+    navigate(`/room-services/${service.id}`);
+  };
+  
+  const handleEditClick = (service) => {
+    navigate(`/room-services/${service.id}/edit`);
+  };
+
   return (
     <>
       <Card>
@@ -178,7 +271,7 @@ const RoomServiceList = ({ roomId, houseId, embedded = false }) => {
           <h4 className="card-title mb-0">
             {embedded ? "Dịch vụ phòng" : `Dịch vụ phòng - ${roomId}`}
           </h4>
-          {canManageServices && (
+          {canAdd && (
             <Link
               to={`/rooms/${roomId}/services/create`}
               className="btn btn-primary btn-sm"
@@ -205,13 +298,11 @@ const RoomServiceList = ({ roomId, houseId, embedded = false }) => {
                 ? [
                     {
                       icon: "mdi-eye",
-                      handler: (service) =>
-                        navigate(`/room-services/${service.id}`),
+                      handler: handleViewClick,
                     },
                     {
                       icon: "mdi-pencil",
-                      handler: (service) =>
-                        navigate(`/room-services/${service.id}/edit`),
+                      handler: handleEditClick,
                     },
                     {
                       icon: "mdi-delete",
@@ -221,8 +312,7 @@ const RoomServiceList = ({ roomId, houseId, embedded = false }) => {
                 : [
                     {
                       icon: "mdi-eye",
-                      handler: (service) =>
-                        navigate(`/room-services/${service.id}`),
+                      handler: handleViewClick,
                     },
                   ],
             }}
@@ -230,47 +320,13 @@ const RoomServiceList = ({ roomId, houseId, embedded = false }) => {
         )}
       </Card>
 
-      {/* Confirm Delete Modal */}
-      <div
-        className="modal fade"
-        id="deleteConfirmModal"
-        tabIndex="-1"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title">Xác nhận xóa</h5>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-            </div>
-            <div className="modal-body">
-              Bạn có chắc chắn muốn xóa dịch vụ{" "}
-              <strong>{serviceToDelete?.service?.name}</strong> khỏi phòng này?
-            </div>
-            <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={cancelDelete}
-              >
-                Hủy
-              </button>
-              <button
-                type="button"
-                className="btn btn-danger"
-                onClick={confirmDelete}
-              >
-                Xóa
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* Custom Delete Confirmation Modal */}
+      <DeleteConfirmModal 
+        show={showDeleteModal}
+        service={serviceToDelete}
+        onCancel={handleCancelDelete}
+        onConfirm={handleConfirmDelete}
+      />
     </>
   );
 };
@@ -279,6 +335,7 @@ RoomServiceList.propTypes = {
   roomId: PropTypes.string.isRequired,
   houseId: PropTypes.number,
   embedded: PropTypes.bool,
+  tenantView: PropTypes.bool,
 };
 
 export default RoomServiceList;

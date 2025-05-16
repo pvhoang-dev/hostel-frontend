@@ -1,8 +1,6 @@
 import { useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { invoiceService } from "../../api/invoices";
-import { houseService } from "../../api/houses";
-import { roomService } from "../../api/rooms";
 import { paymentMethodService } from "../../api/paymentMethods";
 import Table from "../../components/common/Table";
 import Card from "../../components/common/Card";
@@ -15,58 +13,17 @@ import useApi from "../../hooks/useApi";
 import { useAuth } from "../../hooks/useAuth";
 import { formatCurrency } from "../../utils/formatters";
 
-// Filter component for invoices
+// Filter component for invoices (Simplified for tenants)
 const FilterSection = ({
   filters,
-  houses,
-  rooms,
   paymentMethods,
   onFilterChange,
   onClearFilters,
   onApplyFilters,
-  onHouseChange,
 }) => {
-  const handleHouseChange = (e) => {
-    const { value } = e.target;
-    onHouseChange(value);
-    onFilterChange(e);
-  };
-
   return (
     <Card title="Bộ lọc" className="mb-3">
       <div className="row g-3">
-        <div className="col-md-4">
-          <Select
-            label="Nhà"
-            name="house_id"
-            value={filters.house_id}
-            onChange={handleHouseChange}
-            options={[
-              { value: "", label: "Tất cả" },
-              ...houses.map((house) => ({
-                value: house.id.toString(),
-                label: house.name,
-              })),
-            ]}
-          />
-        </div>
-
-        <div className="col-md-4">
-          <Select
-            label="Phòng"
-            name="room_id"
-            value={filters.room_id}
-            onChange={onFilterChange}
-            options={[
-              { value: "", label: "Tất cả" },
-              ...rooms.map((room) => ({
-                value: room.id.toString(),
-                label: `Phòng ${room.room_number}`,
-              })),
-            ]}
-          />
-        </div>
-
         <div className="col-md-4">
           <Select
             label="Loại hóa đơn"
@@ -173,10 +130,10 @@ const FilterSection = ({
   );
 };
 
-const InvoiceList = () => {
+const TenantInvoiceList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { showSuccess, showError } = useAlert();
-  const { user, isAdmin, isManager } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   // Get current filters from URL
@@ -185,8 +142,6 @@ const InvoiceList = () => {
   const sortBy = searchParams.get("sort_by") || "created_at";
   const sortDir = searchParams.get("sort_dir") || "desc";
 
-  const house_id = searchParams.get("house_id") || "";
-  const room_id = searchParams.get("room_id") || "";
   const invoice_type = searchParams.get("invoice_type") || "";
   const payment_status = searchParams.get("payment_status") || "";
   const payment_method_id = searchParams.get("payment_method_id") || "";
@@ -203,24 +158,10 @@ const InvoiceList = () => {
   } = useApi(invoiceService.getInvoices);
 
   const {
-    data: housesData,
-    loading: loadingHouses,
-    execute: fetchHouses,
-  } = useApi(houseService.getHouses);
-
-  const {
-    data: roomsData,
-    loading: loadingRooms,
-    execute: fetchRooms,
-  } = useApi(roomService.getRooms);
-  
-  const {
     data: paymentMethodsData,
     loading: loadingPaymentMethods,
     execute: fetchPaymentMethods,
   } = useApi(paymentMethodService.getPaymentMethods);
-
-  const { execute: deleteInvoice } = useApi(invoiceService.deleteInvoice);
 
   // Derived state
   const invoices = invoicesData?.data || [];
@@ -233,8 +174,6 @@ const InvoiceList = () => {
       }
     : null;
 
-  const houses = housesData?.data || [];
-  const rooms = roomsData?.data || [];
   const paymentMethods = paymentMethodsData?.data || [];
 
   // Function to render payment status badge
@@ -261,60 +200,6 @@ const InvoiceList = () => {
       </span>
     );
   };
-
-  // Render the actions cell for each row
-  const ActionsCell = ({ row }) => {
-    const invoice = row.original;
-    const canEdit = isAdmin || (isManager && invoice.room?.house?.manager_id === user?.id);
-
-    return (
-      <div className="d-flex gap-2">
-        <button
-          type="button"
-          className="btn btn-link p-0 mx-1 action-icon"
-          style={{ border: 'none', background: 'none', cursor: 'pointer' }}
-          onClick={() => navigate(`/invoices/${invoice.id}`)}
-          title="Chi tiết"
-        >
-          <i className="mdi mdi-eye"></i>
-        </button>
-        
-        {canEdit && (
-          <>
-            <button
-              type="button"
-              className="btn btn-link p-0 mx-1 action-icon"
-              style={{ border: 'none', background: 'none', cursor: 'pointer' }}
-              onClick={() => navigate(`/invoices/${invoice.id}/edit`)}
-              title="Sửa"
-            >
-              <i className="mdi mdi-pencil"></i>
-            </button>
-            
-            <button
-              type="button"
-              className="btn btn-link p-0 mx-1 action-icon"
-              style={{ border: 'none', background: 'none', cursor: 'pointer' }}
-              onClick={() => handleDeleteInvoice(invoice)}
-              title="Xóa"
-            >
-              <i className="mdi mdi-delete"></i>
-            </button>
-          </>
-        )}
-        
-        {canEdit && invoice.payment_status !== "completed" && (
-          <button
-            onClick={() => handleMarkAsPaid(invoice)}
-            className="btn btn-sm btn-success"
-            title="Đánh dấu đã thanh toán"
-          >
-            Thanh toán
-          </button>
-        )}
-      </div>
-    );
-  };
   
   // Column definitions for the table
   const columns = [
@@ -323,14 +208,9 @@ const InvoiceList = () => {
       header: "ID",
     },
     {
-      accessorKey: "room.house.name",
-      header: "Nhà",
-      cell: ({ row }) => <Link to={`/houses/${row.original.room.house.id}`}>{row.original.room.house.name}</Link>,
-    },
-    {
       accessorKey: "room.room_number",
       header: "Phòng",
-      cell: ({ row }) => <Link to={`/rooms/${row.original.room.id}`}>{row.original.room.room_number}</Link>,
+      cell: ({ row }) => `${row.original.room?.house?.name || "N/A"} - Phòng ${row.original.room?.room_number || "N/A"}`,
     },
     {
       accessorKey: "month",
@@ -361,24 +241,19 @@ const InvoiceList = () => {
       cell: ({ row }) => row.original.created_at,
     },
     {
-      accessorKey: "payment_method.name",
-      header: "Phương thức thanh toán",
-      cell: ({ row }) => row.original.payment_method?.name || "N/A",
-    },
-    {
-      accessorKey: "payment_date",
-      header: "Ngày thanh toán",
-      cell: ({ row }) => row.original.payment_date ? new Date(row.original.payment_date).toLocaleDateString('vi-VN') : "Chưa thanh toán",
-    },
-    {
       accessorKey: "actions",
       header: "Hành động",
-      cell: ActionsCell,
+      cell: ({ row }) => (
+        <div className="d-flex gap-2">
+          <Link to={`/invoices/${row.original.id}`} className="btn btn-sm btn-info">
+            Chi tiết
+          </Link>
+        </div>
+      ),
     },
   ];
 
   useEffect(() => {
-    loadHouses();
     loadPaymentMethods();
   }, []);
 
@@ -391,34 +266,24 @@ const InvoiceList = () => {
     perPage,
     sortBy,
     sortDir,
-    house_id,
-    room_id,
     invoice_type,
+    payment_status,
+    payment_method_id,
+    month,
+    year,
+    min_amount,
+    max_amount,
     user,
   ]);
 
-  useEffect(() => {
-    if (house_id) {
-      loadRoomsByHouse(house_id);
-    } else {
-      setSearchParams((prev) => {
-        const newParams = { ...Object.fromEntries(prev) };
-        newParams.room_id = "";
-        return newParams;
-      });
-    }
-  }, [house_id]);
-
   const loadInvoices = async () => {
     try {
-      const result = await fetchInvoices({
+      await fetchInvoices({
         page: currentPage,
         per_page: perPage,
         sort_by: sortBy,
         sort_dir: sortDir,
         include: "room.house,items,paymentMethod",
-        house_id: house_id || undefined,
-        room_id: room_id || undefined,
         invoice_type: invoice_type || undefined,
         month: month || undefined,
         year: year || undefined,
@@ -427,29 +292,8 @@ const InvoiceList = () => {
         payment_status: payment_status || undefined,
         payment_method_id: payment_method_id || undefined,
       });
-
-      if (isManager && !isAdmin) {
-        if (houses.length === 0) {
-          await loadHouses();
-        }
-      }
     } catch (error) {
       showError("Error loading invoices");
-    }
-  };
-
-  const loadHouses = async () => {
-    // For managers, only show their managed houses
-    const params = isManager ? { manager_id: user.id } : {};
-    await fetchHouses(params);
-  };
-
-  const loadRoomsByHouse = async (houseId) => {
-    if (!houseId) return;
-
-    const response = await fetchRooms({ house_id: houseId });
-    if (!response.success) {
-      showError("Lỗi khi tải danh sách phòng");
     }
   };
 
@@ -458,18 +302,6 @@ const InvoiceList = () => {
       await fetchPaymentMethods({});
     } catch (error) {
       showError("Lỗi khi tải danh sách phương thức thanh toán");
-    }
-  };
-
-  const handleDeleteInvoice = async (invoice) => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa hóa đơn này không?")) {
-      const response = await deleteInvoice(invoice.id);
-      if (response.success) {
-        showSuccess("Xóa hóa đơn thành công");
-        loadInvoices();
-      } else {
-        showError(response.message || "Không thể xóa hóa đơn");
-      }
     }
   };
 
@@ -504,15 +336,8 @@ const InvoiceList = () => {
     });
   };
 
-  const handleHouseChange = (houseId) => {
-    // When house changes, we need to load rooms for that house
-    loadRoomsByHouse(houseId);
-  };
-
   const clearFilters = () => {
     setSearchParams((params) => {
-      params.delete("house_id");
-      params.delete("room_id");
       params.delete("invoice_type");
       params.delete("month");
       params.delete("year");
@@ -525,55 +350,26 @@ const InvoiceList = () => {
     });
   };
 
-  const isLoading = loadingInvoices || loadingHouses || loadingRooms || loadingPaymentMethods;
+  const isLoading = loadingInvoices || loadingPaymentMethods;
 
   // Nếu chưa có thông tin user, hiển thị loading
   if (!user) {
     return <Loader />;
   }
 
-  const canManageInvoices = isAdmin || isManager;
-
-  // Handle marking an invoice as paid
-  const handleMarkAsPaid = async (invoice) => {
-    if (!window.confirm("Bạn có chắc chắn muốn đánh dấu hóa đơn này là đã thanh toán?")) {
-      return;
-    }
-    
-    const paymentData = {
-      payment_method_id: invoice.payment_method?.id || 1, // Mặc định phương thức thanh toán tiền mặt
-      payment_status: "completed",
-      payment_date: new Date().toISOString().split("T")[0]
-    };
-    
-    try {
-      const response = await invoiceService.updatePaymentStatus(invoice.id, paymentData);
-      if (response.success) {
-        showSuccess("Đã cập nhật trạng thái thanh toán thành công");
-        loadInvoices(); // Tải lại danh sách
-      } else {
-        showError("Lỗi khi cập nhật trạng thái thanh toán");
-      }
-    } catch (error) {
-      showError("Lỗi khi cập nhật trạng thái thanh toán");
-    }
-  };
-
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center my-2">
-        <h3>Hóa đơn</h3>
-        {canManageInvoices && (
-          <Button as={Link} to="/invoices/create">
-            Thêm
-          </Button>
-        )}
+        <h3>Hóa đơn của tôi</h3>
+        <div>
+          <Link to="/invoice-payment" className="btn btn-primary">
+            Thanh toán hóa đơn
+          </Link>
+        </div>
       </div>
 
       <FilterSection
         filters={{
-          house_id,
-          room_id,
           invoice_type,
           month,
           year,
@@ -582,11 +378,8 @@ const InvoiceList = () => {
           payment_status,
           payment_method_id,
         }}
-        houses={houses}
-        rooms={rooms}
         paymentMethods={paymentMethods}
         onFilterChange={handleFilterChange}
-        onHouseChange={handleHouseChange}
         onClearFilters={clearFilters}
         onApplyFilters={loadInvoices}
       />
@@ -610,4 +403,4 @@ const InvoiceList = () => {
   );
 };
 
-export default InvoiceList;
+export default TenantInvoiceList; 
