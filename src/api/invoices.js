@@ -25,4 +25,22 @@ export const invoiceService = {
     const response = await api.delete(`/invoices/${id}`);
     return response.data;
   },
+
+  updatePaymentStatus: async (id, paymentData) => {
+    const response = await api.post(`/invoices/${id}/update-payment`, paymentData);
+    return response.data;
+  },
+
+  createPayosPayment: async (invoiceIds, paymentData) => {
+    const response = await api.post(`/payment/create-link-payment`, {
+      invoice_ids: invoiceIds,
+      ...paymentData
+    });
+    return response.data;
+  },
+  
+  verifyPayment: async (paymentData) => {
+    const response = await api.post(`/payment/receive-hook`, paymentData);
+    return response.data;
+  }
 };

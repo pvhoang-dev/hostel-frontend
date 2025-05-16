@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { roomService } from "../../api/rooms";
-import { serviceUsageService } from "../../api/serviceUsages";
+import { paymentMethodService } from "../../api/paymentMethods";
 import { formatCurrency } from "../../utils/formatters";
 import Input from "../common/Input";
 import Select from "../common/Select";
@@ -8,6 +8,7 @@ import TextArea from "../common/TextArea.jsx";
 import Button from "../common/Button";
 import Loader from "../common/Loader";
 import useApi from "../../hooks/useApi";
+import Checkbox from "../common/Checkbox";
 
 const InvoiceForm = ({
   initialData = {},
@@ -28,19 +29,38 @@ const InvoiceForm = ({
       { source_type: "manual", amount: 0, description: "" },
     ],
     deleted_service_usage_ids: [], // Để lưu danh sách service_usage_id cần xóa
+    // Thêm các trường liên quan đến thanh toán
+    payment_method_id: initialData.payment_method_id || 1,
+    payment_status: initialData.payment_status || "pending",
+    payment_date: initialData.payment_date || "",
+    transaction_code: initialData.transaction_code || "",
   });
 
   const [rooms, setRooms] = useState([]);
+  const [paymentMethods, setPaymentMethods] = useState([]);
   const [loadingRooms, setLoadingRooms] = useState(false);
+  const [loadingPaymentMethods, setLoadingPaymentMethods] = useState(false);
+  const [showPaymentSection, setShowPaymentSection] = useState(false);
 
   const { execute: fetchRooms } = useApi(
     roomService.getRooms
+  );
+
+  const { execute: fetchPaymentMethods } = useApi(
+    paymentMethodService.getPaymentMethods
   );
 
   // Load rooms based on houseId (if provided)
   useEffect(() => {
     if (mode === "create") {
       loadRooms();
+    }
+    // Luôn tải danh sách phương thức thanh toán
+    loadPaymentMethods();
+    
+    // Nếu là mode edit và có payment_method_id, hiển thị phần thanh toán
+    if (mode === "edit" && initialData.payment_method_id) {
+      setShowPaymentSection(true);
     }
   }, [houseId]);
 
@@ -64,8 +84,41 @@ const InvoiceForm = ({
     }
   };
 
+  const loadPaymentMethods = async () => {
+    setLoadingPaymentMethods(true);
+    try {
+      const response = await fetchPaymentMethods({});
+      if (response.success) {
+        setPaymentMethods(response.data.data);
+      }
+    } catch (error) {
+      console.error("Error loading payment methods:", error);
+    } finally {
+      setLoadingPaymentMethods(false);
+    }
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    
+    // Nếu đổi trạng thái thanh toán, xử lý ngày thanh toán tương ứng
+    if (name === 'payment_status') {
+      if (value !== 'completed') {
+        // Nếu không phải trạng thái đã thanh toán, xóa ngày thanh toán
+        setFormData((prev) => ({ 
+          ...prev, 
+          [name]: value,
+          payment_date: ""
+        }));
+        return;
+      } else if (value === 'completed') {
+        setFormData((prev) => ({
+          ...prev,
+          payment_date: new Date().toISOString().split('T')[0]
+        }));
+      }
+    }
+    
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -103,11 +156,6 @@ const InvoiceForm = ({
     
     updatedItems.splice(index, 1);
     
-    // Đảm bảo luôn có ít nhất một item
-    if (updatedItems.length === 0) {
-      updatedItems.push({ source_type: "manual", amount: 0, description: "" });
-    }
-    
     setFormData((prev) => ({ ...prev, items: updatedItems }));
   };
 
@@ -118,12 +166,36 @@ const InvoiceForm = ({
     );
   };
 
+  const togglePaymentSection = () => {
+    setShowPaymentSection(!showPaymentSection);
+    
+    // Nếu ẩn phần thanh toán, xóa dữ liệu thanh toán
+    if (showPaymentSection) {
+      setFormData((prev) => ({
+        ...prev,
+        payment_method_id: "",
+        payment_status: "pending",
+        payment_date: "",
+        transaction_code: "",
+      }));
+    } else {
+      // Nếu hiện phần thanh toán, thiết lập giá trị mặc định
+      setFormData((prev) => ({
+        ...prev,
+        payment_method_id: prev.payment_method_id || (paymentMethods.length > 0 ? paymentMethods[0].id : ""),
+        payment_status: prev.payment_status || "pending",
+        payment_date: prev.payment_date || "",
+        transaction_code: prev.transaction_code || "",
+      }));
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     onSubmit(formData);
   };
 
-  if (loadingRooms && mode === "create") {
+  if (loadingRooms || loadingPaymentMethods && mode === "create") {
     return <Loader />;
   }
 
@@ -253,90 +325,154 @@ const InvoiceForm = ({
                         )}
                       </td>
                       <td>
-                        {item.source_type === "service_usage" ? (
-                          <Input
-                            value={item.description || ""}
-                            disabled={true}
-                            inline
-                          />
-                        ) : (
-                          <Input
-                            name={`item-${index}-description`}
-                            value={item.description || ""}
-                            onChange={(e) =>
-                              handleItemChange(
-                                index,
-                                "description",
-                                e.target.value
-                              )
-                            }
-                            error={errors[`items.${index}.description`]}
-                            placeholder="Mô tả"
-                            inline
-                          />
-                        )}
-                      </td>
-                      <td>
                         <Input
-                          name={`item-${index}-amount`}
-                          type="number"
-                          value={item.amount || 0}
+                          name={`description-${index}`}
+                          value={item.description || ""}
                           onChange={(e) =>
-                            handleItemChange(
-                              index,
-                              "amount",
-                              parseInt(e.target.value) || 0
-                            )
+                            handleItemChange(index, "description", e.target.value)
                           }
-                          error={errors[`items.${index}.amount`]}
-                          min="0"
                           disabled={item.source_type === "service_usage"}
+                          error={
+                            errors.items && errors.items[index]
+                              ? errors.items[index].description
+                              : ""
+                          }
+                          rows={2}
                           inline
                         />
                       </td>
-                      <td className="text-center">
-                        <button
+                      <td>
+                        <Input
+                          name={`amount-${index}`}
+                          type="number"
+                          min="0"
+                          value={item.amount || null}
+                          onChange={(e) =>
+                            handleItemChange(index, "amount", e.target.value)
+                          }
+                          disabled={item.source_type === "service_usage"}
+                          error={
+                            errors.items && errors.items[index]
+                              ? errors.items[index].amount
+                              : ""
+                          }
+                          inline
+                        />
+                      </td>
+                      <td>
+                        <Button
+                          variant="danger"
+                          size="sm"
                           type="button"
-                          className="btn btn-outline-danger btn-sm"
                           onClick={() => removeItem(index)}
-                          disabled={formData.items.length === 1 && item.source_type === "manual"}
                         >
-                          <i className="mdi mdi-delete"></i>
-                        </button>
+                          Xóa
+                        </Button>
                       </td>
                     </tr>
                   ))}
-                <tr className="table-active fw-bold">
-                  <td colSpan="2" className="text-end">
-                    Tổng cộng:
-                  </td>
-                  <td colSpan="2">{formatCurrency(calculateTotal())}</td>
-                </tr>
               </tbody>
+              <tfoot>
+                <tr>
+                  <td colSpan="2" className="text-end">
+                    <strong>Tổng cộng:</strong>
+                  </td>
+                  <td>{formatCurrency(calculateTotal())}</td>
+                  <td></td>
+                </tr>
+              </tfoot>
             </table>
           </div>
-
-          <Button
-            type="button"
-            variant="outline-primary"
-            onClick={addItem}
-            className="mb-3"
-          >
-            <i className="mdi mdi-plus"></i> Thêm dòng
-          </Button>
-
-          {errors.items && (
-            <div className="alert alert-danger">{errors.items}</div>
-          )}
         </div>
+
+        <div className="col-12 mb-4">
+          <Button variant="primary" type="button" onClick={addItem}>
+            Thêm dòng
+          </Button>
+        </div>
+
+        <div className="col-12 mb-3">
+          <div className="form-check form-switch">
+            <Checkbox
+              label="Thanh toán"
+              name="is_fixed_checkbox"
+              checked={showPaymentSection}
+              onChange={togglePaymentSection}
+            />
+          </div>
+        </div>
+
+        {showPaymentSection && (
+          <div className="col-12 mb-4">
+            <div className="card">
+              <div className="card-header">
+                <h5 className="mb-0">Thông tin thanh toán</h5>
+              </div>
+              <div className="card-body">
+                <div className="row g-3">
+                  <div className="col-md-6">
+                    <Select
+                      label="Phương thức thanh toán"
+                      name="payment_method_id"
+                      value={formData.payment_method_id}
+                      onChange={handleInputChange}
+                      error={errors.payment_method_id}
+                      required={showPaymentSection}
+                      options={[
+                        { value: "", label: "-- Chọn phương thức --" },
+                        ...paymentMethods.map((method) => ({
+                          value: method.id,
+                          label: method.name,
+                        })),
+                      ]}
+                    />
+                  </div>
+                  <div className="col-md-6">
+                    <Select
+                      label="Trạng thái thanh toán"
+                      name="payment_status"
+                      value={formData.payment_status}
+                      onChange={handleInputChange}
+                      error={errors.payment_status}
+                      required={showPaymentSection}
+                      options={[
+                        { value: "pending", label: "Chờ thanh toán" },
+                        { value: "completed", label: "Đã thanh toán" },
+                        { value: "failed", label: "Thanh toán thất bại" },
+                        { value: "refunded", label: "Đã hoàn tiền" },
+                      ]}
+                    />
+                  </div>
+                  <div className="col-md-6">
+                    <Input
+                      label="Ngày thanh toán"
+                      name="payment_date"
+                      type="date"
+                      value={formData.payment_date}
+                      onChange={handleInputChange}
+                      error={errors.payment_date}
+                      required={showPaymentSection && formData.payment_status === "completed"}
+                    />
+                  </div>
+                  <div className="col-md-6">
+                    <Input
+                      label="Mã giao dịch (tùy chọn)"
+                      name="transaction_code"
+                      value={formData.transaction_code}
+                      onChange={handleInputChange}
+                      error={errors.transaction_code}
+                      placeholder="Hệ thống sẽ tự động tạo nếu không nhập"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="col-12 d-flex justify-content-end">
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting
-              ? "Đang xử lý..."
-              : mode === "create"
-              ? "Tạo hóa đơn"
-              : "Cập nhật"}
+            {isSubmitting ? "Đang xử lý..." : mode === "create" ? "Tạo" : "Cập nhật"}
           </Button>
         </div>
       </div>
