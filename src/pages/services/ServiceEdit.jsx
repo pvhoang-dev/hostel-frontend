@@ -42,7 +42,6 @@ const ServiceEdit = () => {
 
     if (response.success) {
       showSuccess("Cập nhật dịch vụ thành công");
-      navigate("/services");
     } else {
       if (response.data && typeof response.data === "object") {
         setErrors(response.data); // Set validation errors from API

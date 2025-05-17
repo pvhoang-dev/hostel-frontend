@@ -70,7 +70,6 @@ const ContractEdit = () => {
 
     if (response.success) {
       showSuccess("Cập nhật hợp đồng thành công");
-      navigate(`/contracts/${id}`);
     } else {
       if (response.data && typeof response.data === "object") {
         setErrors(response.data);

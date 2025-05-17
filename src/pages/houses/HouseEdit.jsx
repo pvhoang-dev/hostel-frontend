@@ -73,7 +73,6 @@ const HouseEdit = () => {
 
     if (response.success) {
       showSuccess("Cập nhật nhà thành công");
-      navigate("/houses");
     } else {
       if (response.data && typeof response.data === "object") {
         setErrors(response.data);

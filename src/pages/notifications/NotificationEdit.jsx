@@ -63,7 +63,6 @@ const NotificationEdit = () => {
 
       if (response.success) {
         showSuccess("Cập nhật thông báo thành công");
-        navigate(`/notifications/${id}`);
       } else {
         showError(response.message || "Có lỗi xảy ra khi cập nhật thông báo");
         if (response.errors) {

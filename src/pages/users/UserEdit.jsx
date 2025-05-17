@@ -55,7 +55,6 @@ const UserEdit = () => {
 
     if (response.success) {
       showSuccess("Cập nhật người dùng thành công");
-      navigate("/users");
     } else {
       if (response.data && typeof response.data === "object") {
         setErrors(response.data);

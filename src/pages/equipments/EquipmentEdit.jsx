@@ -42,7 +42,6 @@ const EquipmentEdit = () => {
 
     if (response.success) {
       showSuccess("Cập nhật thiết bị thành công");
-      navigate("/equipments");
     } else {
       if (response.data && typeof response.data === "object") {
         setErrors(response.data);

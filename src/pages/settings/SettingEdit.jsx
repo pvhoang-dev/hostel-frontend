@@ -59,7 +59,6 @@ const SettingEdit = () => {
 
       if (response.success) {
         showSuccess("Cập nhật cài đặt thành công");
-        navigate("/settings");
       } else {
         if (response.data && typeof response.data === "object") {
           setErrors(response.data);

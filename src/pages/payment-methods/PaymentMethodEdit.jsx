@@ -43,7 +43,6 @@ const PaymentMethodEdit = () => {
 
     if (response.success) {
       showSuccess("Cập nhật phương thức thanh toán thành công");
-      navigate("/payment-methods");
     } else {
       if (response.data && typeof response.data === "object") {
         setErrors(response.data);

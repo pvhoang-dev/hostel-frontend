@@ -75,7 +75,6 @@ const InvoiceEdit = () => {
         navigate("/invoices");
       } else {
         showSuccess("Cập nhật hóa đơn thành công");
-        navigate(`/invoices/${id}`);
       }
     } else {
       if (response.data && typeof response.data === "object") {

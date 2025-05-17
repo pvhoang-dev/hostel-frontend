@@ -62,7 +62,6 @@ const HouseSettingEdit = () => {
 
     if (response.success) {
       showSuccess("Cập nhật nội quy nhà thành công");
-      navigate(`/houses/${houseId}/settings/${settingId}`);
     } else {
       if (response.data && typeof response.data === "object") {
         setErrors(response.data);

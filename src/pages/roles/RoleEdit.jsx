@@ -43,7 +43,6 @@ const RoleEdit = () => {
 
     if (response.success) {
       showSuccess("Cập nhật vai trò thành công");
-      navigate("/roles");
     } else {
       if (response.data && typeof response.data === "object") {
         setErrors(response.data);

@@ -59,7 +59,6 @@ const RequestEdit = () => {
     try {
       await requestService.updateRequest(id, formData);
       showAlert("Yêu cầu đã được cập nhật thành công!", "success");
-      navigate(`/requests/${id}`);
     } catch (error) {
       showAlert("Đã xảy ra lỗi khi cập nhật yêu cầu", "danger");
       console.error("Error updating request:", error);
