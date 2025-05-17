@@ -4,54 +4,7 @@ import { useAuth } from "../../hooks/useAuth";
 import Button from "../common/Button";
 import TextArea from "../common/TextArea";
 import Loader from "../common/Loader";
-import ReactSelect from "react-select";
-
-// Custom styles cho ReactSelect trong dark mode
-const darkModeSelectStyles = {
-  control: (baseStyles, state) => ({
-    ...baseStyles,
-    backgroundColor: '#404954',
-    borderColor: state.isFocused ? '#6c757d' : '#555',
-    boxShadow: state.isFocused ? '0 0 0 0.25rem rgba(130, 138, 145, 0.5)' : null,
-    '&:hover': {
-      borderColor: '#6c757d'
-    },
-    color: 'white'
-  }),
-  menu: (baseStyles) => ({
-    ...baseStyles,
-    backgroundColor: '#404954',
-  }),
-  option: (baseStyles, state) => ({
-    ...baseStyles,
-    backgroundColor: state.isSelected ? '#0d6efd' : 
-                     state.isFocused ? '#495057' : '#404954',
-    color: 'white',
-    '&:hover': {
-      backgroundColor: '#495057',
-    }
-  }),
-  singleValue: (baseStyles) => ({
-    ...baseStyles,
-    color: 'white',
-  }),
-  input: (baseStyles) => ({
-    ...baseStyles,
-    color: 'white',
-  }),
-  placeholder: (baseStyles) => ({
-    ...baseStyles,
-    color: '#adb5bd',
-  }),
-  loadingMessage: (baseStyles) => ({
-    ...baseStyles,
-    color: 'white',
-  }),
-  noOptionsMessage: (baseStyles) => ({
-    ...baseStyles,
-    color: 'white',
-  }),
-};
+import Select from "../common/Select";
 
 const RequestForm = ({
   initialData = {},
@@ -143,11 +96,6 @@ const RequestForm = ({
     setFormData({ ...formData, [name]: value });
   };
 
-  // Xử lý change cho ReactSelect
-  const handleSelectChange = (selectedOption, { name }) => {
-    setFormData({ ...formData, [name]: selectedOption ? selectedOption.value : "" });
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
     onSubmit(formData);
@@ -175,78 +123,32 @@ const RequestForm = ({
     <form onSubmit={handleSubmit}>
       <div className="row g-3">
         <div className="col-md-6">
-          <div className="form-group mb-3">
-            <label htmlFor="recipient_id" className="form-label">
-              Người nhận <span className="text-danger">*</span>
-            </label>
-            <ReactSelect
-              id="recipient_id"
-              name="recipient_id"
-              value={recipients.find(option => option.value === formData.recipient_id) || null}
-              onChange={(option) => handleSelectChange(option, { name: "recipient_id" })}
-              options={recipients}
-              placeholder="Chọn người nhận"
-              isSearchable
-              isDisabled={isSubmitting}
-              className="basic-single"
-              classNamePrefix="select"
-              styles={darkModeSelectStyles}
-            />
-            {errors.recipient_id && (
-              <div className="text-danger mt-1">{errors.recipient_id}</div>
-            )}
-          </div>
+          <Select
+            label="Người nhận"
+            name="recipient_id"
+            value={formData.recipient_id}
+            onChange={handleChange}
+            options={recipients}
+            placeholder="Chọn người nhận"
+            disabled={isSubmitting}
+            error={errors.recipient_id}
+            required
+          />
         </div>
 
         <div className="col-md-6">
-          <div className="form-group mb-3">
-            <label htmlFor="request_type" className="form-label">
-              Loại yêu cầu <span className="text-danger">*</span>
-            </label>
-            <ReactSelect
-              id="request_type"
-              name="request_type"
-              value={requestTypes.find(option => option.value === formData.request_type) || null}
-              onChange={(option) => handleSelectChange(option, { name: "request_type" })}
-              options={requestTypes}
-              placeholder="Chọn loại yêu cầu"
-              isSearchable
-              isDisabled={isSubmitting}
-              className="basic-single"
-              classNamePrefix="select"
-              styles={darkModeSelectStyles}
-            />
-            {errors.request_type && (
-              <div className="text-danger mt-1">{errors.request_type}</div>
-            )}
-          </div>
+          <Select
+            label="Loại yêu cầu"
+            name="request_type"
+            value={formData.request_type}
+            onChange={handleChange}
+            options={requestTypes}
+            placeholder="Chọn loại yêu cầu"
+            disabled={isSubmitting}
+            error={errors.request_type}
+            required
+          />
         </div>
-
-        {mode === "edit" && (
-          <div className="col-md-6">
-            <div className="form-group mb-3">
-              <label htmlFor="status" className="form-label">
-                Trạng thái
-              </label>
-              <ReactSelect
-                id="status"
-                name="status"
-                value={requestStatuses.find(option => option.value === formData.status) || null}
-                onChange={(option) => handleSelectChange(option, { name: "status" })}
-                options={requestStatuses}
-                placeholder="Chọn trạng thái"
-                isSearchable
-                isDisabled={isSubmitting}
-                className="basic-single"
-                classNamePrefix="select"
-                styles={darkModeSelectStyles}
-              />
-              {errors.status && (
-                <div className="text-danger mt-1">{errors.status}</div>
-              )}
-            </div>
-          </div>
-        )}
 
         <div className="col-12">
           <TextArea

@@ -7,70 +7,6 @@ import Select from "../common/Select";
 import Button from "../common/Button";
 import TextArea from "../common/TextArea";
 import DatePicker from "../common/DatePicker";
-import ReactSelect from "react-select";
-
-// Custom styles cho dark mode ReactSelect
-const darkModeSelectStyles = {
-  control: (baseStyles, state) => ({
-    ...baseStyles,
-    backgroundColor: '#404954',
-    borderColor: state.isFocused ? '#6c757d' : '#555',
-    boxShadow: state.isFocused ? '0 0 0 0.25rem rgba(130, 138, 145, 0.5)' : null,
-    '&:hover': {
-      borderColor: '#6c757d'
-    },
-    color: 'white'
-  }),
-  menu: (baseStyles) => ({
-    ...baseStyles,
-    backgroundColor: '#404954',
-  }),
-  option: (baseStyles, state) => ({
-    ...baseStyles,
-    backgroundColor: state.isSelected ? '#0d6efd' : 
-                     state.isFocused ? '#495057' : '#404954',
-    color: 'white',
-    '&:hover': {
-      backgroundColor: '#495057',
-    }
-  }),
-  singleValue: (baseStyles) => ({
-    ...baseStyles,
-    color: 'white',
-  }),
-  input: (baseStyles) => ({
-    ...baseStyles,
-    color: 'white',
-  }),
-  placeholder: (baseStyles) => ({
-    ...baseStyles,
-    color: '#adb5bd',
-  }),
-  loadingMessage: (baseStyles) => ({
-    ...baseStyles,
-    color: 'white',
-  }),
-  noOptionsMessage: (baseStyles) => ({
-    ...baseStyles,
-    color: 'white',
-  }),
-  multiValue: (baseStyles) => ({
-    ...baseStyles,
-    backgroundColor: '#495057',
-  }),
-  multiValueLabel: (baseStyles) => ({
-    ...baseStyles,
-    color: 'white',
-  }),
-  multiValueRemove: (baseStyles) => ({
-    ...baseStyles,
-    color: 'white',
-    '&:hover': {
-      backgroundColor: '#dc3545',
-      color: 'white',
-    }
-  }),
-};
 
 const ContractForm = ({
   initialData = {},
@@ -249,9 +185,9 @@ const ContractForm = ({
     }
   };
 
-  // Hàm xử lý khi chọn phòng với react-select
-  const handleRoomChange = (selectedOption) => {
-    const roomId = selectedOption?.value || "";
+  // Hàm xử lý khi chọn phòng với Select
+  const handleRoomChange = (e) => {
+    const roomId = e.target.value || "";
     
     setFormData(prevState => {
       const newFormData = {
@@ -268,8 +204,11 @@ const ContractForm = ({
     });
   };
 
-  // Hàm xử lý khi chọn người thuê với react-select
-  const handleTenantChange = (selectedOption) => {
+  // Hàm xử lý khi chọn người thuê với Select
+  const handleTenantChange = (e) => {
+    const tenantId = e.target.value;
+    const selectedOption = tenants.find(tenant => tenant.value === tenantId);
+    
     if (selectedOption && !selectedTenants.some(t => t.value === selectedOption.value)) {
       const newSelectedTenants = [...selectedTenants, selectedOption];
       setSelectedTenants(newSelectedTenants);
@@ -294,55 +233,36 @@ const ContractForm = ({
     onSubmit(formData);
   };
 
-  // Hiển thị phòng đã chọn trong dropdown khi ở chế độ edit
-  const getSelectedRoomOption = () => {
-    if (formData.room_id && rooms.length > 0) {
-      const selectedRoom = rooms.find(room => room.value === formData.room_id);
-      return selectedRoom || null;
-    }
-    return null;
-  };
-
-  console.log("formData.room:", formData.room);
-
   return (
     <form onSubmit={handleSubmit}>
       <div className="row g-3">
         {!roomId && (
           <div className="col-md-6">
-            <div className="mb-3">
-              <label className="form-label">Phòng</label>
-              <ReactSelect
-                options={rooms}
-                value={getSelectedRoomOption()}
-                onChange={handleRoomChange}
-                isDisabled={isSubmitting || mode === "edit"} // Disable nếu đang ở chế độ edit
-                placeholder={mode === "edit" ? formData.room.room_number + " - " + formData.room.house.name : "Chọn phòng"}
-                className="basic-single"
-                classNamePrefix="select"
-                isClearable={mode !== "edit"}
-                styles={darkModeSelectStyles}
-              />
-              {errors.room_id && <div className="invalid-feedback d-block">{errors.room_id}</div>}
-            </div>
+            <Select
+              label="Phòng"
+              name="room_id"
+              value={formData.room_id}
+              onChange={handleRoomChange}
+              options={rooms}
+              placeholder={mode === "edit" ? `${formData.room?.room_number} - ${formData.room?.house?.name}` : "Chọn phòng"}
+              error={errors.room_id}
+              disabled={isSubmitting || mode === "edit"}
+              isClearable={mode !== "edit"}
+            />
           </div>
         )}
 
         <div className="col-md-6">
-          <label className="form-label">Người thuê</label>
-            <ReactSelect
-              options={tenants}
-              onChange={handleTenantChange}
-              isDisabled={loadingTenants || isSubmitting}
-              placeholder={loadingTenants ? "Đang tải..." : "Chọn người thuê"}
-              className="basic-single"
-              classNamePrefix="select"
-              isSearchable
-              isClearable
-              styles={darkModeSelectStyles}
-            />
-          {errors.user_ids && <div className="invalid-feedback d-block">{errors.user_ids}</div>}
-          
+          <Select
+            label="Người thuê"
+            name="tenant_select"
+            onChange={handleTenantChange}
+            options={tenants}
+            placeholder={loadingTenants ? "Đang tải..." : "Chọn người thuê"}
+            disabled={loadingTenants || isSubmitting}
+            error={errors.user_ids}
+            isClearable
+          />
           <div className="mt-2">
             {selectedTenants.length === 0 && (
               <div className="text-muted">Chưa có người thuê nào được chọn</div>
