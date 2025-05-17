@@ -228,6 +228,23 @@ const RoomList = ({ houseId, embedded = false, fromHouseDetail = false }) => {
         return <span className={statusColor}>{statusText}</span>;
       },
     },
+    {
+      accessorKey: "currentContract",
+      header: "Hợp đồng",
+      cell: ({ row }) => {
+        const currentContract = row.original.currentContract;
+        
+        if (currentContract) {
+          return (
+            <Link to={`/contracts/${currentContract.id}`} className="text-primary">
+              Xem hợp đồng
+            </Link>
+          );
+        } else {
+          return <span className="text-muted">Chưa có hợp đồng</span>;
+        }
+      }
+    },
     // Only show created_at in standalone mode
     ...(!embedded
       ? [
@@ -264,7 +281,7 @@ const RoomList = ({ houseId, embedded = false, fromHouseDetail = false }) => {
       per_page: perPage,
       sort_by: sortBy,
       sort_dir: sortDir,
-      include: "house",
+      include: "house,currentContract",
     };
 
     // When embedded, always use the provided houseId

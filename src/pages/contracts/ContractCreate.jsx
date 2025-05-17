@@ -57,7 +57,7 @@ const ContractCreate = () => {
 
       <Card>
         <ContractForm
-          initialData={{ room_id: roomId, status: "pending", payment_day: 1 }}
+          initialData={{ room_id: roomId, status: "pending" }}
           onSubmit={handleSubmit}
           isSubmitting={isSubmitting}
           errors={errors}

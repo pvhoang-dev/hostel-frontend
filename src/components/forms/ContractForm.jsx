@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { roomService } from "../../api/rooms";
-import { userService } from "../../api/users";
 import { contractService } from "../../api/contracts";
 import Input from "../common/Input";
 import Select from "../common/Select";
@@ -16,8 +15,6 @@ const ContractForm = ({
   mode = "create",
   roomId = null,
 }) => {
-  console.log("ContractForm initialData:", initialData);
-
   const [formData, setFormData] = useState({
     room_id: roomId || initialData?.room?.id || "",
     user_ids: initialData.user_ids || [],
@@ -27,9 +24,10 @@ const ContractForm = ({
       .split("T")[0],
     monthly_price: 0,
     deposit_amount: 0,
-    payment_day: 5,
     status: "active",
     notes: "",
+    auto_renew: initialData?.auto_renew || false,
+    time_renew: initialData?.time_renew || 0,
     ...initialData,
   });
 
@@ -39,24 +37,19 @@ const ContractForm = ({
   const [loadingTenants, setLoadingTenants] = useState(false);
 
   useEffect(() => {
-    console.log("useEffect chính được gọi với initialData:", initialData);
-    
     if (!roomId) {
       loadRooms();
     }
     
     // Khởi tạo giá trị khi ở chế độ edit
     if (mode === "edit" && initialData) {
-      console.log("Kiểm tra tenants trong initialData:", initialData.tenants);
-      console.log("Kiểm tra users trong initialData:", initialData.users);
-      
       // Nếu có tenants (từ API trả về)
       if (initialData.tenants && initialData.tenants.length > 0) {
         const selectedUsers = initialData.tenants.map(tenant => ({
           value: tenant.id,
           label: `${tenant.name} (${tenant.email})`
         }));
-        console.log("Khởi tạo selectedTenants từ tenants:", selectedUsers);
+
         setSelectedTenants(selectedUsers);
         
         // Đưa danh sách tenants vào danh sách người thuê có sẵn
@@ -76,7 +69,7 @@ const ContractForm = ({
           value: user.id,
           label: `${user.name} (${user.email})`
         }));
-        console.log("Khởi tạo selectedTenants từ users:", selectedUsers);
+
         setSelectedTenants(selectedUsers);
         
         // Đưa danh sách users vào danh sách người thuê có sẵn
@@ -126,22 +119,14 @@ const ContractForm = ({
   const loadTenants = async (roomId) => {
     try {
       setLoadingTenants(true);
-      console.log("Đang tải danh sách người thuê cho phòng:", roomId);
-      
       const params = { room_id: roomId };
-      
-      console.log("Params gửi đến API getAvailableTenants:", params);
       const response = await contractService.getAvailableTenants(params);
-      console.log("Kết quả API getAvailableTenants:", response);
       
       if (response.success) {
         const tenantsData = response.data.map((user) => ({
           value: user.id,
           label: `${user.name} (${user.email})`,
         }));
-        
-        console.log("Tenants data từ API:", tenantsData);
-        console.log("Selected tenants hiện tại:", selectedTenants);
                 
         // Kết hợp danh sách từ API với danh sách người thuê đã chọn
         const combinedTenants = [...tenantsData];
@@ -153,7 +138,6 @@ const ContractForm = ({
           }
         });
         
-        console.log("Danh sách người thuê kết hợp cuối cùng:", combinedTenants);
         setTenants(combinedTenants);
       } else {
         console.error("API getAvailableTenants không thành công:", response.message);
@@ -168,7 +152,7 @@ const ContractForm = ({
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    if (["monthly_price", "deposit_amount", "payment_day"].includes(name)) {
+    if (["monthly_price", "deposit_amount"].includes(name)) {
       setFormData({ ...formData, [name]: parseInt(value) || 0 });
     } else if (name === "tenant_select") {
       const selectedTenant = tenants.find(tenant => tenant.value == value);
@@ -185,7 +169,7 @@ const ContractForm = ({
     }
   };
 
-  // Hàm xử lý khi chọn phòng với Select
+  // Hàm xử lý khi chọn phòng
   const handleRoomChange = (e) => {
     const roomId = e.target.value || "";
     
@@ -314,7 +298,7 @@ const ContractForm = ({
             name="monthly_price"
             type="number"
             min="0"
-            value={formData.monthly_price}
+            value={formData.monthly_price || null}
             onChange={handleChange}
             error={errors.monthly_price}
             required
@@ -327,23 +311,9 @@ const ContractForm = ({
             name="deposit_amount"
             type="number"
             min="0"
-            value={formData.deposit_amount}
+            value={formData.deposit_amount || null}
             onChange={handleChange}
             error={errors.deposit_amount}
-            required
-          />
-        </div>
-
-        <div className="col-md-6">
-          <Input
-            label="Ngày thanh toán (hàng tháng)"
-            name="payment_day"
-            type="number"
-            min="1"
-            max="31"
-            value={formData.payment_day}
-            onChange={handleChange}
-            error={errors.payment_day}
             required
           />
         </div>
@@ -361,6 +331,39 @@ const ContractForm = ({
               { value: "terminated", label: "Đã chấm dứt" },
               { value: "expired", label: "Đã hết hạn" },
             ]}
+          />
+        </div>
+
+        <div className="col-md-6">
+          <Select
+            label="Tự động gia hạn"
+            name="auto_renew"
+            value={formData.auto_renew || 0}
+            onChange={
+              (e) => {setFormData({
+                  ...formData,
+                  auto_renew: e.target.value
+                });
+              }
+            }
+            error={errors.auto_renew}
+            options={[
+              { value: 1, label: "Có" },
+              { value: 0, label: "Không" },
+            ]}
+          />
+        </div>
+
+        <div className="col-md-6">
+          <Input
+            label="Thời gian gia hạn (tháng)"
+            name="time_renew"
+            type="number"
+            min="1"
+            value={formData.auto_renew ? formData.time_renew : 0}
+            onChange={handleChange}
+            error={errors.time_renew}
+            disabled={!formData.auto_renew}
           />
         </div>
 
