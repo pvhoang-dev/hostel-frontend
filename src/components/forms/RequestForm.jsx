@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
-import { roomService } from "../../api/rooms";
 import { userService } from "../../api/users";
 import { useAuth } from "../../hooks/useAuth";
-import Select from "../common/Select";
 import Button from "../common/Button";
 import TextArea from "../common/TextArea";
 import Loader from "../common/Loader";
@@ -90,13 +88,15 @@ const RequestForm = ({
       if (user.role === "admin") {
         const response = await userService.getUsers({
           for_requests: "true",
-          include: "house,room,role"
+          include: "house,room,role",
+          per_page: 10000,
         });
         recipients = response.data.data || [];
       } else if (user.role === "manager") {
         const response = await userService.getUsers({
           for_requests: "true",
-          include: "house,room,role"
+          include: "house,room,role",
+          per_page: 10000,
         });
         recipients = response.data.data || [];
       } else if (user.role === "tenant") {

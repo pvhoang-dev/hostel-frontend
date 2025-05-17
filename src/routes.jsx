@@ -65,7 +65,6 @@ import StorageEdit from "./pages/storages/StorageEdit";
 import RequestList from "./pages/requests/RequestList";
 import RequestCreate from "./pages/requests/RequestCreate";
 import RequestDetail from "./pages/requests/RequestDetail";
-import RequestEdit from "./pages/requests/RequestEdit";
 import NotificationList from "./pages/notifications/NotificationList";
 import NotificationCreate from "./pages/notifications/NotificationCreate";
 import NotificationDetail from "./pages/notifications/NotificationDetail";
@@ -706,15 +705,6 @@ const Routes = () => {
           element: (
             <ProtectedRoute
               element={<RequestDetail />}
-              allowedRoles={["admin", "manager", "tenant"]}
-            />
-          ),
-        },
-        {
-          path: "requests/:id/edit",
-          element: (
-            <ProtectedRoute
-              element={<RequestEdit />}
               allowedRoles={["admin", "manager", "tenant"]}
             />
           ),

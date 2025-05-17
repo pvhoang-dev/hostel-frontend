@@ -6,8 +6,8 @@ export const userService = {
     return response.data;
   },
 
-  getUser: async (id) => {
-    const response = await api.get(`/users/${id}`);
+  getUser: async (id, params = {}) => {
+    const response = await api.get(`/users/${id}`, { params });
     return response.data;
   },
 
@@ -31,6 +31,16 @@ export const userService = {
       `/users/change-password/${id}/`,
       passwordData
     );
+    return response.data;
+  },
+
+  getManagersForTenant: async (tenantId) => {
+    const response = await api.get(`/tenant/${tenantId}/managers`);
+    return response.data;
+  },
+
+  getTenantsForManager: async (managerId) => {
+    const response = await api.get(`/manager/${managerId}/tenants`);
     return response.data;
   },
 };
