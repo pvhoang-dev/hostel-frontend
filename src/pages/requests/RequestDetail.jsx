@@ -4,7 +4,6 @@ import { requestService } from "../../api/requests";
 import useAlert from "../../hooks/useAlert";
 import { useAuth } from "../../hooks/useAuth";
 import { userService } from "../../api/users";
-import { notificationService } from "../../api/notifications";
 import Loader from "../../components/common/Loader";
 import Select from "../../components/common/Select";
 
@@ -290,16 +289,6 @@ const RequestDetail = () => {
         content: `Đã chuyển yêu cầu cho ${recipientName}`,
       });
 
-      // Gửi thông báo cho người nhận mới
-      if (newRecipient) {
-        await notificationService.createNotification({
-          user_id: newRecipient.id,
-          type: "request_transferred",
-          content: `${user.name} đã chuyển yêu cầu #${request.id} cho bạn`,
-          url: `/requests/${request.id}`,
-        });
-      }
-
       // Tải lại dữ liệu request và comments
       fetchRequestAndComments();
       window.location.reload();
@@ -336,16 +325,6 @@ const RequestDetail = () => {
         content: `Đã thay đổi người gửi yêu cầu thành ${senderName}`,
       });
 
-      // Gửi thông báo cho người gửi mới
-      if (newSender) {
-        await notificationService.createNotification({
-          user_id: newSender.id,
-          type: "request_sender_changed",
-          content: `${user.name} đã thay đổi người gửi của yêu cầu #${request.id} thành bạn`,
-          url: `/requests/${request.id}`,
-        });
-      }
-
       // Tải lại dữ liệu request và comments
       fetchRequestAndComments();
 
@@ -372,25 +351,6 @@ const RequestDetail = () => {
 
       // Cập nhật lại toàn bộ request để lấy comments mới nhất
       fetchRequestAndComments();
-
-      // Gửi thông báo cho người liên quan
-      if (!autoContent && request) {
-        // Xác định người nhận thông báo (người còn lại)
-        const notificationRecipientId =
-          user.id === request.sender?.id
-            ? request.recipient?.id
-            : request.sender?.id;
-
-        if (notificationRecipientId) {
-          // Tạo thông báo
-          await notificationService.createNotification({
-            user_id: notificationRecipientId,
-            type: "info",
-            content: `${user.name} đã thêm một bình luận vào yêu cầu #${request.id}`,
-            url: `/requests/${request.id}`,
-          });
-        }
-      }
 
       if (!autoContent) {
         showSuccess("Bình luận đã được thêm thành công!");
@@ -499,48 +459,7 @@ const RequestDetail = () => {
       // Tải lại dữ liệu request và comments
       fetchRequestAndComments();
 
-      // Nếu yêu cầu được đánh dấu là hoàn thành, gửi thông báo
       if (isChecked) {
-        // Xác định người cần nhận thông báo
-        const notificationRecipients = [];
-
-        // Trường hợp 1: Nếu manager xử lý request, gửi thông báo cho cả 2 bên
-        if (
-          isManager &&
-          user.id !== request.sender?.id &&
-          user.id !== request.recipient?.id
-        ) {
-          if (request.sender?.id)
-            notificationRecipients.push(request.sender.id);
-          if (request.recipient?.id)
-            notificationRecipients.push(request.recipient.id);
-        }
-        // Trường hợp 2: Nếu người xử lý là sender, gửi thông báo cho recipient
-        else if (user.id === request.sender?.id && request.recipient?.id) {
-          notificationRecipients.push(request.recipient.id);
-        }
-        // Trường hợp 3: Nếu người xử lý là recipient, gửi thông báo cho sender
-        else if (user.id === request.recipient?.id && request.sender?.id) {
-          notificationRecipients.push(request.sender.id);
-        }
-        // Trường hợp 4: Người xử lý là admin hoặc vai trò khác, gửi thông báo cho cả 2 bên
-        else {
-          if (request.sender?.id && user.id !== request.sender.id)
-            notificationRecipients.push(request.sender.id);
-          if (request.recipient?.id && user.id !== request.recipient.id)
-            notificationRecipients.push(request.recipient.id);
-        }
-
-        // Gửi thông báo cho tất cả người nhận trong danh sách
-        for (const recipientId of notificationRecipients) {
-          await notificationService.createNotification({
-            user_id: recipientId,
-            type: "success",
-            content: `Yêu cầu #${request.id} đã được đánh dấu là hoàn thành bởi ${user.name}`,
-            url: `/requests/${request.id}`,
-          });
-        }
-
         // Tự động thêm comment
         await handleCommentSubmit(
           null,

@@ -339,7 +339,7 @@ const HouseList = () => {
                   icon: "mdi-eye",
                   handler: (house) => navigate(`/houses/${house.id}`),
                 },
-                ...(isAdmin && isManager
+                ...(isAdmin || isManager
                   ? [
                       {
                         icon: "mdi-pencil",
