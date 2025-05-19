@@ -26,9 +26,6 @@ const SettingEdit = () => {
     try {
       const response = await settingService.getSetting(id);
 
-      // Kiểm tra và log dữ liệu để debug
-      console.log("Setting data loaded:", response);
-
       if (response.success) {
         // Đảm bảo settingData có cấu trúc đúng cho form
         setSettingData({

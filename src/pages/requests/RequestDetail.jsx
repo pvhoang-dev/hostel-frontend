@@ -78,7 +78,6 @@ const RequestDetail = () => {
     try {
       // Tải thông tin yêu cầu
       const requestResponse = await requestService.getRequest(id);
-      console.log("Request response:", requestResponse);
 
       // Tải dữ liệu từ response
       if (requestResponse && requestResponse.data) {
@@ -90,7 +89,6 @@ const RequestDetail = () => {
 
         // Lấy comments từ response của request
         if (requestResponse.data.comments) {
-          console.log("Comments from request:", requestResponse.data.comments);
           setComments(
             Array.isArray(requestResponse.data.comments)
               ? requestResponse.data.comments

@@ -45,7 +45,6 @@ const ContractEdit = () => {
         contractData.user_ids = contractData.tenants.map(tenant => tenant.id);
       }
       
-      console.log("Contract data after transformation:", contractData);
       setContract(contractData);
 
       // Check permissions

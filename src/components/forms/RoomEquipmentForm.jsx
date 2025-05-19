@@ -406,9 +406,6 @@ const RoomEquipmentForm = ({
         (storage) => storage.equipment.id === parseInt(formData.equipment_id)
       );
 
-      console.log(selectedStorage);
-      console.log(additionalQuantity);
-
       // Kiểm tra xem có đủ thiết bị trong kho không
       if (
         !selectedStorage || 

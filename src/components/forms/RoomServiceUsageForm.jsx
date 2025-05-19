@@ -62,15 +62,6 @@ const RoomServiceForm = ({ roomId, month, year, onFinish, onCancel }) => {
       // Lưu thông tin về hóa đơn trực tiếp vào ref
       apiDataRef.current.hasInvoice = response.data.has_invoice || false;
       apiDataRef.current.invoiceId = response.data.invoice_id || null;
-      
-      console.log("API response:", response.data);
-      console.log("Có hóa đơn cho phòng này trong tháng này?", response.data.has_invoice ? "Có" : "Không");
-      console.log("Giá trị lưu trong ref:", apiDataRef.current);
-
-      // Kiểm tra xem có hóa đơn tồn tại cho phòng này trong tháng/năm này
-      setTimeout(() => {
-        console.log("hasExistingInvoice sau khi set:", apiDataRef.current.hasInvoice);
-      }, 0);
 
       // Set initial service applied state
       const initialServiceApplied = {};
@@ -283,10 +274,6 @@ const RoomServiceForm = ({ roomId, month, year, onFinish, onCancel }) => {
 
       // Lưu dữ liệu để sử dụng trong modal
       setFormattedServices(formattedServicesData);
-      
-      // Kiểm tra hóa đơn từ ref
-      console.log("Kiểm tra hóa đơn từ ref:", apiDataRef.current);
-      console.log("Danh sách dịch vụ bị bỏ chọn:", uncheckedServices);
       
       if (apiDataRef.current.hasInvoice) {
         // Sử dụng confirm thông thường thay vì Modal

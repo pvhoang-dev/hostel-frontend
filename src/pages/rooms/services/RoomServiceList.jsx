@@ -197,20 +197,16 @@ const RoomServiceList = ({ roomId, houseId, embedded = false, tenantView = false
   };
 
   const handleDeleteClick = (service) => {
-    console.log("Attempting to delete service:", service);
     setServiceToDelete(service);
     setShowDeleteModal(true);
   };
 
   const handleCancelDelete = () => {
-    console.log("Cancel delete");
     setShowDeleteModal(false);
     setServiceToDelete(null);
   };
 
   const handleConfirmDelete = async () => {
-    console.log("Confirm delete for service:", serviceToDelete);
-    
     if (!serviceToDelete) {
       console.error("No service selected for deletion");
       return;

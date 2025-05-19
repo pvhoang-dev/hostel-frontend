@@ -34,9 +34,7 @@ const FilterSection = ({
             name="house_id"
             value={filters.house_id}
             onChange={(e) => {
-              // Xử lý filter thay đổi và thông báo cho component cha
               onFilterChange(e);
-              onHouseChange(e.target.value);
             }}
             options={[
               { value: "", label: "Tất cả" },
@@ -338,11 +336,6 @@ const ContractList = () => {
   // Hàm tải contracts
   const loadContracts = async () => {
     try {
-      console.log("Tải contracts với filters:", {
-        house_id, room_id, status, start_date_from, start_date_to,
-        end_date_from, end_date_to, min_rent, max_rent
-      });
-      
       const params = {
         page: currentPage,
         per_page: perPage,
@@ -492,19 +485,15 @@ const ContractList = () => {
             room_id,
             status,
             start_date_from,
-          start_date_to,
-          end_date_from,
-          end_date_to,
-          min_rent,
-          max_rent,
-        }}
-        houses={houses}
-        rooms={filteredRooms.length > 0 ? filteredRooms : rooms}
-        onFilterChange={handleFilterChange}
-        onHouseChange={(value) => {
-          // House filter được xử lý riêng vì liên quan đến việc load rooms
-          console.log("Đã chọn house:", value);
-        }}
+            start_date_to,
+            end_date_from,
+            end_date_to,
+            min_rent,
+            max_rent,
+          }}
+          houses={houses}
+          rooms={filteredRooms.length > 0 ? filteredRooms : rooms}
+          onFilterChange={handleFilterChange}
           onClearFilters={clearFilters}
           onApplyFilters={applyFilters}
         />

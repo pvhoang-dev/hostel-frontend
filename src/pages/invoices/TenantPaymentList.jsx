@@ -273,13 +273,10 @@ const TenantPaymentList = () => {
         description: `Thanh toán HĐ`,
         ...paymentData
       });
-      
-      console.log("Payment API Response:", response);
-      
+            
       // Xử lý kết quả từ API 
       if (response.success && response.data && response.data.checkoutUrl) {
         // Chuyển hướng trực tiếp đến trang thanh toán
-        console.log("Redirecting to checkout URL:", response.data.checkoutUrl);
         window.location.href = response.data.checkoutUrl;
       } else {
         showError(response.message || "Không thể tạo liên kết thanh toán");
