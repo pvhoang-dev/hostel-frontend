@@ -1,11 +1,11 @@
 import { useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { roleService } from "../../api/roles";
-import Table from "../../components/common/Table";
-import Card from "../../components/common/Card";
-import Button from "../../components/common/Button";
-import Input from "../../components/common/Input";
-import Loader from "../../components/common/Loader";
+import Table from "../../components/ui/Table";
+import Card from "../../components/ui/Card";
+import Button from "../../components/ui/Button";
+import Input from "../../components/ui/Input";
+import Loader from "../../components/ui/Loader";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 

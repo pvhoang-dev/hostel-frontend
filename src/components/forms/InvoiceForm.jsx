@@ -2,13 +2,13 @@ import { useState, useEffect } from "react";
 import { roomService } from "../../api/rooms";
 import { paymentMethodService } from "../../api/paymentMethods";
 import { formatCurrency } from "../../utils/formatters";
-import Input from "../common/Input";
-import Select from "../common/Select";
-import TextArea from "../common/TextArea.jsx";
-import Button from "../common/Button";
-import Loader from "../common/Loader";
+import Input from "../ui/Input.jsx";
+import Select from "../ui/Select.jsx";
+import TextArea from "../ui/TextArea.jsx";
+import Button from "../ui/Button.jsx";
+import Loader from "../ui/Loader.jsx";
 import useApi from "../../hooks/useApi";
-import Checkbox from "../common/Checkbox";
+import Checkbox from "../ui/Checkbox.jsx";
 
 const InvoiceForm = ({
   initialData = {},

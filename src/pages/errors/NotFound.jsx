@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import Button from "../../components/common/Button.jsx";
+import Button from "../../components/ui/Button.jsx";
 
 const NotFound = () => {
   return (

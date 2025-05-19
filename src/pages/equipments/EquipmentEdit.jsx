@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { equipmentService } from "../../api/equipments";
 import EquipmentForm from "../../components/forms/EquipmentForm";
-import Card from "../../components/common/Card";
-import Loader from "../../components/common/Loader";
+import Card from "../../components/ui/Card";
+import Loader from "../../components/ui/Loader";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 

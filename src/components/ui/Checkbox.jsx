@@ -1,4 +1,3 @@
-// src/components/common/Checkbox.jsx
 import React, { forwardRef } from "react";
 
 const Checkbox = forwardRef(

@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { settingService } from "../../api/settings";
 import SettingForm from "../../components/forms/SettingForm";
-import Card from "../../components/common/Card";
-import Loader from "../../components/common/Loader";
+import Card from "../../components/ui/Card";
+import Loader from "../../components/ui/Loader";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 

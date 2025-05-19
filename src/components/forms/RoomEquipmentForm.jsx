@@ -1,16 +1,16 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
-import Input from "../common/Input";
-import Button from "../common/Button";
-import Card from "../common/Card";
-import Select from "../common/Select";
-import TextArea from "../common/TextArea";
+import Input from "../ui/Input";
+import Button from "../ui/Button";
+import Card from "../ui/Card";
+import Select from "../ui/Select";
+import TextArea from "../ui/TextArea";
 import useApi from "../../hooks/useApi";
 import useAlert from "../../hooks/useAlert";
 import { equipmentService } from "../../api/equipments";
 import { storageService } from "../../api/storages";
-import Loader from "../common/Loader";
+import Loader from "../ui/Loader";
 
 const RoomEquipmentForm = ({
   roomId,

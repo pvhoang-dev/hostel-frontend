@@ -1,7 +1,7 @@
 import { useState } from "react";
-import Input from "../common/Input";
-import Button from "../common/Button";
-import TextArea from "../common/TextArea.jsx";
+import Input from "../ui/Input.jsx";
+import Button from "../ui/Button.jsx";
+import TextArea from "../ui/TextArea.jsx";
 
 const SettingForm = ({
   initialData = {},

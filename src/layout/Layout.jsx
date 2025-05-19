@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import Alert from "../common/Alert";
+import Alert from "../components/ui/Alert";
 import RightBar from "./RightBar";
 import Header from "./Header";
 import SideBar from "./SideBar";

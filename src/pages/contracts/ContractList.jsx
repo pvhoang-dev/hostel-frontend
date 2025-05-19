@@ -3,16 +3,16 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { contractService } from "../../api/contracts";
 import { houseService } from "../../api/houses";
 import { roomService } from "../../api/rooms";
-import Table from "../../components/common/Table";
-import Card from "../../components/common/Card";
-import Button from "../../components/common/Button";
-import Input from "../../components/common/Input";
-import Select from "../../components/common/Select";
-import Loader from "../../components/common/Loader";
+import Table from "../../components/ui/Table";
+import Card from "../../components/ui/Card";
+import Button from "../../components/ui/Button";
+import Input from "../../components/ui/Input";
+import Select from "../../components/ui/Select";
+import Loader from "../../components/ui/Loader";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 import { useAuth } from "../../hooks/useAuth";
-import DatePicker from "../../components/common/DatePicker";
+import DatePicker from "../../components/ui/DatePicker";
 import { formatCurrency, formatDateWithoutTime } from "../../utils/formatters";
 
 // Component con hiển thị phần filter

@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
-import Table from "../../../components/common/Table";
-import Card from "../../../components/common/Card";
-import Loader from "../../../components/common/Loader";
+import Table from "../../../components/ui/Table";
+import Card from "../../../components/ui/Card";
+import Loader from "../../../components/ui/Loader";
 import useApi from "../../../hooks/useApi";
 import useAlert from "../../../hooks/useAlert";
 import { useAuth } from "../../../hooks/useAuth";

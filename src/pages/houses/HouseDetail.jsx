@@ -7,8 +7,8 @@ import { useAuth } from "../../hooks/useAuth";
 import RoomList from "../rooms/RoomList";
 import HouseSettingList from "./settings/HouseSettingList";
 import StorageList from "../storages/StorageList";
-import Card from "../../components/common/Card";
-import Loader from "../../components/common/Loader";
+import Card from "../../components/ui/Card";
+import Loader from "../../components/ui/Loader";
 
 const HouseDetail = ({ tenantView = false }) => {
   const { id } = useParams();

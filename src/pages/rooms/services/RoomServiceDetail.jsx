@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
-import Card from "../../../components/common/Card";
-import Loader from "../../../components/common/Loader";
+import Card from "../../../components/ui/Card";
+import Loader from "../../../components/ui/Loader";
 import useAlert from "../../../hooks/useAlert";
 import useApi from "../../../hooks/useApi";
 import { roomServiceService } from "../../../api/roomServices";

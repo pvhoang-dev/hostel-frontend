@@ -1,8 +1,8 @@
 import { useEffect, useContext } from "react";
 import { useNavigate, useParams, Link, useLocation } from "react-router-dom";
 import { roomService } from "../../api/rooms";
-import Loader from "../../components/common/Loader";
-import Card from "../../components/common/Card";
+import Loader from "../../components/ui/Loader";
+import Card from "../../components/ui/Card";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 import { useAuth } from "../../hooks/useAuth";

@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import Input from "../common/Input";
-import Button from "../common/Button";
-import TextArea from "../common/TextArea";
-import Select from "../common/Select";
+import Input from "../ui/Input";
+import Button from "../ui/Button";
+import TextArea from "../ui/TextArea";
+import Select from "../ui/Select";
 import { houseService } from "../../api/houses";
 
 const HouseSettingForm = ({

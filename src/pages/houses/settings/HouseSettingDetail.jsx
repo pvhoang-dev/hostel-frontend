@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { houseSettingService } from "../../../api/houseSettings";
-import Card from "../../../components/common/Card";
-import Loader from "../../../components/common/Loader";
+import Card from "../../../components/ui/Card";
+import Loader from "../../../components/ui/Loader";
 import useAlert from "../../../hooks/useAlert";
 import { useAuth } from "../../../hooks/useAuth";
 

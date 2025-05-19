@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { serviceService } from "../../api/services";
 import ServiceForm from "../../components/forms/ServiceForm";
-import Card from "../../components/common/Card";
+import Card from "../../components/ui/Card";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { roleService } from "../../api/roles";
 import RoleForm from "../../components/forms/RoleForm";
-import Card from "../../components/common/Card";
+import Card from "../../components/ui/Card";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 

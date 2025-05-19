@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import Loader from "../common/Loader";
+import Loader from "../ui/Loader";
 import PropTypes from "prop-types";
-import Input from "../common/Input";
-import Select from "../common/Select";
-import TextArea from "../common/TextArea";
-import Button from "../common/Button";
-import Checkbox from "../common/Checkbox";
+import Input from "../ui/Input";
+import Select from "../ui/Select";
+import TextArea from "../ui/TextArea";
+import Button from "../ui/Button";
+import Checkbox from "../ui/Checkbox";
 
 const RoomServiceForm = ({
   initialValues,

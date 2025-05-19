@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { userService } from "../../api/users";
 import { useAuth } from "../../hooks/useAuth";
-import Button from "../common/Button";
-import TextArea from "../common/TextArea";
-import Loader from "../common/Loader";
-import Select from "../common/Select";
+import Button from "../ui/Button";
+import TextArea from "../ui/TextArea";
+import Loader from "../ui/Loader";
+import Select from "../ui/Select";
 
 const RequestForm = ({
   initialData = {},

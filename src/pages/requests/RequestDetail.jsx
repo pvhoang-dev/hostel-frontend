@@ -4,8 +4,8 @@ import { requestService } from "../../api/requests";
 import useAlert from "../../hooks/useAlert";
 import { useAuth } from "../../hooks/useAuth";
 import { userService } from "../../api/users";
-import Loader from "../../components/common/Loader";
-import Select from "../../components/common/Select";
+import Loader from "../../components/ui/Loader";
+import Select from "../../components/ui/Select";
 
 const RequestDetail = () => {
   const { id } = useParams();

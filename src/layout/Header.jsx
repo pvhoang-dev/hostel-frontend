@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from "react";
-import { useAuth } from "../../hooks/useAuth";
+import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
-import { notificationService } from "../../api/notifications";
-import { formatNotificationTime } from "../../utils/validators";
+import { notificationService } from "../api/notifications";
+import { formatNotificationTime } from "../utils/validators";
 
 const Header = () => {
   const { user, logout } = useAuth();

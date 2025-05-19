@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { roomService } from "../../api/rooms";
 import RoomForm from "../../components/forms/RoomForm";
-import Card from "../../components/common/Card";
+import Card from "../../components/ui/Card";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 

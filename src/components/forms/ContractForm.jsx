@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { roomService } from "../../api/rooms";
 import { contractService } from "../../api/contracts";
-import Input from "../common/Input";
-import Select from "../common/Select";
-import Button from "../common/Button";
-import TextArea from "../common/TextArea";
-import DatePicker from "../common/DatePicker";
+import Input from "../ui/Input";
+import Select from "../ui/Select";
+import Button from "../ui/Button";
+import TextArea from "../ui/TextArea";
+import DatePicker from "../ui/DatePicker";
 
 const ContractForm = ({
   initialData = {},
