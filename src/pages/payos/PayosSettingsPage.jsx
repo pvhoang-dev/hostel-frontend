@@ -4,8 +4,11 @@ import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import configService from '../../api/configs';
 import useApi from '../../hooks/useApi';
+import useAlert from '../../hooks/useAlert';
 
 const PayosSettingsPage = () => {
+  const {showSuccess, showError} = useAlert();
+
   // API hooks
   const { 
     data: payosConfigsData, 
@@ -92,11 +95,11 @@ const PayosSettingsPage = () => {
       
       await Promise.all(updates);
       
-      toast.success('Cập nhật cấu hình PayOS thành công');
+      showSuccess('Cập nhật cấu hình PayOS thành công');
       fetchPayosConfigs();
     } catch (error) {
       console.error('Lỗi khi cập nhật:', error);
-      toast.error('Có lỗi xảy ra khi cập nhật cấu hình');
+      showError('Có lỗi xảy ra khi cập nhật cấu hình');
     }
   };
 

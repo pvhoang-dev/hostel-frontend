@@ -66,3 +66,14 @@ export const capitalizeFirstLetter = (string) => {
 export const formatFullName = (firstName, lastName) => {
   return [firstName, lastName].filter(Boolean).join(" ");
 };
+
+export const formatPaymentDate = (dateString) => {
+  if (!dateString) return "";
+  
+  // Nếu chuỗi ngày đã có định dạng YYYY-MM-DD HH:MM:SS, cắt lấy phần ngày
+  if (dateString.includes(" ")) {
+    return dateString.split(" ")[0];
+  }
+  
+  return dateString;
+};

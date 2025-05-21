@@ -273,10 +273,10 @@ const ContractList = () => {
             statusClass = "text-danger";
             return <span className={statusClass}>Đã chấm dứt</span>;
           case "expired":
-            statusClass = "text-secondary";
+            statusClass = "text-warning";
             return <span className={statusClass}>Đã hết hạn</span>;
           default:
-            statusClass = "text-secondary";
+            statusClass = "text-warning";
             return <span className={statusClass}>{status}</span>;
         }
       },

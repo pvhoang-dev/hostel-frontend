@@ -9,7 +9,7 @@ import Button from "../ui/Button.jsx";
 import Loader from "../ui/Loader.jsx";
 import useApi from "../../hooks/useApi";
 import Checkbox from "../ui/Checkbox.jsx";
-
+import { formatPaymentDate } from "../../utils/formatters";
 const InvoiceForm = ({
   initialData = {},
   onSubmit,
@@ -32,7 +32,7 @@ const InvoiceForm = ({
     // Thêm các trường liên quan đến thanh toán
     payment_method_id: initialData.payment_method_id || 1,
     payment_status: initialData.payment_status || "pending",
-    payment_date: initialData.payment_date || "",
+    payment_date: formatPaymentDate(initialData.payment_date) || "",
     transaction_code: initialData.transaction_code || "",
   });
 
@@ -202,6 +202,9 @@ const InvoiceForm = ({
   const selectedRoom = rooms.find(
     (room) => room.id === parseInt(formData.room_id)
   );
+
+  console.log(formData.payment_date);
+  
 
   return (
     <form onSubmit={handleSubmit}>
