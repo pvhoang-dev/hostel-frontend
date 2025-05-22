@@ -52,11 +52,7 @@ const FilterSection = ({
     </div>
 
     <div className="mt-3 d-flex justify-content-end">
-      <Button
-        variant="secondary"
-        onClick={onClearFilters}
-        className=" mr-2"
-      >
+      <Button variant="secondary" onClick={onClearFilters} className=" mr-2">
         Xóa bộ lọc
       </Button>
       <Button onClick={onApplyFilters}>Tìm</Button>
@@ -122,8 +118,10 @@ const ServiceList = () => {
 
   // Fetch data on initial load and when params change
   useEffect(() => {
-    loadServices();
-  }, [currentPage, perPage, sortBy, sortDir, isMetered]);
+    if (!loadingServices) {
+      loadServices();
+    }
+  }, [currentPage, perPage, sortBy, sortDir, isMetered, name, unit]);
 
   const loadServices = async () => {
     const params = {
@@ -204,7 +202,6 @@ const ServiceList = () => {
   };
 
   const clearFilters = () => {
-    // Reset only filter params, keep sorting and per_page
     const paramsToKeep = {
       page: "1",
       per_page: perPage.toString(),
@@ -212,7 +209,6 @@ const ServiceList = () => {
       sort_dir: sortDir,
     };
     setSearchParams(paramsToKeep);
-    loadServices();
   };
 
   return (

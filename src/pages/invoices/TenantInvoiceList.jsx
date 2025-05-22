@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { invoiceService } from "../../api/invoices";
 import { paymentMethodService } from "../../api/paymentMethods";
 import Table from "../../components/ui/Table";
@@ -117,11 +117,7 @@ const FilterSection = ({
       </div>
 
       <div className="mt-3 d-flex justify-content-end">
-        <Button
-          variant="secondary"
-          onClick={onClearFilters}
-          className=" mr-2"
-        >
+        <Button variant="secondary" onClick={onClearFilters} className=" mr-2">
           Xóa bộ lọc
         </Button>
         <Button onClick={onApplyFilters}>Tìm</Button>
@@ -132,9 +128,8 @@ const FilterSection = ({
 
 const TenantInvoiceList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { showSuccess, showError } = useAlert();
+  const { showError } = useAlert();
   const { user } = useAuth();
-  const navigate = useNavigate();
 
   // Get current filters from URL
   const currentPage = Number(searchParams.get("page")) || 1;
@@ -179,28 +174,28 @@ const TenantInvoiceList = () => {
   // Function to render payment status badge
   const getPaymentStatusBadge = (status) => {
     if (!status) return "Chưa thanh toán";
-    
+
     const badgeColors = {
       pending: "warning",
       completed: "success",
       failed: "danger",
-      refunded: "info"
+      refunded: "info",
     };
-    
+
     const statusText = {
       pending: "Chờ thanh toán",
       completed: "Đã thanh toán",
       failed: "Thanh toán thất bại",
-      refunded: "Đã hoàn tiền"
+      refunded: "Đã hoàn tiền",
     };
-    
+
     return (
       <span className={`badge bg-${badgeColors[status]} text-white`}>
         {statusText[status] || status}
       </span>
     );
   };
-  
+
   // Column definitions for the table
   const columns = [
     {
@@ -210,7 +205,10 @@ const TenantInvoiceList = () => {
     {
       accessorKey: "room.room_number",
       header: "Phòng",
-      cell: ({ row }) => `${row.original.room?.house?.name || "N/A"} - Phòng ${row.original.room?.room_number || "N/A"}`,
+      cell: ({ row }) =>
+        `${row.original.room?.house?.name || "N/A"} - Phòng ${
+          row.original.room?.room_number || "N/A"
+        }`,
     },
     {
       accessorKey: "month",
@@ -245,7 +243,10 @@ const TenantInvoiceList = () => {
       header: "Hành động",
       cell: ({ row }) => (
         <div className="d-flex gap-2">
-          <Link to={`/invoices/${row.original.id}`} className="btn btn-sm btn-info">
+          <Link
+            to={`/invoices/${row.original.id}`}
+            className="btn btn-sm btn-info"
+          >
             Chi tiết
           </Link>
         </div>
@@ -403,4 +404,4 @@ const TenantInvoiceList = () => {
   );
 };
 
-export default TenantInvoiceList; 
+export default TenantInvoiceList;

@@ -38,11 +38,7 @@ const FilterSection = ({
     </div>
 
     <div className="mt-3 d-flex justify-content-end">
-      <Button
-        variant="secondary"
-        onClick={onClearFilters}
-        className=" mr-2"
-      >
+      <Button variant="secondary" onClick={onClearFilters} className="mr-2">
         Xóa bộ lọc
       </Button>
       <Button onClick={onApplyFilters}>Tìm</Button>
@@ -105,7 +101,7 @@ const RoleList = () => {
 
   useEffect(() => {
     loadRoles();
-  }, [currentPage, perPage, sortBy, sortDir]);
+  }, [currentPage, perPage, sortBy, sortDir, code, name]);
 
   const loadRoles = async () => {
     const params = {
@@ -175,7 +171,6 @@ const RoleList = () => {
       page: "1",
       per_page: perPage.toString(),
     });
-    loadRoles();
   };
 
   return (

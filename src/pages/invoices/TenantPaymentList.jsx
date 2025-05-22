@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { invoiceService } from "../../api/invoices";
 import { paymentMethodService } from "../../api/paymentMethods";
 import Table from "../../components/ui/Table";
@@ -14,23 +14,31 @@ import { useAuth } from "../../hooks/useAuth";
 import { formatCurrency } from "../../utils/formatters";
 
 // Component con cho phần tính tổng tiền
-const PaymentSummary = ({ selectedInvoices, onPaymentSubmit, paymentMethods, isProcessing }) => {
+const PaymentSummary = ({
+  selectedInvoices,
+  onPaymentSubmit,
+  paymentMethods,
+  isProcessing,
+}) => {
   const [paymentMethodId, setPaymentMethodId] = useState("");
   const [paymentNote, setPaymentNote] = useState("");
-  
-  const totalAmount = selectedInvoices.reduce((sum, invoice) => sum + (invoice.total_amount || 0), 0);
-  
+
+  const totalAmount = selectedInvoices.reduce(
+    (sum, invoice) => sum + (invoice.total_amount || 0),
+    0
+  );
+
   const handleSubmit = () => {
     if (!paymentMethodId) {
       return alert("Vui lòng chọn phương thức thanh toán");
     }
-    
+
     onPaymentSubmit({
       payment_method_id: paymentMethodId,
       note: paymentNote,
     });
   };
-  
+
   return (
     <Card title="Thanh toán hóa đơn đã chọn" className="mb-3">
       <div className="row">
@@ -39,7 +47,8 @@ const PaymentSummary = ({ selectedInvoices, onPaymentSubmit, paymentMethods, isP
             <strong>Số lượng hóa đơn đã chọn:</strong> {selectedInvoices.length}
           </div>
           <div className="mb-3">
-            <strong>Tổng số tiền cần thanh toán:</strong> {formatCurrency(totalAmount)}
+            <strong>Tổng số tiền cần thanh toán:</strong>{" "}
+            {formatCurrency(totalAmount)}
           </div>
         </div>
         <div className="col-md-6">
@@ -67,7 +76,10 @@ const PaymentSummary = ({ selectedInvoices, onPaymentSubmit, paymentMethods, isP
         </div>
       </div>
       <div className="mt-3 d-flex justify-content-end">
-        <Button onClick={handleSubmit} disabled={selectedInvoices.length === 0 || isProcessing}>
+        <Button
+          onClick={handleSubmit}
+          disabled={selectedInvoices.length === 0 || isProcessing}
+        >
           {isProcessing ? "Đang xử lý..." : "Thanh toán hóa đơn đã chọn"}
         </Button>
       </div>
@@ -125,11 +137,7 @@ const FilterSection = ({
       </div>
 
       <div className="mt-3 d-flex justify-content-end">
-        <Button
-          variant="secondary"
-          onClick={onClearFilters}
-          className="mr-2"
-        >
+        <Button variant="secondary" onClick={onClearFilters} className="mr-2">
           Xóa bộ lọc
         </Button>
         <Button onClick={onApplyFilters}>Tìm</Button>
@@ -142,13 +150,12 @@ const TenantPaymentList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { showSuccess, showError } = useAlert();
   const { user } = useAuth();
-  const navigate = useNavigate();
-  
+
   // State để lưu các invoice được chọn
   const [selectedInvoices, setSelectedInvoices] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
-  
+
   // Get current filters from URL
   const currentPage = Number(searchParams.get("page")) || 1;
   const perPage = Number(searchParams.get("per_page")) || 10;
@@ -172,12 +179,10 @@ const TenantPaymentList = () => {
     loading: loadingPaymentMethods,
     execute: fetchPaymentMethods,
   } = useApi(paymentMethodService.getPaymentMethods);
-  
+
   // Thêm API hook cho Payos
-  const {
-    loading: processingPayosPayment,
-    execute: executePayosPayment,
-  } = useApi(invoiceService.createPayosPayment);
+  const { loading: processingPayosPayment, execute: executePayosPayment } =
+    useApi(invoiceService.createPayosPayment);
 
   // Derived state
   const invoices = invoicesData?.data || [];
@@ -201,28 +206,28 @@ const TenantPaymentList = () => {
   // Function to render payment status badge
   const getPaymentStatusBadge = (status) => {
     if (!status) return "Chưa thanh toán";
-    
+
     const badgeColors = {
       pending: "warning",
       completed: "success",
       failed: "danger",
-      refunded: "info"
+      refunded: "info",
     };
-    
+
     const statusText = {
       pending: "Chờ thanh toán",
       completed: "Đã thanh toán",
       failed: "Thanh toán thất bại",
-      refunded: "Đã hoàn tiền"
+      refunded: "Đã hoàn tiền",
     };
-    
+
     return (
       <span className={`badge bg-${badgeColors[status]} text-white`}>
         {statusText[status] || status}
       </span>
     );
   };
-  
+
   // Hàm xử lý chọn/bỏ chọn tất cả
   const handleSelectAll = () => {
     if (selectAll) {
@@ -230,17 +235,20 @@ const TenantPaymentList = () => {
     } else {
       // Chỉ chọn các hóa đơn có trạng thái pending
       const pendingInvoices = invoices.filter(
-        (invoice) => invoice.payment_status === "pending" || !invoice.payment_status
+        (invoice) =>
+          invoice.payment_status === "pending" || !invoice.payment_status
       );
       setSelectedInvoices(pendingInvoices);
     }
     setSelectAll(!selectAll);
   };
-  
+
   // Hàm xử lý chọn/bỏ chọn một hóa đơn
   const handleSelectInvoice = (invoice) => {
-    if (selectedInvoices.some(item => item.id === invoice.id)) {
-      setSelectedInvoices(selectedInvoices.filter(item => item.id !== invoice.id));
+    if (selectedInvoices.some((item) => item.id === invoice.id)) {
+      setSelectedInvoices(
+        selectedInvoices.filter((item) => item.id !== invoice.id)
+      );
       setSelectAll(false);
     } else {
       setSelectedInvoices([...selectedInvoices, invoice]);
@@ -253,28 +261,31 @@ const TenantPaymentList = () => {
       }
     }
   };
-  
+
   // Hàm xử lý thanh toán nhiều hóa đơn qua Payos
   const handleBatchPayment = async (paymentData) => {
     if (selectedInvoices.length === 0) {
       showError("Vui lòng chọn ít nhất một hóa đơn để thanh toán");
       return;
     }
-    
-    const invoiceIds = selectedInvoices.map(invoice => invoice.id);
-    const totalAmount = selectedInvoices.reduce((sum, invoice) => sum + (invoice.total_amount || 0), 0);
-    
+
+    const invoiceIds = selectedInvoices.map((invoice) => invoice.id);
+    const totalAmount = selectedInvoices.reduce(
+      (sum, invoice) => sum + (invoice.total_amount || 0),
+      0
+    );
+
     try {
       setIsProcessingPayment(true);
-      
+
       // Tạo thanh toán trên Payos
       const response = await executePayosPayment(invoiceIds, {
         amount: totalAmount,
         description: `Thanh toán HĐ`,
-        ...paymentData
+        ...paymentData,
       });
-            
-      // Xử lý kết quả từ API 
+
+      // Xử lý kết quả từ API
       if (response.success && response.data && response.data.checkoutUrl) {
         // Chuyển hướng trực tiếp đến trang thanh toán
         window.location.href = response.data.checkoutUrl;
@@ -289,29 +300,34 @@ const TenantPaymentList = () => {
       setIsProcessingPayment(false);
     }
   };
-  
+
   // Column definitions for the table
   const columns = [
     {
-      id: 'selection',
-      header: 
+      id: "selection",
+      header: (
         <div className="d-flex justify-content-center align-items-center h-100">
-          <input 
-            type="checkbox" 
-            className="form-check-input" 
+          <input
+            type="checkbox"
+            className="form-check-input"
             checked={selectAll}
             onChange={handleSelectAll}
           />
-        </div>,
+        </div>
+      ),
       cell: ({ row }) => {
         // Chỉ cho phép chọn các hóa đơn có trạng thái pending hoặc null
-        const isPending = row.original.payment_status === "pending" || !row.original.payment_status;
-        const isSelected = selectedInvoices.some(item => item.id === row.original.id);
-        
+        const isPending =
+          row.original.payment_status === "pending" ||
+          !row.original.payment_status;
+        const isSelected = selectedInvoices.some(
+          (item) => item.id === row.original.id
+        );
+
         return (
           <div className="d-flex justify-content-center align-items-center h-100">
-            <input 
-              type="checkbox" 
+            <input
+              type="checkbox"
               className="form-check-input"
               checked={isSelected}
               disabled={!isPending}
@@ -329,7 +345,10 @@ const TenantPaymentList = () => {
     {
       accessorKey: "room.room_number",
       header: "Phòng",
-      cell: ({ row }) => `${row.original.room?.house?.name || "N/A"} - Phòng ${row.original.room?.room_number || "N/A"}`,
+      cell: ({ row }) =>
+        `${row.original.room?.house?.name || "N/A"} - Phòng ${
+          row.original.room?.room_number || "N/A"
+        }`,
     },
     {
       accessorKey: "month",
@@ -364,7 +383,10 @@ const TenantPaymentList = () => {
       header: "Hành động",
       cell: ({ row }) => (
         <div className="d-flex gap-2">
-          <Link to={`/invoices/${row.original.id}`} className="btn btn-sm btn-info">
+          <Link
+            to={`/invoices/${row.original.id}`}
+            className="btn btn-sm btn-info"
+          >
             Chi tiết
           </Link>
         </div>
@@ -468,35 +490,35 @@ const TenantPaymentList = () => {
     const cancel = searchParams.get("cancel");
     const orderCode = searchParams.get("orderCode");
     const invoiceIds = searchParams.get("invoice_ids");
-    
+
     // Chỉ xử lý khi có đầy đủ các tham số cần thiết
     if (!orderCode || (!success && !cancel) || !user) {
       return; // Không làm gì nếu không đủ tham số
     }
-    
+
     const checkPaymentStatus = async () => {
       try {
         // Gọi API để xác nhận trạng thái thanh toán
         const response = await invoiceService.verifyPayment({
           orderCode: orderCode,
-          success: success === 'true',
-          cancel: cancel === 'true',
-          invoice_ids: invoiceIds
+          success: success === "true",
+          cancel: cancel === "true",
+          invoice_ids: invoiceIds,
         });
-        
+
         if (response.success) {
-          if (success === 'true') {
+          if (success === "true") {
             showSuccess("Thanh toán thành công!");
-          } else if (cancel === 'true') {
+          } else if (cancel === "true") {
             showError("Bạn đã hủy thanh toán", "info");
           }
-          
+
           // Tải lại danh sách hóa đơn
           loadInvoices();
         } else {
           showError("Không thể xác thực trạng thái thanh toán");
         }
-        
+
         // Xóa query params để tránh xử lý lại khi refresh trang
         const newSearchParams = new URLSearchParams(searchParams);
         newSearchParams.delete("success");
@@ -509,9 +531,9 @@ const TenantPaymentList = () => {
         console.error(error);
       }
     };
-    
+
     checkPaymentStatus();
-    
+
     // Chỉ chạy khi searchParams hoặc user thay đổi
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, searchParams]);
@@ -531,10 +553,10 @@ const TenantPaymentList = () => {
           </Link>
         </div>
       </div>
-      
+
       {selectedInvoices.length > 0 && (
-        <PaymentSummary 
-          selectedInvoices={selectedInvoices} 
+        <PaymentSummary
+          selectedInvoices={selectedInvoices}
           onPaymentSubmit={handleBatchPayment}
           paymentMethods={paymentMethods}
           isProcessing={isProcessingPayment}
@@ -573,4 +595,4 @@ const TenantPaymentList = () => {
   );
 };
 
-export default TenantPaymentList; 
+export default TenantPaymentList;

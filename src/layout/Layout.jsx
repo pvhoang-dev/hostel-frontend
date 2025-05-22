@@ -20,8 +20,7 @@ const Layout = () => {
             </div>
           </div>
         </div>
-      </div>
-      <RightBar />
+      </div>  
     </>
   );
 };

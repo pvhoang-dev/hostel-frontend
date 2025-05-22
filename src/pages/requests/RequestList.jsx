@@ -76,11 +76,7 @@ const FilterSection = ({
     </div>
 
     <div className="mt-3 d-flex justify-content-end">
-      <Button
-        variant="secondary"
-        onClick={onClearFilters}
-        className=" mr-2"
-      >
+      <Button variant="secondary" onClick={onClearFilters} className=" mr-2">
         Xóa bộ lọc
       </Button>
       <Button onClick={onApplyFilters}>Tìm</Button>
@@ -346,7 +342,6 @@ const RequestList = () => {
     };
 
     setSearchParams(baseParams);
-    loadRequests();
   };
 
   // Helper functions

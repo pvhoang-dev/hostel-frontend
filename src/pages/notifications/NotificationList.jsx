@@ -134,7 +134,7 @@ const NotificationList = () => {
   const perPage = Number(searchParams.get("per_page")) || 10;
   const sortBy = searchParams.get("sort_by") || "id";
   const sortDir = searchParams.get("sort_dir") || "desc";
-  const viewAll = searchParams.get("viewAll") || "";
+  const viewAll = searchParams.get("viewAll") || "false";
   const user_id = searchParams.get("user_id") || "";
   const is_read = searchParams.get("is_read") || "";
   const type = searchParams.get("type") || "";
@@ -441,7 +441,6 @@ const NotificationList = () => {
     }
 
     setSearchParams(newParams);
-    loadNotifications();
   };
 
   const isLoading = loadingNotifications || (loadingUsers && canViewOthers);

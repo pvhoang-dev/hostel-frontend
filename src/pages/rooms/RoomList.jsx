@@ -101,11 +101,7 @@ const FilterSection = ({
     </div>
 
     <div className="mt-3 d-flex justify-content-end">
-      <Button
-        variant="secondary"
-        onClick={onClearFilters}
-        className=" mr-2"
-      >
+      <Button variant="secondary" onClick={onClearFilters} className=" mr-2">
         Xóa bộ lọc
       </Button>
       <Button onClick={onApplyFilters}>Tìm</Button>
@@ -233,17 +229,20 @@ const RoomList = ({ houseId, embedded = false, fromHouseDetail = false }) => {
       header: "Hợp đồng",
       cell: ({ row }) => {
         const currentContract = row.original.currentContract;
-        
+
         if (currentContract) {
           return (
-            <Link to={`/contracts/${currentContract.id}`} className="text-primary">
+            <Link
+              to={`/contracts/${currentContract.id}`}
+              className="text-primary"
+            >
               Xem hợp đồng
             </Link>
           );
         } else {
           return <span className="text-muted">Chưa có hợp đồng</span>;
         }
-      }
+      },
     },
     // Only show created_at in standalone mode
     ...(!embedded
@@ -273,7 +272,20 @@ const RoomList = ({ houseId, embedded = false, fromHouseDetail = false }) => {
     if (user && (!loadingHouses || embedded) && !loadingRooms) {
       loadRooms();
     }
-  }, [currentPage, perPage, sortBy, sortDir, house_id, status, user, houseId]);
+  }, [
+    currentPage,
+    perPage,
+    sortBy,
+    sortDir,
+    house_id,
+    status,
+    user,
+    houseId,
+    room_number,
+    capacity,
+    min_price,
+    max_price,
+  ]);
 
   const loadRooms = async () => {
     const params = {
@@ -417,7 +429,6 @@ const RoomList = ({ houseId, embedded = false, fromHouseDetail = false }) => {
         page: "1",
         per_page: perPage.toString(),
       });
-      loadRooms();
     }
   };
 

@@ -45,11 +45,7 @@ const FilterSection = ({
       )}
     </div>
     <div className="mt-3 d-flex justify-content-end">
-      <Button
-        variant="secondary"
-        onClick={onClearFilters}
-        className=" mr-2"
-      >
+      <Button variant="secondary" onClick={onClearFilters} className=" mr-2">
         Xóa bộ lọc
       </Button>
       <Button onClick={onApplyFilters}>Tìm</Button>
@@ -129,7 +125,7 @@ const PaymentMethodList = () => {
 
   useEffect(() => {
     loadPaymentMethods();
-  }, [currentPage, perPage, sortBy, sortDir, status]);
+  }, [currentPage, perPage, sortBy, sortDir, status, name]);
 
   const loadPaymentMethods = async () => {
     const params = {
@@ -201,7 +197,6 @@ const PaymentMethodList = () => {
       page: "1",
       per_page: perPage.toString(),
     });
-    loadPaymentMethods();
   };
 
   return (

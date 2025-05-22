@@ -52,7 +52,7 @@ const FilterSection = ({
         <Select
           label="Vai trò"
           name="role_id"
-          value={filters.roleId}
+          value={filters.role_id}
           onChange={onFilterChange}
           options={[
             { value: "", label: "Tất cả" },
@@ -77,11 +77,7 @@ const FilterSection = ({
     </div>
 
     <div className="mt-3 d-flex justify-content-end">
-      <Button
-        variant="secondary"
-        onClick={onClearFilters}
-        className=" mr-2"
-      >
+      <Button variant="secondary" onClick={onClearFilters} className=" mr-2">
         Xóa bộ lọc
       </Button>
       <Button onClick={onApplyFilters}>Tìm</Button>
@@ -184,7 +180,17 @@ const UserList = () => {
     if (!loadingRoles && !loadingUsers) {
       loadUsers();
     }
-  }, [currentPage, perPage, sortBy, sortDir, roleId, status]);
+  }, [
+    currentPage,
+    perPage,
+    sortBy,
+    sortDir,
+    roleId,
+    status,
+    username,
+    name,
+    email,
+  ]);
 
   const loadUsers = async () => {
     const params = {
@@ -257,11 +263,12 @@ const UserList = () => {
   };
 
   const clearFilters = () => {
+    // Only keep page and per_page parameters
     setSearchParams({
       page: "1",
       per_page: perPage.toString(),
     });
-    loadUsers();
+    // Don't call loadUsers() here - let the useEffect handle it
   };
 
   const isLoading = loadingUsers || loadingRoles;
@@ -276,7 +283,13 @@ const UserList = () => {
       </div>
 
       <FilterSection
-        filters={{ username, name, email, roleId, status }}
+        filters={{
+          username,
+          name,
+          email,
+          role_id: roleId,
+          status,
+        }}
         roles={roles}
         onFilterChange={handleFilterChange}
         onClearFilters={clearFilters}

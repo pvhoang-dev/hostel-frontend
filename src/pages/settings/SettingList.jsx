@@ -48,11 +48,7 @@ const FilterSection = ({
     </div>
 
     <div className="mt-3 d-flex justify-content-end">
-      <Button
-        variant="secondary"
-        onClick={onClearFilters}
-        className=" mr-2"
-      >
+      <Button variant="secondary" onClick={onClearFilters} className=" mr-2">
         Xóa bộ lọc
       </Button>
       <Button onClick={onApplyFilters}>Tìm</Button>
@@ -64,7 +60,7 @@ const SettingList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { showSuccess, showError } = useAlert();
   const navigate = useNavigate();
-  const { user, isAdmin, isManager, isTenant } = useAuth();
+  const { isTenant } = useAuth();
 
   // Xác định nếu người dùng là tenant
   const isInTenantView = isTenant;
@@ -127,7 +123,7 @@ const SettingList = () => {
 
   useEffect(() => {
     loadSettings();
-  }, [currentPage, perPage, sortBy, sortDir]);
+  }, [currentPage, perPage, sortBy, sortDir, key, value, description]);
 
   const loadSettings = async () => {
     const params = {
@@ -198,7 +194,6 @@ const SettingList = () => {
       page: "1",
       per_page: perPage.toString(),
     });
-    loadSettings();
   };
 
   return (

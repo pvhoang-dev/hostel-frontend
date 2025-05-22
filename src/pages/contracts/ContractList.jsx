@@ -138,11 +138,7 @@ const FilterSection = ({
       </div>
 
       <div className="mt-3 d-flex justify-content-end">
-        <Button
-          variant="secondary"
-          onClick={onClearFilters}
-          className=" mr-2"
-        >
+        <Button variant="secondary" onClick={onClearFilters} className=" mr-2">
           Xóa bộ lọc
         </Button>
         <Button onClick={onApplyFilters}>Tìm</Button>
@@ -313,7 +309,21 @@ const ContractList = () => {
     if (user) {
       loadContracts();
     }
-  }, [currentPage, perPage, sortBy, sortDir, house_id, room_id, status]);
+  }, [
+    currentPage,
+    perPage,
+    sortBy,
+    sortDir,
+    house_id,
+    room_id,
+    status,
+    start_date_from,
+    start_date_to,
+    end_date_from,
+    end_date_to,
+    min_rent,
+    max_rent,
+  ]);
 
   // Tải phòng khi house_id thay đổi
   useEffect(() => {
@@ -324,7 +334,7 @@ const ContractList = () => {
       setFilteredRooms([]);
       if (room_id) {
         // Xóa room_id nếu house_id không còn
-        setSearchParams(prev => {
+        setSearchParams((prev) => {
           const newParams = new URLSearchParams(prev);
           newParams.delete("room_id");
           return newParams;
@@ -372,7 +382,7 @@ const ContractList = () => {
 
     try {
       const response = await fetchRooms({ house_id: houseId });
-      
+
       if (response.success) {
         setFilteredRooms(response.data.data || []);
       } else {
@@ -406,7 +416,7 @@ const ContractList = () => {
 
   // Xử lý chuyển trang
   const handlePageChange = (page) => {
-    setSearchParams(prev => {
+    setSearchParams((prev) => {
       const newParams = new URLSearchParams(prev);
       newParams.set("page", page.toString());
       return newParams;
@@ -416,7 +426,7 @@ const ContractList = () => {
   // Xử lý thay đổi sắp xếp
   const handleSortingChange = (sorting) => {
     if (sorting.length > 0) {
-      setSearchParams(prev => {
+      setSearchParams((prev) => {
         const newParams = new URLSearchParams(prev);
         newParams.set("sort_by", sorting[0].id);
         newParams.set("sort_dir", sorting[0].desc ? "desc" : "asc");
@@ -428,19 +438,19 @@ const ContractList = () => {
   // Xử lý thay đổi filter
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
-    
-    setSearchParams(prev => {
+
+    setSearchParams((prev) => {
       const newParams = new URLSearchParams(prev);
-      
+
       if (value) {
         newParams.set(name, value);
       } else {
         newParams.delete(name);
       }
-      
+
       // Reset về trang 1 khi filter thay đổi
       newParams.set("page", "1");
-      
+
       return newParams;
     });
   };
