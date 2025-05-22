@@ -41,8 +41,7 @@ const Dashboard = () => {
     fetchDashboardData();
   }, []);
 
-  if (loading)
-    return <Loader fullScreen color="primary" showText text="Đang tải..." />;
+  if (loading) return <Loader />;
 
   return (
     <div className="container-fluid py-3">

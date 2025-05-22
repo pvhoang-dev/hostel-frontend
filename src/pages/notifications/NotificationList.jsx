@@ -32,7 +32,7 @@ const FilterSection = ({
             value={filters.viewAll}
             onChange={onFilterChange}
             options={[
-              { value: "", label: "Chỉ của tôi" },
+              { value: "false", label: "Chỉ của tôi" },
               { value: "true", label: "Tất cả" },
             ]}
           />
@@ -84,6 +84,8 @@ const FilterSection = ({
             { value: "success", label: "Thành công" },
             { value: "danger", label: "Nguy hiểm" },
             { value: "request", label: "Yêu cầu" },
+            { value: "invoice", label: "Hóa đơn" },
+            { value: "contract", label: "Hợp đồng" },
           ]}
         />
       </div>
@@ -110,11 +112,7 @@ const FilterSection = ({
     </div>
 
     <div className="mt-3 d-flex justify-content-end">
-      <Button
-        variant="secondary"
-        onClick={onClearFilters}
-        className=" mr-2"
-      >
+      <Button variant="secondary" onClick={onClearFilters} className=" mr-2">
         Xóa bộ lọc
       </Button>
       <Button onClick={onApplyFilters}>Tìm</Button>
@@ -309,11 +307,19 @@ const NotificationList = () => {
       include: "user",
     };
 
-    // For admin and manager, always view all notifications by default
-    if (canViewOthers) {
+    // Handle viewAll parameter correctly
+    if (viewAll === "true") {
+      // "Tất cả" option selected - explicitly set viewAll=true
       params.viewAll = "true";
-    } else if (viewAll) {
-      params.viewAll = viewAll;
+    } else if (viewAll === "false") {
+      // "Chỉ của tôi" option selected - explicitly set viewAll=false
+      params.viewAll = "false";
+    } else {
+      // No explicit selection yet (first page load)
+      if (canViewOthers) {
+        // For admins/managers, default to viewAll=true on first page load
+        params.viewAll = "true";
+      }
     }
 
     // Add other filters if they exist
@@ -424,10 +430,17 @@ const NotificationList = () => {
   };
 
   const clearFilters = () => {
-    setSearchParams({
+    const newParams = {
       page: "1",
       per_page: perPage.toString(),
-    });
+    };
+
+    // For admin/manager, default to viewAll=false when clearing filters
+    if (canViewOthers) {
+      newParams.viewAll = "false";
+    }
+
+    setSearchParams(newParams);
     loadNotifications();
   };
 
@@ -460,7 +473,7 @@ const NotificationList = () => {
 
       <FilterSection
         filters={{
-          viewAll: canViewOthers ? "true" : viewAll,
+          viewAll,
           user_id,
           is_read,
           type,
