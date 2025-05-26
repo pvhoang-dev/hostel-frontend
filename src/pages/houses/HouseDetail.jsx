@@ -123,22 +123,12 @@ const HouseDetail = ({ tenantView = false }) => {
             <h5 className="mb-3">Thông tin quản lý</h5>
             {house.manager ? (
               <div className="d-flex align-items-center mb-3">
-                {house.manager.avatar_url ? (
-                  <img
-                    src={house.manager.avatar_url}
-                    alt={house.manager.name}
-                    className="rounded-circle object-fit-cover me-4"
-                    width="40"
-                    height="40"
-                  />
-                ) : (
-                  <div
-                    className="rounded-circle d-flex align-items-center justify-content-center text-white fs-1 me-4 bg-light mr-3"
-                    style={{ width: "40px", height: "40px" }}
-                  >
-                    {house.manager.name.charAt(0).toUpperCase()}
-                  </div>
-                )}
+                <div
+                  className="rounded-circle d-flex align-items-center justify-content-center text-white fs-1 me-4 bg-light mr-3"
+                  style={{ width: "40px", height: "40px" }}
+                >
+                  {house.manager.name.charAt(0).toUpperCase()}
+                </div>
                 <div>
                   <h4 className="fs-5 fw-semibold mb-0">
                     {house.manager.name}
