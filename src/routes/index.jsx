@@ -69,6 +69,7 @@ import NotificationList from "../pages/notifications/NotificationList.jsx";
 import NotificationCreate from "../pages/notifications/NotificationCreate.jsx";
 import NotificationDetail from "../pages/notifications/NotificationDetail.jsx";
 import NotificationEdit from "../pages/notifications/NotificationEdit.jsx";
+import Statistics from "../pages/statistics/Statistics.jsx";
 
 // Protected route wrapper component
 const ProtectedRoute = ({ element, allowedRoles = [] }) => {
@@ -751,6 +752,16 @@ const Routes = () => {
           element: (
             <ProtectedRoute
               element={<MonthlyServiceManagement />}
+              allowedRoles={["admin", "manager"]}
+            />
+          ),
+        },
+        // Statistics routes
+        {
+          path: "statistics",
+          element: (
+            <ProtectedRoute
+              element={<Statistics />}
               allowedRoles={["admin", "manager"]}
             />
           ),
