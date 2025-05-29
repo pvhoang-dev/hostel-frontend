@@ -64,7 +64,7 @@ const ServiceList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { showSuccess, showError } = useAlert();
   const navigate = useNavigate();
-  const { isAdmin } = useAuth();
+  const { isAdmin, isTenant } = useAuth();
 
   // Get current state from URL params
   const currentPage = Number(searchParams.get("page")) || 1;
@@ -215,7 +215,7 @@ const ServiceList = () => {
     <div>
       <div className="d-flex justify-content-between align-items-center my-2">
         <h3>Dịch vụ</h3>
-        {isAdmin && (
+        {!isTenant && (
           <Button as={Link} to="/services/create">
             Thêm
           </Button>

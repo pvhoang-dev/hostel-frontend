@@ -477,7 +477,7 @@ const Routes = () => {
           element: (
             <ProtectedRoute
               element={<ServiceCreate />}
-              allowedRoles={["admin"]}
+              allowedRoles={["admin", "manager"]}
             />
           ),
         },
@@ -559,7 +559,7 @@ const Routes = () => {
           element: (
             <ProtectedRoute
               element={<SettingCreate />}
-              allowedRoles={["admin", "manager"]}
+              allowedRoles={["admin"]}
             />
           ),
         },
@@ -577,7 +577,7 @@ const Routes = () => {
           element: (
             <ProtectedRoute
               element={<SettingEdit />}
-              allowedRoles={["admin", "manager"]}
+              allowedRoles={["admin"]}
             />
           ),
         },

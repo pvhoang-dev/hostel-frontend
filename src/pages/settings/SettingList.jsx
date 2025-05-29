@@ -60,7 +60,7 @@ const SettingList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { showSuccess, showError } = useAlert();
   const navigate = useNavigate();
-  const { isTenant } = useAuth();
+  const { isTenant, isAdmin } = useAuth();
 
   // Xác định nếu người dùng là tenant
   const isInTenantView = isTenant;
@@ -200,7 +200,7 @@ const SettingList = () => {
     <div>
       <div className="d-flex justify-content-between align-items-center my-2">
         <h3>Nội quy chung</h3>
-        {!isInTenantView && (
+        {isAdmin && (
           <Button as={Link} to="/settings/create">
             Thêm
           </Button>
@@ -230,7 +230,7 @@ const SettingList = () => {
             loading={loadingSettings}
             actionColumn={{
               key: "actions",
-              actions: isInTenantView
+              actions: !isAdmin
                 ? [
                     {
                       icon: "mdi-eye",
