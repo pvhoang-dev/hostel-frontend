@@ -273,10 +273,6 @@ const TenantPaymentList = () => {
     }
 
     const invoiceIds = selectedInvoices.map((invoice) => invoice.id);
-    const totalAmount = selectedInvoices.reduce(
-      (sum, invoice) => sum + (invoice.total_amount || 0),
-      0
-    );
 
     try {
       setIsProcessingPayment(true);
@@ -317,19 +313,8 @@ const TenantPaymentList = () => {
         }
       } else {
         try {
-          // Kiểm tra số tiền thanh toán
-          if (totalAmount <= 0) {
-            showError("Tổng số tiền thanh toán phải lớn hơn 0");
-            return;
-          }
-          
-          // Tạo thanh toán trên Payos
-          const response = await executePayosPayment(invoiceIds, {
-            amount: totalAmount,
-            description: paymentData.note 
-              ? `Thanh toán HĐ - Note: ${paymentData.note}` 
-              : `Thanh toán HĐ`,
-          });
+          // Tạo thanh toán trên Payos - backend sẽ tính toán số tiền
+          const response = await executePayosPayment(invoiceIds);
 
           // Xử lý kết quả từ API
           if (response.success && response.data && response.data.checkoutUrl) {

@@ -31,10 +31,9 @@ export const invoiceService = {
     return response.data;
   },
 
-  createPayosPayment: async (invoiceIds, paymentData) => {
+  createPayosPayment: async (invoiceIds) => {
     const response = await api.post(`/payment/create-link-payment`, {
       invoice_ids: invoiceIds,
-      ...paymentData
     });
     return response.data;
   },
