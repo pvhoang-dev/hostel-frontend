@@ -12,7 +12,7 @@ import { formatDate, formatCurrency } from "../../utils/formatters";
 const InvoiceDetail = () => {
   const { id } = useParams();
   const [invoice, setInvoice] = useState(null);
-  const { user, isAdmin, isManager } = useAuth();
+  const { user, isAdmin, isManager, isTenant } = useAuth();
   const { showError, showSuccess } = useAlert();
   const navigate = useNavigate();
 
@@ -293,37 +293,39 @@ const InvoiceDetail = () => {
             </div>
           </div>
 
-          <div className="col-md-12 mb-4">
-            <h5 className="mb-3">Thông tin hệ thống</h5>
-            <div className="table-responsive">
-              <table className="table table-bordered">
-                <thead style={{ backgroundColor: "rgba(0, 0, 0, .075)" }}>
-                  <tr>
-                    <th style={{ width: "200px" }}>Thông tin</th>
-                    <th>Chi tiết</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Người tạo:</td>
-                    <td>{invoice.creator?.username || "N/A"}</td>
-                  </tr>
-                  <tr>
-                    <td>Ngày tạo:</td>
-                    <td>{invoice.created_at}</td>
-                  </tr>
-                  <tr>
-                    <td>Người cập nhật:</td>
-                    <td>{invoice.updater?.username || "N/A"}</td>
-                  </tr>
-                  <tr>
-                    <td>Ngày cập nhật:</td>
-                    <td>{invoice.updated_at}</td>
-                  </tr>
-                </tbody>
-              </table>
+          {!isTenant && (
+            <div className="col-md-12 mb-4">
+              <h5 className="mb-3">Thông tin hệ thống</h5>
+              <div className="table-responsive">
+                <table className="table table-bordered">
+                  <thead style={{ backgroundColor: "rgba(0, 0, 0, .075)" }}>
+                    <tr>
+                      <th style={{ width: "200px" }}>Thông tin</th>
+                      <th>Chi tiết</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Người tạo:</td>
+                      <td>{invoice.creator?.username || "N/A"}</td>
+                    </tr>
+                    <tr>
+                      <td>Ngày tạo:</td>
+                      <td>{invoice.created_at}</td>
+                    </tr>
+                    <tr>
+                      <td>Người cập nhật:</td>
+                      <td>{invoice.updater?.username || "N/A"}</td>
+                    </tr>
+                    <tr>
+                      <td>Ngày cập nhật:</td>
+                      <td>{invoice.updated_at}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </Card>
     </div>

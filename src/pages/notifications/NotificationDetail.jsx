@@ -42,7 +42,7 @@ const NotificationDetail = () => {
   const handleDelete = async () => {
     // Admin can delete any, Managers can delete notifications they can view,
     // Other users can only delete their own
-    if (!(isAdmin || isManager || notification?.user_id === user?.id)) {
+    if (!(isAdmin || isManager || notification?.user.id === user?.id)) {
       showError("Bạn không có quyền xóa thông báo này");
       return;
     }

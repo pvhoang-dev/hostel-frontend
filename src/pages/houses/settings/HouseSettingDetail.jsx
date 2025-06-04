@@ -12,7 +12,7 @@ const HouseSettingDetail = () => {
   const [loading, setLoading] = useState(true);
   const { showError } = useAlert();
   const navigate = useNavigate();
-  const { user, isAdmin, isManager } = useAuth();
+  const { user, isAdmin, isManager, isTenant } = useAuth();
 
   useEffect(() => {
     loadHouseSetting();
@@ -99,39 +99,41 @@ const HouseSettingDetail = () => {
             </div>
           )}
 
-          <div>
-            <h2 className="fs-5 fw-semibold">Thông tin hệ thống</h2>
-            <div className="row g-3">
-              <div className="col-md-6">
-                <p className="mb-1 text-muted">ID</p>
-                <p>{houseSetting.id}</p>
-              </div>
-
-              <div className="col-md-6">
-                <p className="mb-1 text-muted">Ngày tạo</p>
-                <p>{houseSetting.created_at}</p>
-              </div>
-
-              <div className="col-md-6">
-                <p className="mb-1 text-muted">Lần cuối cập nhật</p>
-                <p>{houseSetting.updated_at}</p>
-              </div>
-
-              {houseSetting.creator && (
+          {!isTenant && (
+            <div>
+              <h2 className="fs-5 fw-semibold">Thông tin hệ thống</h2>
+              <div className="row g-3">
                 <div className="col-md-6">
-                  <p className="mb-1 text-muted">Người tạo</p>
-                  <p>{houseSetting.creator.name}</p>
+                  <p className="mb-1 text-muted">ID</p>
+                  <p>{houseSetting.id}</p>
                 </div>
-              )}
 
-              {houseSetting.updater && (
                 <div className="col-md-6">
-                  <p className="mb-1 text-muted">Người cập nhật</p>
-                  <p>{houseSetting.updater.name}</p>
+                  <p className="mb-1 text-muted">Ngày tạo</p>
+                  <p>{houseSetting.created_at}</p>
                 </div>
-              )}
+
+                <div className="col-md-6">
+                  <p className="mb-1 text-muted">Lần cuối cập nhật</p>
+                  <p>{houseSetting.updated_at}</p>
+                </div>
+
+                {houseSetting.creator && (
+                  <div className="col-md-6">
+                    <p className="mb-1 text-muted">Người tạo</p>
+                    <p>{houseSetting.creator.name}</p>
+                  </div>
+                )}
+
+                {houseSetting.updater && (
+                  <div className="col-md-6">
+                    <p className="mb-1 text-muted">Người cập nhật</p>
+                    <p>{houseSetting.updater.name}</p>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </Card>
     </div>

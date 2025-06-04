@@ -158,15 +158,6 @@ const RoomDetail = ({ tenantView = false }) => {
                 </thead>
                 <tbody>
                   <tr>
-                    <td>Tiền đặt cọc:</td>
-                    <td className="text-primary">
-                      {new Intl.NumberFormat("vi-VN", {
-                        style: "currency",
-                        currency: "VND",
-                      }).format(room.deposit || 0)}
-                    </td>
-                  </tr>
-                  <tr>
                     <td>Nhà:</td>
                     <td>
                       <Link
@@ -206,33 +197,35 @@ const RoomDetail = ({ tenantView = false }) => {
             </div>
           )}
 
-          <div className="col-md-12">
-            <h5 className="mb-3">Thông tin hệ thống</h5>
-            <div className="table-responsive">
-              <table className="table table-bordered">
-                <thead style={{ backgroundColor: "rgba(0, 0, 0, .075)" }}>
-                  <tr>
-                    <th style={{ width: "200px" }}>Thông tin</th>
-                    <th>Chi tiết</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>ID:</td>
-                    <td>{room.id}</td>
-                  </tr>
-                  <tr>
-                    <td>Tạo lúc:</td>
-                    <td>{room.created_at}</td>
-                  </tr>
-                  <tr>
-                    <td>Cập nhật lúc:</td>
-                    <td>{room.updated_at}</td>
-                  </tr>
-                </tbody>
-              </table>
+          {!isTenant && (
+            <div className="col-md-12">
+              <h5 className="mb-3">Thông tin hệ thống</h5>
+              <div className="table-responsive">
+                <table className="table table-bordered">
+                  <thead style={{ backgroundColor: "rgba(0, 0, 0, .075)" }}>
+                    <tr>
+                      <th style={{ width: "200px" }}>Thông tin</th>
+                      <th>Chi tiết</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>ID:</td>
+                      <td>{room.id}</td>
+                    </tr>
+                    <tr>
+                      <td>Tạo lúc:</td>
+                      <td>{room.created_at}</td>
+                    </tr>
+                    <tr>
+                      <td>Cập nhật lúc:</td>
+                      <td>{room.updated_at}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </Card>
       

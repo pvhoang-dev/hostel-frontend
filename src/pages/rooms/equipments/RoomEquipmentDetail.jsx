@@ -187,33 +187,35 @@ const RoomEquipmentDetail = () => {
             </div>
           )}
 
-          <div className="col-md-12">
-            <h5 className="mb-3">Thông tin hệ thống</h5>
-            <div className="table-responsive">
-              <table className="table table-bordered">
-                <thead style={{ backgroundColor: "rgba(0, 0, 0, .075)" }}>
-                  <tr>
-                    <th style={{ width: "200px" }}>Thông tin</th>
-                    <th>Chi tiết</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>ID:</td>
-                    <td>{roomEquipment.id}</td>
-                  </tr>
-                  <tr>
-                    <td>Tạo lúc:</td>
-                    <td>{roomEquipment.created_at}</td>
-                  </tr>
-                  <tr>
-                    <td>Cập nhật lúc:</td>
-                    <td>{roomEquipment.updated_at}</td>
-                  </tr>
-                </tbody>
-              </table>
+          {!isTenant && (
+            <div className="col-md-12">
+              <h5 className="mb-3">Thông tin hệ thống</h5>
+              <div className="table-responsive">
+                <table className="table table-bordered">
+                  <thead style={{ backgroundColor: "rgba(0, 0, 0, .075)" }}>
+                    <tr>
+                      <th style={{ width: "200px" }}>Thông tin</th>
+                      <th>Chi tiết</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>ID:</td>
+                      <td>{roomEquipment.id}</td>
+                    </tr>
+                    <tr>
+                      <td>Tạo lúc:</td>
+                      <td>{roomEquipment.created_at}</td>
+                    </tr>
+                    <tr>
+                      <td>Cập nhật lúc:</td>
+                      <td>{roomEquipment.updated_at}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </Card>
     </div>

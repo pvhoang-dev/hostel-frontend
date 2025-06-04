@@ -211,51 +211,53 @@ const ContractDetail = () => {
             </div>
           </div>
 
-          <div className="col-md-6 mb-4">
-            <h5 className="mb-3">Thông tin hệ thống</h5>
-            <div className="table-responsive">
-              <table className="table table-bordered">
-                <thead style={{ backgroundColor: "rgba(0, 0, 0, .075)" }}>
-                  <tr>
-                    <th style={{ width: "40%" }}>Thông tin</th>
-                    <th>Chi tiết</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>ID:</td>
-                    <td>{contract.id}</td>
-                  </tr>
-                  <tr>
-                    <td>Trạng thái:</td>
-                    <td>
-                      <span
-                        className={`badge ${getStatusClass(contract.status)}`}
-                      >
-                        {getStatusText(contract.status)}
-                      </span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Người tạo:</td>
-                    <td>{contract.created_by?.name || "N/A"}</td>
-                  </tr>
-                  <tr>
-                    <td>Người cập nhật:</td>
-                    <td>{contract.updated_by?.name || "N/A"}</td>
-                  </tr>
-                  <tr>
-                    <td>Ngày tạo:</td>
-                    <td>{contract.created_at}</td>
-                  </tr>
-                  <tr>
-                    <td>Ngày cập nhật:</td>
-                    <td>{contract.updated_at}</td>
-                  </tr>
-                </tbody>
-              </table>
+          {!isTenant && (
+            <div className="col-md-6 mb-4">
+              <h5 className="mb-3">Thông tin hệ thống</h5>
+              <div className="table-responsive">
+                <table className="table table-bordered">
+                  <thead style={{ backgroundColor: "rgba(0, 0, 0, .075)" }}>
+                    <tr>
+                      <th style={{ width: "40%" }}>Thông tin</th>
+                      <th>Chi tiết</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>ID:</td>
+                      <td>{contract.id}</td>
+                    </tr>
+                    <tr>
+                      <td>Trạng thái:</td>
+                      <td>
+                        <span
+                          className={`badge ${getStatusClass(contract.status)}`}
+                        >
+                          {getStatusText(contract.status)}
+                        </span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Người tạo:</td>
+                      <td>{contract.created_by?.name || "N/A"}</td>
+                    </tr>
+                    <tr>
+                      <td>Người cập nhật:</td>
+                      <td>{contract.updated_by?.name || "N/A"}</td>
+                    </tr>
+                    <tr>
+                      <td>Ngày tạo:</td>
+                      <td>{contract.created_at}</td>
+                    </tr>
+                    <tr>
+                      <td>Ngày cập nhật:</td>
+                      <td>{contract.updated_at}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Thông tin người thuê */}

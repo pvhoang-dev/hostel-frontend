@@ -466,20 +466,15 @@ const RequestList = () => {
             loading={isLoading}
             actionColumn={{
               key: "actions",
-              actions: [
+              actions: isTenant ? [
                 {
                   icon: "mdi-eye",
                   handler: (request) => navigate(`/requests/${request.id}`),
                 },
+              ] : [
                 {
-                  icon: "mdi-pencil",
-                  handler: (request) => {
-                    if (canEdit(request)) {
-                      navigate(`/requests/${request.id}`);
-                    } else {
-                      showError("Bạn không có quyền sửa yêu cầu này");
-                    }
-                  },
+                  icon: "mdi-eye",
+                  handler: (request) => navigate(`/requests/${request.id}`),
                 },
                 {
                   icon: "mdi-delete",
