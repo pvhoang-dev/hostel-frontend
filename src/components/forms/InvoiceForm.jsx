@@ -31,7 +31,7 @@ const InvoiceForm = ({
     ],
     deleted_service_usage_ids: [], // Để lưu danh sách service_usage_id cần xóa
     // Thêm các trường liên quan đến thanh toán
-    payment_method_id: initialData.payment_method.id || 1,
+    payment_method_id: initialData?.payment_method?.id || 1,
     payment_status: initialData.payment_status || "pending",
     payment_date: formatPaymentDate(initialData.payment_date) || "",
     transaction_code: initialData.transaction_code || "",

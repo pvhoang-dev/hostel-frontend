@@ -182,12 +182,23 @@ const PayosSettingsPage = () => {
                     onChange={handleChange}
                     required
                   />
-                  <Form.Text className="text-muted">
-                    Khóa kiểm tra tính toàn vẹn giao dịch
-                  </Form.Text>
+                  <small className="form-text text-muted">
+                    Khóa kiểm tra chữ ký (Checksum Key) của PayOS để xác thực các giao dịch
+                  </small>
                 </Form.Group>
               </Col>
             </Row>
+            
+            <div className="mb-3">
+              <h6 className="mb-3">Cài đặt Webhook (Bảo mật thanh toán)</h6>
+              <p className="text-muted">
+                Để tăng cường bảo mật giao dịch, vui lòng thiết lập webhook URL trong tài khoản PayOS của bạn:
+              </p>
+              <div className="alert alert-info">
+                <strong>URL Webhook:</strong> <code>{window.location.origin}/api/payment/webhook</code>
+                <p className="mt-2 mb-0 small">Thiết lập webhook giúp xác thực trạng thái thanh toán trực tiếp từ PayOS, ngăn chặn việc giả mạo thanh toán thành công.</p>
+              </div>
+            </div>
             
             <div className="d-flex justify-content-end mt-4">
               <Button variant="primary" type="submit" disabled={updatingConfig}>

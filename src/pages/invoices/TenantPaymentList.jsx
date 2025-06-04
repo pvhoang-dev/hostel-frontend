@@ -529,25 +529,31 @@ const TenantPaymentList = () => {
 
     const checkPaymentStatus = async () => {
       try {
+        // Hiển thị thông báo đang xác thực với Payos
+        showSuccess("Đang xác thực thanh toán với cổng Payos...", "info");
+        
         // Gọi API để xác nhận trạng thái thanh toán
         const response = await invoiceService.verifyPayment({
           orderCode: orderCode,
-          success: success === "true",
+          success: success === "true", 
           cancel: cancel === "true",
           invoice_ids: invoiceIds,
         });
 
         if (response.success) {
-          if (success === "true") {
-            showSuccess("Thanh toán thành công!");
-          } else if (cancel === "true") {
+          if (response.data && response.data.status === 'SUCCESS') {
+            showSuccess("Thanh toán thành công và đã được xác thực!");
+          } else if (response.data && response.data.status === 'CANCELLED') {
             showError("Bạn đã hủy thanh toán", "info");
+          } else {
+            // Xử lý trường hợp API trả về thất bại
+            showError(response.data?.message || "Không thể xác thực thanh toán với Payos.");
           }
 
           // Tải lại danh sách hóa đơn
           loadInvoices();
         } else {
-          showError("Không thể xác thực trạng thái thanh toán");
+          showError(response.message || "Không thể xác thực trạng thái thanh toán");
         }
 
         // Xóa query params để tránh xử lý lại khi refresh trang
@@ -558,8 +564,16 @@ const TenantPaymentList = () => {
         newSearchParams.delete("invoice_ids");
         setSearchParams(newSearchParams);
       } catch (error) {
-        showError("Lỗi khi cập nhật trạng thái thanh toán");
+        showError("Lỗi khi cập nhật trạng thái thanh toán: " + (error.message || "Vui lòng liên hệ quản trị viên"));
         console.error(error);
+        
+        // Xóa query params ngay cả khi có lỗi
+        const newSearchParams = new URLSearchParams(searchParams);
+        newSearchParams.delete("success");
+        newSearchParams.delete("cancel");
+        newSearchParams.delete("orderCode");
+        newSearchParams.delete("invoice_ids");
+        setSearchParams(newSearchParams);
       }
     };
 
