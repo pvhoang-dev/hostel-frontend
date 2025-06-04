@@ -109,6 +109,7 @@ const InvoiceForm = ({
           ...prev,
           [name]: value,
           payment_date: "",
+          transaction_code: "",
         }));
         return;
       } else if (value === "completed") {

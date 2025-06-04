@@ -67,13 +67,15 @@ const PaymentSummary = ({
             ]}
             required
           />
-          <Input
-            label="Ghi chú thanh toán"
-            name="note"
-            value={paymentNote}
-            onChange={(e) => setPaymentNote(e.target.value)}
-            placeholder="Ghi chú thêm về việc thanh toán (không bắt buộc)"
-          />
+          {paymentMethodId === '2' && (
+            <Input
+              label="Ghi chú thanh toán"
+              name="note"
+              value={paymentNote}
+              onChange={(e) => setPaymentNote(e.target.value)}
+              placeholder="Ghi chú thêm về việc thanh toán (không bắt buộc)"
+            />
+          )}
         </div>
       </div>
       <div className="mt-3 d-flex justify-content-end">
@@ -279,49 +281,68 @@ const TenantPaymentList = () => {
     try {
       setIsProcessingPayment(true);
 
-      console.log(paymentData);
+      // Kiểm tra dữ liệu đầu vào hợp lệ
+      if (!paymentData.payment_method_id) {
+        showError("Vui lòng chọn phương thức thanh toán");
+        return;
+      }
 
       // Nếu là thanh toán tiền mặt (payment_method_id = 2)
       if (paymentData.payment_method_id === '2') {
         // Tạo mô tả với note
         const description = paymentData.note 
-          ? `Thanh toán tiền mặt. Note của khách hàng: ${paymentData.note}` 
+          ? `Thanh toán tiền mặt. Note: ${paymentData.note}` 
           : 'Thanh toán tiền mặt';
         
-        // Gọi API để cập nhật hóa đơn thành thanh toán tiền mặt
-        const response = await api.post('/payment/update-cash', {
-          invoice_ids: invoiceIds,
-          payment_method_id: 2,
-          description: description,
-        });
+        try {
+          // Gọi API để cập nhật hóa đơn thành thanh toán tiền mặt
+          const response = await api.post('/payment/update-cash', {
+            invoice_ids: invoiceIds,
+            payment_method_id: 2,
+            description: description,
+          });
 
-        if (response.data.success) {
-          showSuccess("Yêu cầu thanh toán tiền mặt đã được gửi đến quản lý nhà");
-          loadInvoices();
-        } else {
-          showError(response.data.message || "Không thể cập nhật trạng thái thanh toán");
+          if (response.data.success) {
+            showSuccess("Yêu cầu thanh toán tiền mặt đã được gửi đến quản lý nhà");
+            // Đặt lại danh sách đã chọn
+            setSelectedInvoices([]);
+            setSelectAll(false);
+            loadInvoices();
+          } else {
+            showError(response.data.message || "Không thể cập nhật trạng thái thanh toán");
+          }
+        } catch (error) {
+          console.error("Cash payment error:", error);
+          showError(error.response?.data?.message || "Có lỗi xảy ra khi xử lý thanh toán tiền mặt");
         }
       } else {
-        // Nếu là phương thức thanh toán online
-        // Tạo mô tả với note nếu có
-        const description = paymentData.note 
-          ? `Thanh toán HĐ. Note của khách hàng: ${paymentData.note}`
-          : `Thanh toán HĐ`;
+        try {
+          // Kiểm tra số tiền thanh toán
+          if (totalAmount <= 0) {
+            showError("Tổng số tiền thanh toán phải lớn hơn 0");
+            return;
+          }
           
-        // Tạo thanh toán trên Payos
-        const response = await executePayosPayment(invoiceIds, {
-          amount: totalAmount,
-          description: description,
-          ...paymentData,
-        });
+          // Tạo thanh toán trên Payos
+          const response = await executePayosPayment(invoiceIds, {
+            amount: totalAmount,
+            description: paymentData.note 
+              ? `Thanh toán HĐ - Note: ${paymentData.note}` 
+              : `Thanh toán HĐ`,
+          });
 
-        // Xử lý kết quả từ API
-        if (response.success && response.data && response.data.checkoutUrl) {
-          // Chuyển hướng trực tiếp đến trang thanh toán
-          window.location.href = response.data.checkoutUrl;
-        } else {
-          showError(response.message || "Không thể tạo liên kết thanh toán");
-          console.error("API error:", response);
+          // Xử lý kết quả từ API
+          if (response.success && response.data && response.data.checkoutUrl) {
+            showSuccess("Đang chuyển hướng đến cổng thanh toán...");
+            // Chuyển hướng trực tiếp đến trang thanh toán
+            window.location.href = response.data.checkoutUrl;
+          } else {
+            showError(response.message || "Không thể tạo liên kết thanh toán");
+            console.error("API error:", response);
+          }
+        } catch (error) {
+          console.error("Online payment error:", error);
+          showError(error.response?.data?.message || "Có lỗi xảy ra khi tạo liên kết thanh toán");
         }
       }
     } catch (error) {
@@ -532,12 +553,27 @@ const TenantPaymentList = () => {
         // Hiển thị thông báo đang xác thực với Payos
         showSuccess("Đang xác thực thanh toán với cổng Payos...", "info");
         
+        // Kiểm tra xem có invoiceIds không
+        const invoiceIdsArray = invoiceIds ? invoiceIds.split(',') : [];
+        if (invoiceIdsArray.length === 0) {
+          showError("Thiếu thông tin hóa đơn cần thanh toán");
+          
+          // Xóa query params
+          const newSearchParams = new URLSearchParams(searchParams);
+          newSearchParams.delete("success");
+          newSearchParams.delete("cancel");
+          newSearchParams.delete("orderCode");
+          newSearchParams.delete("invoice_ids");
+          setSearchParams(newSearchParams);
+          return;
+        }
+        
         // Gọi API để xác nhận trạng thái thanh toán
         const response = await invoiceService.verifyPayment({
           orderCode: orderCode,
           success: success === "true", 
           cancel: cancel === "true",
-          invoice_ids: invoiceIds,
+          invoice_ids: invoiceIdsArray,
         });
 
         if (response.success) {
