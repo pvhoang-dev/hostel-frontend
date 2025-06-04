@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { invoiceService } from "../../api/invoices";
 import { paymentMethodService } from "../../api/paymentMethods";
+import api from "../../api/axios";
 import Table from "../../components/ui/Table";
 import Card from "../../components/ui/Card";
 import Button from "../../components/ui/Button";
@@ -278,20 +279,50 @@ const TenantPaymentList = () => {
     try {
       setIsProcessingPayment(true);
 
-      // Tạo thanh toán trên Payos
-      const response = await executePayosPayment(invoiceIds, {
-        amount: totalAmount,
-        description: `Thanh toán HĐ`,
-        ...paymentData,
-      });
+      console.log(paymentData);
 
-      // Xử lý kết quả từ API
-      if (response.success && response.data && response.data.checkoutUrl) {
-        // Chuyển hướng trực tiếp đến trang thanh toán
-        window.location.href = response.data.checkoutUrl;
+      // Nếu là thanh toán tiền mặt (payment_method_id = 2)
+      if (paymentData.payment_method_id === '2') {
+        // Tạo mô tả với note
+        const description = paymentData.note 
+          ? `Thanh toán tiền mặt. Note của khách hàng: ${paymentData.note}` 
+          : 'Thanh toán tiền mặt';
+        
+        // Gọi API để cập nhật hóa đơn thành thanh toán tiền mặt
+        const response = await api.post('/payment/update-cash', {
+          invoice_ids: invoiceIds,
+          payment_method_id: 2,
+          description: description,
+        });
+
+        if (response.data.success) {
+          showSuccess("Yêu cầu thanh toán tiền mặt đã được gửi đến quản lý nhà");
+          loadInvoices();
+        } else {
+          showError(response.data.message || "Không thể cập nhật trạng thái thanh toán");
+        }
       } else {
-        showError(response.message || "Không thể tạo liên kết thanh toán");
-        console.error("API error:", response);
+        // Nếu là phương thức thanh toán online
+        // Tạo mô tả với note nếu có
+        const description = paymentData.note 
+          ? `Thanh toán HĐ. Note của khách hàng: ${paymentData.note}`
+          : `Thanh toán HĐ`;
+          
+        // Tạo thanh toán trên Payos
+        const response = await executePayosPayment(invoiceIds, {
+          amount: totalAmount,
+          description: description,
+          ...paymentData,
+        });
+
+        // Xử lý kết quả từ API
+        if (response.success && response.data && response.data.checkoutUrl) {
+          // Chuyển hướng trực tiếp đến trang thanh toán
+          window.location.href = response.data.checkoutUrl;
+        } else {
+          showError(response.message || "Không thể tạo liên kết thanh toán");
+          console.error("API error:", response);
+        }
       }
     } catch (error) {
       showError("Có lỗi xảy ra khi xử lý thanh toán");

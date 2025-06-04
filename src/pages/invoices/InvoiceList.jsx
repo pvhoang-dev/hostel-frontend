@@ -114,8 +114,7 @@ const FilterSection = ({
               { value: "", label: "Tất cả" },
               { value: "pending", label: "Chờ thanh toán" },
               { value: "completed", label: "Đã thanh toán" },
-              { value: "failed", label: "Thanh toán thất bại" },
-              { value: "refunded", label: "Đã hoàn tiền" },
+              { value: "waiting", label: "Chờ xác nhận" },
             ]}
           />
         </div>
@@ -262,7 +261,7 @@ const InvoiceList = () => {
   const ActionsCell = ({ row }) => {
     const invoice = row.original;
     const canEdit =
-      isAdmin || (isManager && invoice.room?.house?.manager_id === user?.id);
+      isAdmin || isManager;
 
     return (
       <div className="d-flex gap-2">

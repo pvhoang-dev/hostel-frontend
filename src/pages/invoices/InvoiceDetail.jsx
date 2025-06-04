@@ -90,8 +90,7 @@ const InvoiceDetail = () => {
   }
 
   // Check if user is manager of this house
-  const canManage = isManager && invoice.room?.house?.manager_id === user?.id;
-  const canEdit = isAdmin || canManage;
+  const canEdit = isAdmin || isManager;
 
   const getInvoiceTypeText = (type) => {
     switch (type) {

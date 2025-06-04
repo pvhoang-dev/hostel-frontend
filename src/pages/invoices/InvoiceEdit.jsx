@@ -36,10 +36,7 @@ const InvoiceEdit = () => {
 
       // Check permissions
       if (user) {
-        const isHouseManager =
-          response.data.room?.house?.manager_id === user?.id;
-
-        if (!isAdmin && !(isManager && isHouseManager)) {
+        if (!isAdmin && !isManager) {
           showError("Bạn không có quyền chỉnh sửa hóa đơn này");
           navigate(`/invoices/${id}`);
           return;
