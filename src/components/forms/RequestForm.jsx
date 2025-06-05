@@ -55,7 +55,7 @@ const RequestForm = ({
       } else if (user.role === "tenant") {
         const response = await userService.getUsers({
           for_requests: "true",
-          include: "house,room,role"
+          include: "house,room,role",
         });
         recipients = response.data.data || [];
       }
@@ -64,19 +64,21 @@ const RequestForm = ({
         .filter((r) => r.id !== user.id)
         .map((r) => {
           let label = "";
-          
+
           if (r.role.code === "admin") {
             label = `${r.name} (Quản trị viên)`;
           } else if (r.role.code === "manager") {
             label = `${r.name} (Quản lý${r.house ? ` - ${r.house.name}` : ""})`;
           } else if (r.role.code === "tenant") {
-            const roomInfo = r.room ? ` - ${r.room.room_number}` : " - Chưa có phòng";
+            const roomInfo = r.room
+              ? ` - ${r.room.room_number}`
+              : " - Chưa có phòng";
             const houseInfo = r.house ? ` - ${r.house.name}` : "";
             label = `${r.name} (Người thuê${roomInfo}${houseInfo})`;
           } else {
             label = r.name;
           }
-          
+
           return {
             value: r.id,
             label: label,
@@ -110,13 +112,6 @@ const RequestForm = ({
     { value: "complaint", label: "Khiếu nại" },
     { value: "inquiry", label: "Yêu cầu thông tin" },
     { value: "other", label: "Khác" },
-  ];
-
-  const requestStatuses = [
-    { value: "pending", label: "Đang chờ" },
-    { value: "in_progress", label: "Đang xử lý" },
-    { value: "completed", label: "Đã hoàn thành" },
-    { value: "rejected", label: "Đã từ chối" },
   ];
 
   return (
@@ -172,18 +167,20 @@ const RequestForm = ({
             >
               Hủy
             </Button>
-            <Button
-              type="submit"
-              variant="primary"
-              disabled={isSubmitting}
-            >
+            <Button type="submit" variant="primary" disabled={isSubmitting}>
               {isSubmitting ? (
                 <>
-                  <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  <span
+                    className="spinner-border spinner-border-sm me-2"
+                    role="status"
+                    aria-hidden="true"
+                  ></span>
                   {mode === "create" ? "Đang tạo..." : "Đang cập nhật..."}
                 </>
+              ) : mode === "create" ? (
+                "Tạo yêu cầu"
               ) : (
-                mode === "create" ? "Tạo yêu cầu" : "Cập nhật yêu cầu"
+                "Cập nhật yêu cầu"
               )}
             </Button>
           </div>
