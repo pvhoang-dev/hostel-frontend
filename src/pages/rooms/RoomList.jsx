@@ -70,9 +70,8 @@ const FilterSection = ({
           options={[
             { value: "", label: "Tất cả" },
             { value: "available", label: "Có sẵn" },
-            { value: "occupied", label: "Đã thuê" },
-            { value: "maintenance", label: "Bảo trì" },
-            { value: "unavailable", label: "Không khả dụng" },
+            { value: "used", label: "Đã thuê" },
+            { value: "maintain", label: "Bảo trì" },
           ]}
         />
       </div>
