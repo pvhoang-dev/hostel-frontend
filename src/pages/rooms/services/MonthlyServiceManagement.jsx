@@ -178,16 +178,39 @@ const MonthlyServiceManagement = () => {
   ];
 
   return (
-    <div className="mt-3" style={{ backgroundColor: "#212529", color: "#f8f9fa" }}>
-      <Card 
-        title="Quản lý dịch vụ hàng tháng" 
-        style={{ backgroundColor: "#343a40", color: "#f8f9fa", borderRadius: "0.25rem", boxShadow: "0 0.5rem 1rem rgba(0, 0, 0, 0.15)" }}
-        headStyle={{ color: "#f8f9fa", borderBottom: "1px solid #495057", padding: "1rem 1.5rem", fontSize: "1.25rem", fontWeight: 500 }}
+    <div
+      className="mt-3"
+      style={{ backgroundColor: "#212529", color: "#f8f9fa" }}
+    >
+      <Card
+        title="Quản lý dịch vụ hàng tháng"
+        style={{
+          backgroundColor: "#343a40",
+          color: "#f8f9fa",
+          borderRadius: "0.25rem",
+          boxShadow: "0 0.5rem 1rem rgba(0, 0, 0, 0.15)",
+        }}
+        headStyle={{
+          color: "#f8f9fa",
+          borderBottom: "1px solid #495057",
+          padding: "1rem 1.5rem",
+          fontSize: "1.25rem",
+          fontWeight: 500,
+        }}
         styles={{ body: { color: "#f8f9fa", padding: "1.5rem" } }}
       >
         <Row gutter={16} style={{ marginBottom: 16 }}>
           <Col span={8}>
-            <Text strong style={{ color: "#f8f9fa", display: "block", marginBottom: "0.5rem" }}>Nhà:</Text>
+            <Text
+              strong
+              style={{
+                color: "#f8f9fa",
+                display: "block",
+                marginBottom: "0.5rem",
+              }}
+            >
+              Nhà:
+            </Text>
             <Select
               placeholder="Chọn nhà"
               style={{ width: "100%", color: "#fff" }}
@@ -204,7 +227,16 @@ const MonthlyServiceManagement = () => {
             </Select>
           </Col>
           <Col span={8}>
-            <Text strong style={{ color: "#f8f9fa", display: "block", marginBottom: "0.5rem" }}>Tháng:</Text>
+            <Text
+              strong
+              style={{
+                color: "#f8f9fa",
+                display: "block",
+                marginBottom: "0.5rem",
+              }}
+            >
+              Tháng:
+            </Text>
             <Select
               style={{ width: "100%", color: "#fff" }}
               value={selectedMonth}
@@ -220,7 +252,16 @@ const MonthlyServiceManagement = () => {
             </Select>
           </Col>
           <Col span={8}>
-            <Text strong style={{ color: "#f8f9fa", display: "block", marginBottom: "0.5rem" }}>Năm:</Text>
+            <Text
+              strong
+              style={{
+                color: "#f8f9fa",
+                display: "block",
+                marginBottom: "0.5rem",
+              }}
+            >
+              Năm:
+            </Text>
             <Select
               style={{ width: "100%", color: "#fff" }}
               value={selectedYear}
@@ -249,10 +290,17 @@ const MonthlyServiceManagement = () => {
           </Col>
         </Row>
 
-        <Divider style={{ borderTop: "1px solid #495057", margin: "1.5rem 0" }} />
+        <Divider
+          style={{ borderTop: "1px solid #495057", margin: "1.5rem 0" }}
+        />
 
         <div style={{ marginBottom: 24 }}>
-          <Title level={4} style={{ color: "#f8f9fa", fontWeight: 500, marginBottom: "1rem" }}>Danh sách phòng</Title>
+          <Title
+            level={4}
+            style={{ color: "#f8f9fa", fontWeight: 500, marginBottom: "1rem" }}
+          >
+            Danh sách phòng
+          </Title>
           <Row gutter={16}>
             <Col span={24}>
               {!showAllRooms && (
@@ -268,20 +316,38 @@ const MonthlyServiceManagement = () => {
                   message="Không tìm thấy phòng nào"
                   type="warning"
                   showIcon
-                  style={{ marginBottom: 16, backgroundColor: "#ffc107", borderColor: "#ffc107", color: "#212529", borderRadius: "0.25rem" }}
+                  style={{
+                    marginBottom: 16,
+                    backgroundColor: "#ffc107",
+                    borderColor: "#ffc107",
+                    color: "#212529",
+                    borderRadius: "0.25rem",
+                  }}
                 />
               )}
               <Alert
                 message="Lưu ý: Khi tạo dịch vụ tháng cho một phòng, hệ thống sẽ tự động tạo hóa đơn tương ứng. Khi cập nhật dịch vụ tháng, bạn sẽ được hỏi xem có muốn cập nhật hóa đơn tương ứng không."
                 type="info"
                 showIcon
-                style={{ marginBottom: 16, backgroundColor: "#0d6efd", borderColor: "#0d6efd", color: "#fff", borderRadius: "0.25rem" }}
+                style={{
+                  marginBottom: 16,
+                  backgroundColor: "#0d6efd",
+                  borderColor: "#0d6efd",
+                  color: "#fff",
+                  borderRadius: "0.25rem",
+                }}
               />
               <Alert
                 message="Lưu ý quan trọng: Chỉ những dịch vụ được chọn (đánh dấu ở cột 'Áp dụng') mới được lưu vào hệ thống. Những dịch vụ không được chọn sẽ không xuất hiện trong hóa đơn."
                 type="warning"
                 showIcon
-                style={{ marginBottom: 16, backgroundColor: "#fd7e14", borderColor: "#fd7e14", color: "#fff", borderRadius: "0.25rem" }}
+                style={{
+                  marginBottom: 16,
+                  backgroundColor: "#fd7e14",
+                  borderColor: "#fd7e14",
+                  color: "#fff",
+                  borderRadius: "0.25rem",
+                }}
               />
             </Col>
           </Row>
@@ -299,15 +365,23 @@ const MonthlyServiceManagement = () => {
       </Card>
 
       <Modal
-        title={`Cập nhật dịch vụ phòng ${selectedRoom?.room_number || ""}`}
         open={roomServiceModalVisible}
         onCancel={() => handleRoomServiceModalClose(false)}
         footer={null}
         width="90%"
         style={{ top: 20, zIndex: 1003 }}
-        styles={{ 
-          body: { backgroundColor: "#343a40", color: "#f8f9fa", padding: "1.5rem" },
-          header: { backgroundColor: "#343a40", color: "#f8f9fa", borderBottom: "1px solid #495057", padding: "1rem" }
+        styles={{
+          body: {
+            backgroundColor: "#343a40",
+            color: "#f8f9fa",
+            padding: "1.5rem",
+          },
+          header: {
+            backgroundColor: "#343a40",
+            color: "#f8f9fa",
+            borderBottom: "1px solid #495057",
+            padding: "1rem",
+          },
         }}
         wrapClassName="service-modal-custom"
       >
@@ -362,7 +436,7 @@ const MonthlyServiceManagement = () => {
         .bootstrap-dark-table .ant-pagination-item-active a {
           color: #fff;
         }
-        .bootstrap-dark-table .ant-pagination-prev button, 
+        .bootstrap-dark-table .ant-pagination-prev button,
         .bootstrap-dark-table .ant-pagination-next button {
           color: #f8f9fa;
           background-color: #343a40;
@@ -392,7 +466,10 @@ const MonthlyServiceManagement = () => {
           background-color: #2c3034 !important;
           color: #fff !important;
         }
-        .ant-select-dropdown .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+        .ant-select-dropdown
+          .ant-select-item-option-selected:not(
+            .ant-select-item-option-disabled
+          ) {
           background-color: #2c3034 !important;
           color: #fff !important;
         }
