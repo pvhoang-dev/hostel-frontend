@@ -23,6 +23,7 @@ import {
   CalculatorOutlined,
 } from "@ant-design/icons";
 import useAlert from "../../hooks/useAlert";
+import "../../styles/RoomServiceUsageForm.css";
 
 const { Text } = Typography;
 
@@ -678,50 +679,6 @@ const RoomServiceForm = ({ roomId, month, year, onFinish, onCancel }) => {
           </Col>
         </Row>
       </Form>
-
-      <style jsx="true">{`
-        .dark-input {
-          background-color: #212529 !important;
-          color: #fff !important;
-          border-color: #495057 !important;
-        }
-        .dark-input input {
-          background-color: #212529 !important;
-          color: #fff !important;
-        }
-        .dark-input .ant-input-number-handler-wrap {
-          background-color: #212529 !important;
-          border-color: #495057 !important;
-        }
-        .custom-dark-table {
-          color: #fff;
-        }
-        .custom-dark-table .ant-table {
-          background-color: #343a40;
-          color: #fff;
-        }
-        .custom-dark-table .ant-table-thead > tr > th {
-          background-color: #212529;
-          color: #fff;
-          border-bottom: 1px solid #495057;
-        }
-        .custom-dark-table .ant-table-tbody > tr > td {
-          border-bottom: 1px solid #495057;
-          color: #fff;
-        }
-        .custom-dark-table .ant-table-tbody > tr:hover > td {
-          background-color: #2c3034 !important;
-        }
-        .custom-dark-table .ant-table-tbody > tr.ant-table-row:hover > td {
-          background-color: #2c3034 !important;
-        }
-        .custom-dark-table .ant-table-row:hover {
-          background-color: #2c3034 !important;
-        }
-        .ant-checkbox-wrapper {
-          color: #fff !important;
-        }
-      `}</style>
     </Spin>
   );
 };

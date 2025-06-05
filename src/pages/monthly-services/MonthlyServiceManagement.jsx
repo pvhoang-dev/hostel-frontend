@@ -17,10 +17,11 @@ import {
 import {
   getAvailableHouses,
   getRoomsNeedingUpdate,
-} from "../../../api/monthlyServices";
-import RoomServiceUsageForm from "../../../components/forms/RoomServiceUsageForm";
+} from "../../api/monthlyServices";
+import RoomServiceUsageForm from "../../components/forms/RoomServiceUsageForm";
 import moment from "moment";
-import useAlert from "../../../hooks/useAlert";
+import useAlert from "../../hooks/useAlert";
+import "../../styles/MonthlyServiceManagement.css";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -395,100 +396,6 @@ const MonthlyServiceManagement = () => {
           />
         )}
       </Modal>
-
-      <style jsx="true">{`
-        .bootstrap-dark-table {
-          color: #f8f9fa;
-        }
-        .bootstrap-dark-table .ant-table {
-          background-color: #343a40;
-          color: #f8f9fa;
-        }
-        .bootstrap-dark-table .ant-table-thead > tr > th {
-          background-color: #212529;
-          color: #f8f9fa;
-          border-bottom: 1px solid #495057;
-          padding: 0.75rem;
-          font-weight: 500;
-        }
-        .bootstrap-dark-table .ant-table-tbody > tr > td {
-          border-bottom: 1px solid #495057;
-          color: #f8f9fa;
-          padding: 0.75rem;
-        }
-        .bootstrap-dark-table .ant-table-tbody > tr:hover > td {
-          background-color: #2c3034 !important;
-        }
-        .bootstrap-dark-table .ant-table-tbody > tr.ant-table-row:hover > td {
-          background-color: #2c3034 !important;
-        }
-        .bootstrap-dark-table .ant-pagination-item {
-          background-color: #343a40;
-          border-color: #495057;
-        }
-        .bootstrap-dark-table .ant-pagination-item a {
-          color: #f8f9fa;
-        }
-        .bootstrap-dark-table .ant-pagination-item-active {
-          background-color: #0d6efd;
-          border-color: #0d6efd;
-        }
-        .bootstrap-dark-table .ant-pagination-item-active a {
-          color: #fff;
-        }
-        .bootstrap-dark-table .ant-pagination-prev button,
-        .bootstrap-dark-table .ant-pagination-next button {
-          color: #f8f9fa;
-          background-color: #343a40;
-          border-color: #495057;
-        }
-        .dark-select .ant-select-selector {
-          background-color: #343a40 !important;
-          color: #fff !important;
-          border-color: #495057 !important;
-        }
-        .dark-select .ant-select-selection-item {
-          color: #fff !important;
-        }
-        .dark-select .ant-select-arrow {
-          color: #adb5bd !important;
-        }
-        .ant-select-dropdown {
-          background-color: #343a40 !important;
-        }
-        .ant-select-item {
-          color: #f8f9fa !important;
-        }
-        .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
-          background-color: #2c3034 !important;
-        }
-        .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
-          background-color: #2c3034 !important;
-          color: #fff !important;
-        }
-        .ant-select-dropdown
-          .ant-select-item-option-selected:not(
-            .ant-select-item-option-disabled
-          ) {
-          background-color: #2c3034 !important;
-          color: #fff !important;
-        }
-        .service-modal-custom {
-          z-index: 1003 !important;
-        }
-        .service-modal-custom .ant-modal {
-          z-index: 1003 !important;
-        }
-        .service-modal-custom .ant-modal-mask {
-          z-index: 1002 !important;
-        }
-        .service-modal-custom .ant-modal-wrap {
-          z-index: 1003 !important;
-        }
-        .white-placeholder .ant-select-selection-placeholder {
-          color: #fff !important;
-        }
-      `}</style>
     </div>
   );
 };

@@ -43,7 +43,7 @@ import RoomEquipmentEdit from "../pages/rooms/equipments/RoomEquipmentEdit.jsx";
 import RoomServiceCreate from "../pages/rooms/services/RoomServiceCreate.jsx";
 import RoomServiceDetail from "../pages/rooms/services/RoomServiceDetail.jsx";
 import RoomServiceEdit from "../pages/rooms/services/RoomServiceEdit.jsx";
-import MonthlyServiceManagement from "../pages/rooms/services/MonthlyServiceManagement.jsx";
+import MonthlyServiceManagement from "../pages/monthly-services/MonthlyServiceManagement.jsx";
 import ContractList from "../pages/contracts/ContractList.jsx";
 import ContractCreate from "../pages/contracts/ContractCreate.jsx";
 import ContractDetail from "../pages/contracts/ContractDetail.jsx";
