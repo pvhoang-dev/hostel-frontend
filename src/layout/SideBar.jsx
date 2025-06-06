@@ -19,7 +19,7 @@ const SideBar = () => {
     },
     {
       path: "/users",
-      label: "QL Users",
+      label: "QL Người dùng",
       roles: ["admin", "manager"],
       icon: "dripicons-user",
     },
