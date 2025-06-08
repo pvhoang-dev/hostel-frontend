@@ -1,6 +1,7 @@
 import React from "react";
 import Card from "../../../components/ui/Card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { formatCurrency } from "../../../utils/formatters";
 
 const ContractsStatistics = ({ data, loading, period, house_name }) => {
   if (!data) return null;
@@ -24,9 +25,9 @@ const ContractsStatistics = ({ data, loading, period, house_name }) => {
 
   return (
     <div className="row g-3">
-      {/* Biểu đồ hợp đồng mới */}
+      {/* Biểu đồ tổng quan hợp đồng */}
       <div className="col-md-6">
-        <Card title={`Hợp đồng mới theo ${periodText} ${house_name ? `- ${house_name}` : ''}`}>
+        <Card title={`Tổng quan hợp đồng theo ${periodText} ${house_name ? `- ${house_name}` : ''}`}>
           <div style={{ height: "300px" }}>
             {new_contracts && new_contracts.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
@@ -44,7 +45,8 @@ const ContractsStatistics = ({ data, loading, period, house_name }) => {
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Bar dataKey="count" fill="#0088FE" name="Số hợp đồng" />
+                  <Bar dataKey="new_count" name="Hợp đồng mới" fill="#0088FE" />
+                  <Bar dataKey="renewal_count" name="Hợp đồng gia hạn" fill="#82ca9d" />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
@@ -54,8 +56,38 @@ const ContractsStatistics = ({ data, loading, period, house_name }) => {
         </Card>
       </div>
 
-      {/* Thống kê khách thuê theo nhà */}
+      {/* Giá trị hợp đồng */}
       <div className="col-md-6">
+        <Card title={`Giá trị hợp đồng theo ${periodText}`}>
+          <div style={{ height: "300px" }}>
+            {new_contracts && new_contracts.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={new_contracts}
+                  margin={{
+                    top: 5,
+                    right: 30,
+                    left: 20,
+                    bottom: 5,
+                  }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="period" />
+                  <YAxis tickFormatter={(value) => formatCurrency(value)} />
+                  <Tooltip formatter={(value) => formatCurrency(value)} />
+                  <Legend />
+                  <Bar dataKey="total_value" fill="#FF8042" name="Giá trị hợp đồng" />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="alert alert-warning">Không có dữ liệu giá trị hợp đồng</div>
+            )}
+          </div>
+        </Card>
+      </div>
+
+      {/* Thống kê khách thuê theo nhà */}
+      <div className="col-md-12">
         <Card title={houseTitle}>
           <div style={{ height: "300px" }}>
             {tenant_stats && tenant_stats.by_house && tenant_stats.by_house.length > 0 ? (
