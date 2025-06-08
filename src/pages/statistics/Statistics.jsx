@@ -10,9 +10,7 @@ import StatisticsFilter from "./components/StatisticsFilter";
 import OverviewStatistics from "./components/OverviewStatistics";
 import ContractsStatistics from "./components/ContractsStatistics";
 import RevenueStatistics from "./components/RevenueStatistics";
-import ServicesStatistics from "./components/ServicesStatistics";
 import EquipmentStatistics from "./components/EquipmentStatistics";
-import ExportReport from "./components/ExportReport";
 
 const Statistics = () => {
   const { user, isAdmin } = useAuth();
@@ -20,16 +18,20 @@ const Statistics = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [filters, setFilters] = useState({
     house_id: "",
+    house_name: "",
     date_from: "",
     date_to: "",
     period: "monthly",
+    filter_type: "period",
+    month: new Date().getMonth() + 1,
+    year: new Date().getFullYear(),
+    quarter: Math.floor(new Date().getMonth() / 3) + 1,
   });
   
   const [loading, setLoading] = useState({
     overview: false,
     contracts: false,
     revenue: false,
-    services: false,
     equipment: false,
   });
   
@@ -37,7 +39,6 @@ const Statistics = () => {
     overview: null,
     contracts: null,
     revenue: null,
-    services: null,
     equipment: null,
   });
 
@@ -60,35 +61,64 @@ const Statistics = () => {
   // Tải dữ liệu thống kê
   const loadData = async (tabKey, currentFilters) => {
     try {
+      // Ngăn việc gửi nhiều request cùng lúc
+      if (loading[tabKey]) {
+        return;
+      }
+      
       setLoading((prev) => ({ ...prev, [tabKey]: true }));
+      console.log(`Loading data for tab ${tabKey} with filters:`, currentFilters);
       
       let response;
       switch (tabKey) {
         case "overview":
-          response = await statisticsService.getOverview(currentFilters);
+          response = await statisticsService.getOverview({
+            house_id: currentFilters.house_id
+          });
           break;
         case "contracts":
-          response = await statisticsService.getContractsStats(currentFilters);
+          console.log('Gửi request contracts với period:', currentFilters.period);
+          response = await statisticsService.getContractsStats({
+            house_id: currentFilters.house_id,
+            period: currentFilters.period
+          });
           break;
         case "revenue":
-          response = await statisticsService.getRevenueStats(currentFilters);
-          break;
-        case "services":
-          response = await statisticsService.getServicesStats(currentFilters);
+          // Chỉ gửi các tham số cần thiết, tránh gửi thừa dữ liệu
+          const revenueParams = {
+            house_id: currentFilters.house_id,
+            period: currentFilters.period
+          };
+          
+          // Chỉ thêm year khi không phải kỳ theo năm
+          if (currentFilters.period !== 'yearly') {
+            revenueParams.year = currentFilters.year;
+          }
+          
+          response = await statisticsService.getRevenueStats(revenueParams);
           break;
         case "equipment":
-          response = await statisticsService.getEquipmentStats(currentFilters);
+          response = await statisticsService.getEquipmentStats({
+            house_id: currentFilters.house_id
+          });
           break;
-        case "export":
-          // Tab xuất báo cáo không cần tải dữ liệu
-          setLoading((prev) => ({ ...prev, [tabKey]: false }));
-          return;
         default:
           return;
       }
       
       if (response && response.success) {
         setData((prev) => ({ ...prev, [tabKey]: response.data }));
+        
+        // Thêm bộ lọc vào dữ liệu để các component con có thể sử dụng
+        if (tabKey === 'revenue') {
+          setData((prev) => ({ 
+            ...prev, 
+            revenue: { 
+              ...prev.revenue, 
+              filters: currentFilters 
+            } 
+          }));
+        }
       } else {
         showError(response?.message || `Có lỗi xảy ra khi tải dữ liệu ${tabKey}`);
         // Đặt dữ liệu thành null để tránh hiển thị dữ liệu cũ
@@ -124,7 +154,7 @@ const Statistics = () => {
       </div>
 
       {/* Bộ lọc */}
-      <StatisticsFilter onFilterChange={handleFilterChange} />
+      <StatisticsFilter onFilterChange={handleFilterChange} activeTab={activeTab} />
 
       {/* Tab thống kê */}
       <div className="row">
@@ -143,13 +173,7 @@ const Statistics = () => {
                     <Nav.Link eventKey="revenue">Doanh thu</Nav.Link>
                   </Nav.Item>
                   <Nav.Item>
-                    <Nav.Link eventKey="services">Dịch vụ</Nav.Link>
-                  </Nav.Item>
-                  <Nav.Item>
                     <Nav.Link eventKey="equipment">Thiết bị</Nav.Link>
-                  </Nav.Item>
-                  <Nav.Item>
-                    <Nav.Link eventKey="export">Xuất báo cáo</Nav.Link>
                   </Nav.Item>
                 </Nav>
 
@@ -165,21 +189,17 @@ const Statistics = () => {
                     {loading.contracts ? (
                       <Loader />
                     ) : (
-                      <ContractsStatistics data={data.contracts} />
+                      <ContractsStatistics data={data.contracts} period={filters.period} house_name={filters.house_name}/>
                     )}
                   </Tab.Pane>
                   <Tab.Pane eventKey="revenue">
                     {loading.revenue ? (
                       <Loader />
                     ) : (
-                      <RevenueStatistics data={data.revenue} />
-                    )}
-                  </Tab.Pane>
-                  <Tab.Pane eventKey="services">
-                    {loading.services ? (
-                      <Loader />
-                    ) : (
-                      <ServicesStatistics data={data.services} />
+                      <RevenueStatistics 
+                        data={data.revenue} 
+                        loading={loading.revenue}
+                      />
                     )}
                   </Tab.Pane>
                   <Tab.Pane eventKey="equipment">
@@ -188,9 +208,6 @@ const Statistics = () => {
                     ) : (
                       <EquipmentStatistics data={data.equipment} />
                     )}
-                  </Tab.Pane>
-                  <Tab.Pane eventKey="export">
-                    <ExportReport filters={filters} />
                   </Tab.Pane>
                 </Tab.Content>
               </Tab.Container>

@@ -1,6 +1,7 @@
 import React from "react";
 import Card from "../../../components/ui/Card";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
+import { formatCurrency } from "../../../utils/formatters";
 
 const COLORS = ["#0088FE", "#FF8042"];
 
@@ -131,7 +132,7 @@ const OverviewStatistics = ({ data, loading }) => {
                 </tr>
                 <tr>
                   <td>Doanh thu hiện tại</td>
-                  <td>{revenue_comparison?.current_revenue?.toLocaleString() || 0} VND</td>
+                  <td>{formatCurrency(revenue_comparison?.current_revenue) || 0} VND</td>
                 </tr>
                 <tr>
                   <td>Kỳ trước</td>
@@ -139,12 +140,12 @@ const OverviewStatistics = ({ data, loading }) => {
                 </tr>
                 <tr>
                   <td>Doanh thu kỳ trước</td>
-                  <td>{revenue_comparison?.previous_revenue?.toLocaleString() || 0} VND</td>
+                  <td>{formatCurrency(revenue_comparison?.previous_revenue) || 0} VND</td>
                 </tr>
                 <tr>
                   <td>Thay đổi</td>
                   <td className={revenue_comparison?.change > 0 ? 'text-success' : 'text-danger'}>
-                    {revenue_comparison?.change?.toLocaleString() || 0} VND
+                    {formatCurrency(revenue_comparison?.change) || 0} VND
                     ({revenue_comparison?.change_percent || 0}%)
                   </td>
                 </tr>

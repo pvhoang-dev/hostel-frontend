@@ -19,21 +19,9 @@ export const statisticsService = {
         return response.data;
     },
 
-    // Lấy thống kê dịch vụ
-    getServicesStats: async (filters = {}) => {
-        const response = await api.get("/statistics/services", { params: filters });
-        return response.data;
-    },
-
     // Lấy thống kê thiết bị
     getEquipmentStats: async (filters = {}) => {
         const response = await api.get("/statistics/equipment", { params: filters });
-        return response.data;
-    },
-
-    // Xuất báo cáo
-    exportReport: async (data) => {
-        const response = await api.post("/statistics/export-report", data);
         return response.data;
     }
 }; 

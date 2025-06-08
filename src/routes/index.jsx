@@ -762,7 +762,7 @@ const Routes = () => {
           element: (
             <ProtectedRoute
               element={<Statistics />}
-              allowedRoles={["admin", "manager"]}
+              allowedRoles={["admin"]}
             />
           ),
         },
