@@ -4,8 +4,6 @@ import { useAuth } from "../../hooks/useAuth";
 import { statisticsService } from "../../api/statistics";
 import Loader from "../../components/ui/Loader";
 import useAlert from "../../hooks/useAlert";
-
-// Import các components
 import StatisticsFilter from "./components/StatisticsFilter";
 import OverviewStatistics from "./components/OverviewStatistics";
 import ContractsStatistics from "./components/ContractsStatistics";
@@ -13,14 +11,12 @@ import RevenueStatistics from "./components/RevenueStatistics";
 import EquipmentStatistics from "./components/EquipmentStatistics";
 
 const Statistics = () => {
-  const { user, isAdmin } = useAuth();
-  const { showSuccess, showError } = useAlert();
+  const { user } = useAuth();
+  const { showError } = useAlert();
   const [activeTab, setActiveTab] = useState("overview");
   const [filters, setFilters] = useState({
     house_id: "",
     house_name: "",
-    date_from: "",
-    date_to: "",
     period: "monthly",
     filter_type: "period",
     month: new Date().getMonth() + 1,
@@ -42,10 +38,8 @@ const Statistics = () => {
     equipment: null,
   });
 
-  // Xử lý thay đổi bộ lọc
   const handleFilterChange = (newFilters) => {
     setFilters(newFilters);
-    // Tải lại dữ liệu cho tab hiện tại
     loadData(activeTab, newFilters);
   };
 
@@ -67,7 +61,6 @@ const Statistics = () => {
       }
       
       setLoading((prev) => ({ ...prev, [tabKey]: true }));
-      console.log(`Loading data for tab ${tabKey} with filters:`, currentFilters);
       
       let response;
       switch (tabKey) {
@@ -77,7 +70,6 @@ const Statistics = () => {
           });
           break;
         case "contracts":
-          console.log('Gửi request contracts với period:', currentFilters.period);
           response = await statisticsService.getContractsStats({
             house_id: currentFilters.house_id,
             period: currentFilters.period

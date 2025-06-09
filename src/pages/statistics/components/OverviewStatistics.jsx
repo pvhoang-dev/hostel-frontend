@@ -10,7 +10,6 @@ const OverviewStatistics = ({ data, loading }) => {
 
   const { overview, occupancy, revenue_comparison } = data;
 
-  // Dữ liệu cho biểu đồ tỷ lệ phòng
   const occupancyData = [
     { name: "Đã thuê", value: occupancy?.occupied_rooms || 0 },
     { name: "Còn trống", value: occupancy?.vacant_rooms || 0 },

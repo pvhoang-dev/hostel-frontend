@@ -74,7 +74,7 @@ const RevenueStatistics = ({ data, loading: initialLoading }) => {
       }
       
       return (
-        <div className="custom-tooltip" style={{ backgroundColor: 'white', padding: '10px', border: '1px solid #ccc' }}>
+        <div className="custom-tooltip" style={{ backgroundColor: 'white', padding: '10px', border: '1px solid #ccc', color: 'black' }}>
           <p className="label">{labelText}</p>
           <p className="intro">{`Doanh thu: ${formatCurrency(payload[0].value)}`}</p>
         </div>
@@ -137,7 +137,6 @@ const RevenueStatistics = ({ data, loading: initialLoading }) => {
     
     try {
       setLoadingInvoices(true);
-      console.log('Loading unpaid invoices with filters:', currentFilters, 'page:', page);
       
       const response = await statisticsService.getRevenueStats({
         ...currentFilters,
