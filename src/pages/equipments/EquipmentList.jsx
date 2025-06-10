@@ -42,7 +42,7 @@ const EquipmentList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { showSuccess, showError } = useAlert();
   const navigate = useNavigate();
-  const { isAdmin, isManager } = useAuth();
+  const { isAdmin } = useAuth();
 
   // Get current filters from URL
   const currentPage = Number(searchParams.get("page")) || 1;
