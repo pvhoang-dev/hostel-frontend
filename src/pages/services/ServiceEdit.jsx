@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { serviceService } from "../../api/services";
 import ServiceForm from "../../components/forms/ServiceForm";
-import Card from "../../components/common/Card";
-import Loader from "../../components/common/Loader";
+import Card from "../../components/ui/Card";
+import Loader from "../../components/ui/Loader";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 
@@ -42,7 +42,6 @@ const ServiceEdit = () => {
 
     if (response.success) {
       showSuccess("Cập nhật dịch vụ thành công");
-      navigate("/services");
     } else {
       if (response.data && typeof response.data === "object") {
         setErrors(response.data); // Set validation errors from API

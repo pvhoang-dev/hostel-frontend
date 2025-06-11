@@ -1,17 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { requestService } from "../../api/requests";
-import { notificationService } from "../../api/notifications";
 import RequestForm from "../../components/forms/RequestForm";
-import Card from "../../components/common/Card";
+import Card from "../../components/ui/Card";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
-import { useAuth } from "../../hooks/useAuth";
 
 const RequestCreate = () => {
   const navigate = useNavigate();
   const { showSuccess, showError } = useAlert();
-  const { user } = useAuth();
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -28,21 +25,6 @@ const RequestCreate = () => {
 
       if (response.success) {
         showSuccess("Yêu cầu đã được tạo thành công!");
-
-        // Gửi thông báo cho người nhận
-        if (
-          response.data &&
-          response.data.recipient &&
-          response.data.recipient.id
-        ) {
-          await notificationService.createNotification({
-            user_id: response.data.recipient.id,
-            type: "new_request",
-            content: `${user.name} đã tạo một yêu cầu mới cho bạn`,
-            url: `/requests/${response.data.id}`,
-          });
-        }
-
         navigate(`/requests/${response.data.id}`);
       } else {
         showError(response.message || "Đã xảy ra lỗi khi tạo yêu cầu");

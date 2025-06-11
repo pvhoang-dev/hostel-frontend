@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { userService } from "../../api/users";
-import Input from "../common/Input";
-import Select from "../common/Select";
-import Button from "../common/Button";
-import TextArea from "../common/TextArea";
+import Input from "../ui/Input";
+import Select from "../ui/Select";
+import Button from "../ui/Button";
+import TextArea from "../ui/TextArea";
 import { useAuth } from "../../hooks/useAuth";
 
 const NotificationForm = ({
@@ -151,7 +151,7 @@ const NotificationForm = ({
           type="button"
           variant="secondary"
           onClick={() => window.history.back()}
-          className="me-2 mr-2"
+          className=" mr-2"
         >
           Hủy
         </Button>

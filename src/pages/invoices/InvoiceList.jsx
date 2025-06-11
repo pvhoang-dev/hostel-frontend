@@ -3,12 +3,13 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { invoiceService } from "../../api/invoices";
 import { houseService } from "../../api/houses";
 import { roomService } from "../../api/rooms";
-import Table from "../../components/common/Table";
-import Card from "../../components/common/Card";
-import Button from "../../components/common/Button";
-import Input from "../../components/common/Input";
-import Select from "../../components/common/Select";
-import Loader from "../../components/common/Loader";
+import { paymentMethodService } from "../../api/paymentMethods";
+import Table from "../../components/ui/Table";
+import Card from "../../components/ui/Card";
+import Button from "../../components/ui/Button";
+import Input from "../../components/ui/Input";
+import Select from "../../components/ui/Select";
+import Loader from "../../components/ui/Loader";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 import { useAuth } from "../../hooks/useAuth";
@@ -19,6 +20,7 @@ const FilterSection = ({
   filters,
   houses,
   rooms,
+  paymentMethods,
   onFilterChange,
   onClearFilters,
   onApplyFilters,
@@ -42,7 +44,7 @@ const FilterSection = ({
             options={[
               { value: "", label: "Tất cả" },
               ...houses.map((house) => ({
-                value: house.id,
+                value: house.id.toString(),
                 label: house.name,
               })),
             ]}
@@ -58,7 +60,7 @@ const FilterSection = ({
             options={[
               { value: "", label: "Tất cả" },
               ...rooms.map((room) => ({
-                value: room.id,
+                value: room.id.toString(),
                 label: `Phòng ${room.room_number}`,
               })),
             ]}
@@ -74,7 +76,7 @@ const FilterSection = ({
             options={[
               { value: "", label: "Tất cả" },
               { value: "custom", label: "Tùy chỉnh" },
-              { value: "service_usage", label: "Sử dụng dịch vụ" },
+              { value: "service_usage", label: "Dịch vụ / Tháng" },
             ]}
           />
         </div>
@@ -103,6 +105,37 @@ const FilterSection = ({
         </div>
 
         <div className="col-md-3">
+          <Select
+            label="Trạng thái thanh toán"
+            name="payment_status"
+            value={filters.payment_status}
+            onChange={onFilterChange}
+            options={[
+              { value: "", label: "Tất cả" },
+              { value: "pending", label: "Chờ thanh toán" },
+              { value: "completed", label: "Đã thanh toán" },
+              { value: "waiting", label: "Chờ xác nhận" },
+            ]}
+          />
+        </div>
+
+        <div className="col-md-3">
+          <Select
+            label="Phương thức thanh toán"
+            name="payment_method_id"
+            value={filters.payment_method_id}
+            onChange={onFilterChange}
+            options={[
+              { value: "", label: "Tất cả" },
+              ...paymentMethods.map((method) => ({
+                value: method.id.toString(),
+                label: method.name,
+              })),
+            ]}
+          />
+        </div>
+
+        <div className="col-md-3">
           <Input
             label="Số tiền từ"
             name="min_amount"
@@ -126,11 +159,7 @@ const FilterSection = ({
       </div>
 
       <div className="mt-3 d-flex justify-content-end">
-        <Button
-          variant="secondary"
-          onClick={onClearFilters}
-          className="me-2 mr-2"
-        >
+        <Button variant="secondary" onClick={onClearFilters} className=" mr-2">
           Xóa bộ lọc
         </Button>
         <Button onClick={onApplyFilters}>Tìm</Button>
@@ -147,13 +176,15 @@ const InvoiceList = () => {
 
   // Get current filters from URL
   const currentPage = Number(searchParams.get("page")) || 1;
-  const perPage = Number(searchParams.get("per_page")) || 5;
+  const perPage = Number(searchParams.get("per_page")) || 10;
   const sortBy = searchParams.get("sort_by") || "created_at";
   const sortDir = searchParams.get("sort_dir") || "desc";
 
   const house_id = searchParams.get("house_id") || "";
   const room_id = searchParams.get("room_id") || "";
   const invoice_type = searchParams.get("invoice_type") || "";
+  const payment_status = searchParams.get("payment_status") || "";
+  const payment_method_id = searchParams.get("payment_method_id") || "";
   const month = searchParams.get("month") || "";
   const year = searchParams.get("year") || "";
   const min_amount = searchParams.get("min_amount") || "";
@@ -178,6 +209,12 @@ const InvoiceList = () => {
     execute: fetchRooms,
   } = useApi(roomService.getRooms);
 
+  const {
+    data: paymentMethodsData,
+    loading: loadingPaymentMethods,
+    execute: fetchPaymentMethods,
+  } = useApi(paymentMethodService.getPaymentMethods);
+
   const { execute: deleteInvoice } = useApi(invoiceService.deleteInvoice);
 
   // Derived state
@@ -193,6 +230,87 @@ const InvoiceList = () => {
 
   const houses = housesData?.data || [];
   const rooms = roomsData?.data || [];
+  const paymentMethods = paymentMethodsData?.data || [];
+
+  // Function to render payment status badge
+  const getPaymentStatusBadge = (status) => {
+    if (!status) return "Chưa thanh toán";
+
+    const badgeColors = {
+      pending: "warning",
+      completed: "success",
+      failed: "danger",
+      refunded: "info",
+    };
+
+    const statusText = {
+      pending: "Chờ thanh toán",
+      completed: "Đã thanh toán",
+      failed: "Thanh toán thất bại",
+      refunded: "Đã hoàn tiền",
+    };
+
+    return (
+      <span className={`badge bg-${badgeColors[status]} text-white`}>
+        {statusText[status] || status}
+      </span>
+    );
+  };
+
+  // Render the actions cell for each row
+  const ActionsCell = ({ row }) => {
+    const invoice = row.original;
+    const canEdit =
+      isAdmin || isManager;
+
+    return (
+      <div className="d-flex gap-2">
+        <button
+          type="button"
+          className="btn btn-link p-0 mx-1 action-icon"
+          style={{ border: "none", background: "none", cursor: "pointer" }}
+          onClick={() => navigate(`/invoices/${invoice.id}`)}
+          title="Chi tiết"
+        >
+          <i className="mdi mdi-eye"></i>
+        </button>
+
+        {canEdit && (
+          <>
+            <button
+              type="button"
+              className="btn btn-link p-0 mx-1 action-icon"
+              style={{ border: "none", background: "none", cursor: "pointer" }}
+              onClick={() => navigate(`/invoices/${invoice.id}/edit`)}
+              title="Sửa"
+            >
+              <i className="mdi mdi-pencil"></i>
+            </button>
+
+            <button
+              type="button"
+              className="btn btn-link p-0 mx-1 action-icon"
+              style={{ border: "none", background: "none", cursor: "pointer" }}
+              onClick={() => handleDeleteInvoice(invoice)}
+              title="Xóa"
+            >
+              <i className="mdi mdi-delete"></i>
+            </button>
+          </>
+        )}
+
+        {canEdit && invoice.payment_status !== "completed" && (
+          <button
+            onClick={() => handleMarkAsPaid(invoice)}
+            className="btn btn-sm btn-success"
+            title="Đánh dấu đã thanh toán"
+          >
+            Thanh toán
+          </button>
+        )}
+      </div>
+    );
+  };
 
   // Column definitions for the table
   const columns = [
@@ -203,12 +321,20 @@ const InvoiceList = () => {
     {
       accessorKey: "room.house.name",
       header: "Nhà",
-      cell: ({ row }) => row.original.room?.house?.name || "N/A",
+      cell: ({ row }) => (
+        <Link to={`/houses/${row.original.room.house.id}`}>
+          {row.original.room.house.name}
+        </Link>
+      ),
     },
     {
       accessorKey: "room.room_number",
       header: "Phòng",
-      cell: ({ row }) => row.original.room?.room_number || "N/A",
+      cell: ({ row }) => (
+        <Link to={`/rooms/${row.original.room.id}`}>
+          {row.original.room.room_number}
+        </Link>
+      ),
     },
     {
       accessorKey: "month",
@@ -221,7 +347,7 @@ const InvoiceList = () => {
       cell: ({ row }) =>
         row.original.invoice_type === "custom"
           ? "Tùy chỉnh"
-          : "Sử dụng dịch vụ",
+          : "Dịch vụ / Tháng",
     },
     {
       accessorKey: "total_amount",
@@ -229,18 +355,38 @@ const InvoiceList = () => {
       cell: ({ row }) => formatCurrency(row.original.total_amount),
     },
     {
+      accessorKey: "payment_status",
+      header: "Trạng thái",
+      cell: ({ row }) => getPaymentStatusBadge(row.original.payment_status),
+    },
+    {
       accessorKey: "created_at",
       header: "Ngày tạo",
       cell: ({ row }) => row.original.created_at,
     },
     {
+      accessorKey: "payment_method.name",
+      header: "Phương thức thanh toán",
+      cell: ({ row }) => row.original.payment_method?.name || "N/A",
+    },
+    {
+      accessorKey: "payment_date",
+      header: "Ngày thanh toán",
+      cell: ({ row }) =>
+        row.original.payment_date
+          ? new Date(row.original.payment_date).toLocaleDateString("vi-VN")
+          : "Chưa thanh toán",
+    },
+    {
       accessorKey: "actions",
       header: "Hành động",
+      cell: ActionsCell,
     },
   ];
 
   useEffect(() => {
     loadHouses();
+    loadPaymentMethods();
   }, []);
 
   useEffect(() => {
@@ -256,6 +402,12 @@ const InvoiceList = () => {
     room_id,
     invoice_type,
     user,
+    month,
+    year,
+    min_amount,
+    max_amount,
+    payment_status,
+    payment_method_id,
   ]);
 
   useEffect(() => {
@@ -271,27 +423,31 @@ const InvoiceList = () => {
   }, [house_id]);
 
   const loadInvoices = async () => {
-    const params = {
-      page: currentPage,
-      per_page: perPage,
-      sort_by: sortBy,
-      sort_dir: sortDir,
-      include: "room.house,items,creator",
-    };
+    try {
+      const result = await fetchInvoices({
+        page: currentPage,
+        per_page: perPage,
+        sort_by: sortBy,
+        sort_dir: sortDir,
+        include: "room.house,items,paymentMethod",
+        house_id: house_id || undefined,
+        room_id: room_id || undefined,
+        invoice_type: invoice_type || undefined,
+        month: month || undefined,
+        year: year || undefined,
+        min_amount: min_amount || undefined,
+        max_amount: max_amount || undefined,
+        payment_status: payment_status || undefined,
+        payment_method_id: payment_method_id || undefined,
+      });
 
-    // Add filters if they exist
-    if (house_id) params.house_id = house_id;
-    if (room_id) params.room_id = room_id;
-    if (invoice_type) params.invoice_type = invoice_type;
-    if (month) params.month = month;
-    if (year) params.year = year;
-    if (min_amount) params.min_amount = min_amount;
-    if (max_amount) params.max_amount = max_amount;
-
-    const response = await fetchInvoices(params);
-
-    if (!response.success) {
-      showError("Lỗi khi tải danh sách hóa đơn");
+      if (isManager && !isAdmin) {
+        if (houses.length === 0) {
+          await loadHouses();
+        }
+      }
+    } catch (error) {
+      showError("Error loading invoices");
     }
   };
 
@@ -307,6 +463,14 @@ const InvoiceList = () => {
     const response = await fetchRooms({ house_id: houseId });
     if (!response.success) {
       showError("Lỗi khi tải danh sách phòng");
+    }
+  };
+
+  const loadPaymentMethods = async () => {
+    try {
+      await fetchPaymentMethods({});
+    } catch (error) {
+      showError("Lỗi khi tải danh sách phương thức thanh toán");
     }
   };
 
@@ -341,16 +505,16 @@ const InvoiceList = () => {
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
-
-    const newParams = { ...Object.fromEntries(searchParams), page: "1" };
-
-    if (value) {
-      newParams[name] = value;
-    } else {
-      delete newParams[name];
-    }
-
-    setSearchParams(newParams);
+    setSearchParams((prev) => {
+      if (value === "") {
+        prev.delete(name);
+      } else {
+        prev.set(name, value);
+      }
+      // Reset to first page when filters change
+      prev.set("page", "1");
+      return prev;
+    });
   };
 
   const handleHouseChange = (houseId) => {
@@ -359,14 +523,23 @@ const InvoiceList = () => {
   };
 
   const clearFilters = () => {
-    setSearchParams({
-      page: "1",
-      per_page: perPage.toString(),
+    setSearchParams((params) => {
+      params.delete("house_id");
+      params.delete("room_id");
+      params.delete("invoice_type");
+      params.delete("month");
+      params.delete("year");
+      params.delete("min_amount");
+      params.delete("max_amount");
+      params.delete("payment_status");
+      params.delete("payment_method_id");
+      params.set("page", "1");
+      return params;
     });
-    loadInvoices();
   };
 
-  const isLoading = loadingInvoices || loadingHouses || loadingRooms;
+  const isLoading =
+    loadingInvoices || loadingHouses || loadingRooms || loadingPaymentMethods;
 
   // Nếu chưa có thông tin user, hiển thị loading
   if (!user) {
@@ -374,6 +547,38 @@ const InvoiceList = () => {
   }
 
   const canManageInvoices = isAdmin || isManager;
+
+  // Handle marking an invoice as paid
+  const handleMarkAsPaid = async (invoice) => {
+    if (
+      !window.confirm(
+        "Bạn có chắc chắn muốn đánh dấu hóa đơn này là đã thanh toán?"
+      )
+    ) {
+      return;
+    }
+
+    const paymentData = {
+      payment_method_id: invoice.payment_method?.id || 1, // Mặc định phương thức thanh toán tiền mặt
+      payment_status: "completed",
+      payment_date: new Date().toISOString().split("T")[0],
+    };
+
+    try {
+      const response = await invoiceService.updatePaymentStatus(
+        invoice.id,
+        paymentData
+      );
+      if (response.success) {
+        showSuccess("Đã cập nhật trạng thái thanh toán thành công");
+        loadInvoices(); // Tải lại danh sách
+      } else {
+        showError("Lỗi khi cập nhật trạng thái thanh toán");
+      }
+    } catch (error) {
+      showError("Lỗi khi cập nhật trạng thái thanh toán");
+    }
+  };
 
   return (
     <div>
@@ -395,9 +600,12 @@ const InvoiceList = () => {
           year,
           min_amount,
           max_amount,
+          payment_status,
+          payment_method_id,
         }}
         houses={houses}
         rooms={rooms}
+        paymentMethods={paymentMethods}
         onFilterChange={handleFilterChange}
         onHouseChange={handleHouseChange}
         onClearFilters={clearFilters}
@@ -416,55 +624,6 @@ const InvoiceList = () => {
             sortingState={[{ id: sortBy, desc: sortDir === "desc" }]}
             onSortingChange={handleSortingChange}
             loading={isLoading}
-            actionColumn={{
-              key: "actions",
-              actions: [
-                {
-                  icon: "mdi-eye",
-                  handler: (invoice) => navigate(`/invoices/${invoice.id}`),
-                },
-                ...(canManageInvoices
-                  ? [
-                      {
-                        icon: "mdi-pencil",
-                        handler: (invoice) => {
-                          // Check if user is manager of this house or admin
-                          const canManage =
-                            isAdmin ||
-                            (isManager &&
-                              invoice.room?.house?.manager_id === user?.id);
-
-                          if (canManage) {
-                            navigate(`/invoices/${invoice.id}/edit`);
-                          }
-                        },
-                        isDisabled: (invoice) =>
-                          isManager &&
-                          invoice.room?.house?.manager_id !== user?.id,
-                      },
-                      {
-                        icon: "mdi-delete",
-                        handler: (invoice) => {
-                          // Check if user is manager of this house or admin
-                          const canManage =
-                            isAdmin ||
-                            (isManager &&
-                              invoice.room?.house?.manager_id === user?.id);
-
-                          if (canManage) {
-                            handleDeleteInvoice(invoice);
-                          }
-                        },
-                        isDisabled: (invoice) =>
-                          (isManager &&
-                            invoice.room?.house?.manager_id !== user?.id) ||
-                          (invoice.transactions &&
-                            invoice.transactions.length > 0),
-                      },
-                    ]
-                  : []),
-              ],
-            }}
           />
         )}
       </Card>

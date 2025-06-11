@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { invoiceService } from "../../api/invoices";
 import InvoiceForm from "../../components/forms/InvoiceForm";
-import Card from "../../components/common/Card";
-import Button from "../../components/common/Button";
-import Loader from "../../components/common/Loader";
+import Card from "../../components/ui/Card";
+import Button from "../../components/ui/Button";
+import Loader from "../../components/ui/Loader";
 import { useAuth } from "../../hooks/useAuth";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
@@ -36,10 +36,7 @@ const InvoiceEdit = () => {
 
       // Check permissions
       if (user) {
-        const isHouseManager =
-          response.data.room?.house?.manager_id === user?.id;
-
-        if (!isAdmin && !(isManager && isHouseManager)) {
+        if (!isAdmin && !isManager) {
           showError("Bạn không có quyền chỉnh sửa hóa đơn này");
           navigate(`/invoices/${id}`);
           return;
@@ -52,11 +49,30 @@ const InvoiceEdit = () => {
   };
 
   const handleSubmit = async (formData) => {
-    const response = await updateInvoice(id, formData);
+    // Chỉ gửi các trường payment nếu được chọn thanh toán ngay
+    const dataToSubmit = { ...formData };
+    
+    // Nếu payment_method_id trống, có nghĩa là không chọn thanh toán ngay
+    if (!dataToSubmit.payment_method_id) {
+      delete dataToSubmit.payment_method_id;
+      delete dataToSubmit.payment_status;
+      delete dataToSubmit.payment_date;
+      delete dataToSubmit.transaction_code;
+    } else if (dataToSubmit.payment_status !== 'completed') {
+      // Nếu trạng thái không phải là completed, đặt ngày thanh toán thành null
+      dataToSubmit.payment_date = null;
+    }
+    
+    const response = await updateInvoice(id, dataToSubmit);
 
     if (response.success) {
-      showSuccess("Cập nhật hóa đơn thành công");
-      navigate(`/invoices/${id}`);
+      // Nếu không có dữ liệu trả về, có nghĩa là hóa đơn đã bị xóa do không còn mục nào
+      if (!response.data || Object.keys(response.data).length === 0) {
+        showSuccess("Hóa đơn đã bị xóa do không còn mục nào");
+        navigate("/invoices");
+      } else {
+        showSuccess("Cập nhật hóa đơn thành công");
+      }
     } else {
       if (response.data && typeof response.data === "object") {
         setErrors(response.data);

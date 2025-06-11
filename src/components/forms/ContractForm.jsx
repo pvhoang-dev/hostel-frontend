@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 import { roomService } from "../../api/rooms";
-import { userService } from "../../api/users";
-import Input from "../common/Input";
-import Select from "../common/Select";
-import Button from "../common/Button";
-import TextArea from "../common/TextArea";
-import DatePicker from "../common/DatePicker";
-import { USER_ROLES } from "../../utils/constants.js";
+import { contractService } from "../../api/contracts";
+import Input from "../ui/Input";
+import Select from "../ui/Select";
+import Button from "../ui/Button";
+import TextArea from "../ui/TextArea";
+import DatePicker from "../ui/DatePicker";
 
 const ContractForm = ({
   initialData = {},
@@ -17,35 +16,93 @@ const ContractForm = ({
   roomId = null,
 }) => {
   const [formData, setFormData] = useState({
-    room_id: roomId || "",
-    tenant_id: "",
+    room_id: roomId || initialData?.room?.id || "",
+    user_ids: initialData.user_ids || [],
     start_date: new Date().toISOString().split("T")[0],
     end_date: new Date(new Date().setMonth(new Date().getMonth() + 6))
       .toISOString()
       .split("T")[0],
-    monthly_rent: 0,
+    monthly_price: 0,
     deposit_amount: 0,
-    payment_day: 5,
     status: "active",
     notes: "",
+    auto_renew: initialData?.auto_renew || false,
+    time_renew: initialData?.time_renew || 0,
     ...initialData,
   });
 
   const [rooms, setRooms] = useState([]);
   const [tenants, setTenants] = useState([]);
+  const [selectedTenants, setSelectedTenants] = useState([]);
+  const [loadingTenants, setLoadingTenants] = useState(false);
 
   useEffect(() => {
-    loadTenants();
     if (!roomId) {
       loadRooms();
     }
-  }, [roomId]);
+
+    // Khởi tạo giá trị khi ở chế độ edit
+    if (mode === "edit" && initialData) {
+      // Nếu có tenants (từ API trả về)
+      if (initialData.tenants && initialData.tenants.length > 0) {
+        const selectedUsers = initialData.tenants.map((tenant) => ({
+          value: tenant.id,
+          label: `${tenant.name} (${tenant.email})`,
+        }));
+
+        setSelectedTenants(selectedUsers);
+
+        // Đưa danh sách tenants vào danh sách người thuê có sẵn
+        setTenants((currentTenants) => {
+          const newList = [...currentTenants];
+          selectedUsers.forEach((user) => {
+            if (!newList.some((t) => t.value === user.value)) {
+              newList.push(user);
+            }
+          });
+          return newList;
+        });
+      }
+      // Nếu không có tenants nhưng có users (từ cấu trúc dữ liệu cũ)
+      else if (initialData.users && initialData.users.length > 0) {
+        const selectedUsers = initialData.users.map((user) => ({
+          value: user.id,
+          label: `${user.name} (${user.email})`,
+        }));
+
+        setSelectedTenants(selectedUsers);
+
+        // Đưa danh sách users vào danh sách người thuê có sẵn
+        setTenants((currentTenants) => {
+          const newList = [...currentTenants];
+          selectedUsers.forEach((user) => {
+            if (!newList.some((t) => t.value === user.value)) {
+              newList.push(user);
+            }
+          });
+          return newList;
+        });
+      }
+
+      // Nếu có room_id trong dữ liệu ban đầu, tải danh sách người thuê
+      if (initialData.room_id) {
+        loadTenants(initialData.room_id);
+      }
+    }
+  }, [initialData, mode, roomId]);
+
+  useEffect(() => {
+    if (formData.room_id) {
+      loadTenants(formData.room_id);
+    }
+  }, [formData.room_id]);
 
   const loadRooms = async () => {
     try {
       const response = await roomService.getRooms({
         status: "available",
         include: "house",
+        per_page: 10000,
       });
       if (response.success) {
         setRooms(
@@ -60,33 +117,111 @@ const ContractForm = ({
     }
   };
 
-  const loadTenants = async () => {
+  const loadTenants = async (roomId) => {
     try {
-      const response = await userService.getUsers({
-        role_id: USER_ROLES.TENANT,
-      });
+      setLoadingTenants(true);
+      const params = { room_id: roomId };
+      const response = await contractService.getAvailableTenants(params);
+
       if (response.success) {
-        setTenants(
-          response.data.data.map((user) => ({
-            value: user.id,
-            label: `${user.name} (${user.email})`,
-          }))
+        const tenantsData = response.data.map((user) => ({
+          value: user.id,
+          label: `${user.name} (${user.email})`,
+        }));
+
+        // Kết hợp danh sách từ API với danh sách người thuê đã chọn
+        const combinedTenants = [...tenantsData];
+
+        // Thêm những người thuê đã chọn vào danh sách nếu chưa có
+        selectedTenants.forEach((selected) => {
+          if (!combinedTenants.some((t) => t.value === selected.value)) {
+            combinedTenants.push(selected);
+          }
+        });
+
+        setTenants(combinedTenants);
+      } else {
+        console.error(
+          "API getAvailableTenants không thành công:",
+          response.message
         );
       }
     } catch (error) {
-      console.error("Error loading tenants:", error);
+      console.error("Lỗi khi gọi API getAvailableTenants:", error);
+    } finally {
+      setLoadingTenants(false);
     }
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // Convert numerical values
-    if (["monthly_rent", "deposit_amount", "payment_day"].includes(name)) {
+    if (["monthly_price", "deposit_amount"].includes(name)) {
       setFormData({ ...formData, [name]: parseInt(value) || 0 });
+    } else if (name === "tenant_select") {
+      const selectedTenant = tenants.find((tenant) => tenant.value == value);
+      if (
+        selectedTenant &&
+        !selectedTenants.some((t) => t.value === selectedTenant.value)
+      ) {
+        const newSelectedTenants = [...selectedTenants, selectedTenant];
+        setSelectedTenants(newSelectedTenants);
+        setFormData({
+          ...formData,
+          user_ids: newSelectedTenants.map((t) => t.value),
+        });
+      }
     } else {
       setFormData({ ...formData, [name]: value });
     }
+  };
+
+  // Hàm xử lý khi chọn phòng
+  const handleRoomChange = (e) => {
+    const roomId = e.target.value || "";
+
+    setFormData((prevState) => {
+      const newFormData = {
+        ...prevState,
+        room_id: roomId,
+      };
+
+      // Gọi trực tiếp loadTenants nếu có room_id
+      if (roomId) {
+        loadTenants(roomId);
+      }
+
+      return newFormData;
+    });
+  };
+
+  // Hàm xử lý khi chọn người thuê với Select
+  const handleTenantChange = (e) => {
+    const tenantId = e.target.value;
+    const selectedOption = tenants.find((tenant) => tenant.value === tenantId);
+
+    if (
+      selectedOption &&
+      !selectedTenants.some((t) => t.value === selectedOption.value)
+    ) {
+      const newSelectedTenants = [...selectedTenants, selectedOption];
+      setSelectedTenants(newSelectedTenants);
+      setFormData({
+        ...formData,
+        user_ids: newSelectedTenants.map((t) => t.value),
+      });
+    }
+  };
+
+  const removeTenant = (tenantId) => {
+    const newSelectedTenants = selectedTenants.filter(
+      (t) => t.value !== tenantId
+    );
+    setSelectedTenants(newSelectedTenants);
+    setFormData({
+      ...formData,
+      user_ids: newSelectedTenants.map((t) => t.value),
+    });
   };
 
   const handleSubmit = (e) => {
@@ -103,11 +238,16 @@ const ContractForm = ({
               label="Phòng"
               name="room_id"
               value={formData.room_id}
-              onChange={handleChange}
+              onChange={handleRoomChange}
+              options={rooms}
+              placeholder={
+                mode === "edit"
+                  ? `${formData.room?.room_number} - ${formData.room?.house?.name}`
+                  : "Chọn phòng"
+              }
               error={errors.room_id}
-              options={[{ value: "", label: "Chọn phòng" }, ...rooms]}
-              placeholder="Chọn phòng"
-              required
+              disabled={isSubmitting || mode === "edit"}
+              isClearable={mode !== "edit"}
             />
           </div>
         )}
@@ -115,14 +255,49 @@ const ContractForm = ({
         <div className="col-md-6">
           <Select
             label="Người thuê"
-            name="tenant_id"
-            value={formData.tenant_id}
-            onChange={handleChange}
-            error={errors.tenant_id}
-            options={[{ value: "", label: "Chọn người thuê" }, ...tenants]}
-            placeholder="Chọn người thuê"
-            required
+            name="tenant_select"
+            onChange={handleTenantChange}
+            options={tenants}
+            placeholder={loadingTenants ? "Đang tải..." : "Chọn người thuê"}
+            disabled={loadingTenants || isSubmitting}
+            error={errors.user_ids}
+            isClearable
           />
+          <div className="mt-2">
+            {selectedTenants.length === 0 && (
+              <div className="text-muted">Chưa có người thuê nào được chọn</div>
+            )}
+            {selectedTenants.map((tenant) => (
+              <div
+                key={tenant.value}
+                className="d-flex align-items-center mb-1 bg-light p-2 rounded"
+              >
+                <div className="flex-grow-1">{tenant.label}</div>
+                <button
+                  type="button"
+                  className="btn btn-sm btn-danger"
+                  onClick={() => removeTenant(tenant.value)}
+                  style={{
+                    width: "28px",
+                    height: "28px",
+                    padding: "0",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <span style={{ fontSize: "18px", fontWeight: "bold" }}>
+                    ×
+                  </span>
+                </button>
+              </div>
+            ))}
+          </div>
+          {selectedTenants.length === 0 && mode === "create" && (
+            <div className="text-danger mt-1">
+              Vui lòng chọn ít nhất một người thuê
+            </div>
+          )}
         </div>
 
         <div className="col-md-6">
@@ -150,12 +325,12 @@ const ContractForm = ({
         <div className="col-md-6">
           <Input
             label="Tiền thuê hàng tháng"
-            name="monthly_rent"
+            name="monthly_price"
             type="number"
             min="0"
-            value={formData.monthly_rent}
+            value={formData.monthly_price || null}
             onChange={handleChange}
-            error={errors.monthly_rent}
+            error={errors.monthly_price}
             required
           />
         </div>
@@ -166,23 +341,9 @@ const ContractForm = ({
             name="deposit_amount"
             type="number"
             min="0"
-            value={formData.deposit_amount}
+            value={formData.deposit_amount || null}
             onChange={handleChange}
             error={errors.deposit_amount}
-            required
-          />
-        </div>
-
-        <div className="col-md-6">
-          <Input
-            label="Ngày thanh toán (hàng tháng)"
-            name="payment_day"
-            type="number"
-            min="1"
-            max="31"
-            value={formData.payment_day}
-            onChange={handleChange}
-            error={errors.payment_day}
             required
           />
         </div>
@@ -203,6 +364,38 @@ const ContractForm = ({
           />
         </div>
 
+        <div className="col-md-6">
+          <Select
+            label="Tự động gia hạn"
+            name="auto_renew"
+            value={formData.auto_renew || 0}
+            onChange={(e) => {
+              setFormData({
+                ...formData,
+                auto_renew: e.target.value,
+              });
+            }}
+            error={errors.auto_renew}
+            options={[
+              { value: 1, label: "Có" },
+              { value: 0, label: "Không" },
+            ]}
+          />
+        </div>
+
+        <div className="col-md-6">
+          <Input
+            label="Thời gian gia hạn (tháng)"
+            name="time_renew"
+            type="number"
+            min="1"
+            value={formData.auto_renew ? formData.time_renew : 0}
+            onChange={handleChange}
+            error={errors.time_renew}
+            disabled={!formData.auto_renew}
+          />
+        </div>
+
         <div className="col-12">
           <TextArea
             label="Ghi chú"
@@ -220,11 +413,14 @@ const ContractForm = ({
           type="button"
           variant="secondary"
           onClick={() => window.history.back()}
-          className="me-2 mr-2"
+          className=" mr-2"
         >
           Hủy
         </Button>
-        <Button type="submit" disabled={isSubmitting}>
+        <Button
+          type="submit"
+          disabled={isSubmitting || selectedTenants.length === 0}
+        >
           {isSubmitting
             ? `${mode === "create" ? "Đang tạo" : "Đang cập nhật"}...`
             : mode === "create"

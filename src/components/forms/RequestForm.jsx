@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
-import { roomService } from "../../api/rooms";
 import { userService } from "../../api/users";
 import { useAuth } from "../../hooks/useAuth";
-import Input from "../common/Input";
-import Select from "../common/Select";
-import Button from "../common/Button";
-import TextArea from "../common/TextArea";
-import Loader from "../common/Loader";
+import Button from "../ui/Button";
+import TextArea from "../ui/TextArea";
+import Loader from "../ui/Loader";
+import Select from "../ui/Select";
 
 const RequestForm = ({
   initialData = {},
@@ -19,81 +17,79 @@ const RequestForm = ({
   const { user } = useAuth();
 
   const [formData, setFormData] = useState({
-    room_id: roomId || initialData.room_id || "",
-    creator_id: user?.id || initialData.creator_id || "",
-    assignee_id: initialData.assignee_id || "",
-    type: initialData.type || "maintenance",
+    sender_id: user?.id || initialData.sender_id || "",
+    recipient_id: initialData.recipient_id || "",
+    request_type: initialData.request_type || "maintenance",
     description: initialData.description || "",
     status: initialData.status || "pending",
     ...initialData,
   });
 
-  const [rooms, setRooms] = useState([]);
   const [recipients, setRecipients] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setLoading(true);
-    loadRooms();
     loadPotentialRecipients();
   }, [user?.id]);
 
-  const loadRooms = async () => {
-    try {
-      const response = await roomService.getRooms({
-        per_page: 100, // Load more rooms
-        include: "house",
-      });
-      if (response.success) {
-        const roomsList = response.data.data.map((room) => ({
-          value: room.id,
-          label: `${room.room_number} - ${room.house?.name || ""}`,
-        }));
-        setRooms(roomsList);
-      }
-    } catch (error) {
-      console.error("Lỗi khi tải danh sách phòng:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const loadPotentialRecipients = async () => {
     try {
-      let recipients;
+      let recipients = [];
+
+      // Thêm tham số include để lấy thêm thông tin về phòng và nhà
       if (user.role === "admin") {
-        // Admin có thể gửi cho admin hoặc manager khác
         const response = await userService.getUsers({
-          role: ["admin", "manager"],
+          for_requests: "true",
+          include: "house,room,role",
+          per_page: 10000,
         });
         recipients = response.data.data || [];
       } else if (user.role === "manager") {
-        // Manager chỉ có thể gửi cho admin
         const response = await userService.getUsers({
-          role: ["admin"],
+          for_requests: "true",
+          include: "house,room,role",
+          per_page: 10000,
         });
         recipients = response.data.data || [];
       } else if (user.role === "tenant") {
-        // Tenant chỉ có thể gửi cho manager quản lý nhà của họ hoặc admin
         const response = await userService.getUsers({
-          role: ["admin", "manager"],
+          for_requests: "true",
+          include: "house,room,role",
         });
         recipients = response.data.data || [];
       }
 
-      // Lọc bỏ người dùng hiện tại
       const filteredRecipients = recipients
         .filter((r) => r.id !== user.id)
-        .map((r) => ({
-          value: r.id,
-          label: `${r.name} (${
-            r.role === "admin" ? "Quản trị viên" : "Quản lý"
-          })`,
-        }));
+        .map((r) => {
+          let label = "";
+
+          if (r.role.code === "admin") {
+            label = `${r.name} (Quản trị viên)`;
+          } else if (r.role.code === "manager") {
+            label = `${r.name} (Quản lý${r.house ? ` - ${r.house.name}` : ""})`;
+          } else if (r.role.code === "tenant") {
+            const roomInfo = r.room
+              ? ` - ${r.room.room_number}`
+              : " - Chưa có phòng";
+            const houseInfo = r.house ? ` - ${r.house.name}` : "";
+            label = `${r.name} (Người thuê${roomInfo}${houseInfo})`;
+          } else {
+            label = r.name;
+          }
+
+          return {
+            value: r.id,
+            label: label,
+          };
+        });
 
       setRecipients(filteredRecipients);
     } catch (error) {
       console.error("Lỗi khi tải danh sách người nhận:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -118,37 +114,19 @@ const RequestForm = ({
     { value: "other", label: "Khác" },
   ];
 
-  const requestStatuses = [
-    { value: "pending", label: "Đang chờ" },
-    { value: "in_progress", label: "Đang xử lý" },
-    { value: "completed", label: "Đã hoàn thành" },
-    { value: "rejected", label: "Đã từ chối" },
-  ];
-
   return (
     <form onSubmit={handleSubmit}>
       <div className="row g-3">
         <div className="col-md-6">
           <Select
-            label="Phòng"
-            name="room_id"
-            value={formData.room_id}
-            onChange={handleChange}
-            error={errors.room_id}
-            options={[{ value: "", label: "Chọn phòng" }, ...rooms]}
-            required
-            disabled={!!roomId || mode === "edit"}
-          />
-        </div>
-
-        <div className="col-md-6">
-          <Select
             label="Người nhận"
-            name="assignee_id"
-            value={formData.assignee_id}
+            name="recipient_id"
+            value={formData.recipient_id}
             onChange={handleChange}
-            error={errors.assignee_id}
-            options={[{ value: "", label: "Chọn người nhận" }, ...recipients]}
+            options={recipients}
+            placeholder="Chọn người nhận"
+            disabled={isSubmitting}
+            error={errors.recipient_id}
             required
           />
         </div>
@@ -156,28 +134,16 @@ const RequestForm = ({
         <div className="col-md-6">
           <Select
             label="Loại yêu cầu"
-            name="type"
-            value={formData.type}
+            name="request_type"
+            value={formData.request_type}
             onChange={handleChange}
-            error={errors.type}
             options={requestTypes}
+            placeholder="Chọn loại yêu cầu"
+            disabled={isSubmitting}
+            error={errors.request_type}
             required
           />
         </div>
-
-        {mode === "edit" && (
-          <div className="col-md-6">
-            <Select
-              label="Trạng thái"
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-              error={errors.status}
-              options={requestStatuses}
-              required
-            />
-          </div>
-        )}
 
         <div className="col-12">
           <TextArea
@@ -186,28 +152,39 @@ const RequestForm = ({
             value={formData.description}
             onChange={handleChange}
             error={errors.description}
-            rows={5}
+            rows={4}
+            placeholder="Nhập mô tả chi tiết về yêu cầu của bạn..."
             required
           />
         </div>
-      </div>
 
-      <div className="mt-4 d-flex justify-content-end">
-        <Button
-          type="button"
-          variant="secondary"
-          onClick={() => window.history.back()}
-          className="me-2 mr-2"
-        >
-          Hủy
-        </Button>
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting
-            ? `${mode === "create" ? "Đang tạo" : "Đang cập nhật"}...`
-            : mode === "create"
-            ? "Tạo yêu cầu"
-            : "Cập nhật yêu cầu"}
-        </Button>
+        <div className="col-12 mt-4">
+          <div className="d-flex justify-content-end gap-2">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => window.history.back()}
+            >
+              Hủy
+            </Button>
+            <Button type="submit" variant="primary" disabled={isSubmitting}>
+              {isSubmitting ? (
+                <>
+                  <span
+                    className="spinner-border spinner-border-sm me-2"
+                    role="status"
+                    aria-hidden="true"
+                  ></span>
+                  {mode === "create" ? "Đang tạo..." : "Đang cập nhật..."}
+                </>
+              ) : mode === "create" ? (
+                "Tạo yêu cầu"
+              ) : (
+                "Cập nhật yêu cầu"
+              )}
+            </Button>
+          </div>
+        </div>
       </div>
     </form>
   );

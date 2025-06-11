@@ -6,6 +6,13 @@ export const equipmentService = {
     return response.data;
   },
 
+  getEquipmentByExactName: async (name) => {
+    const response = await api.get("/equipments", {
+      params: { name, exact: true },
+    });
+    return response.data;
+  },
+
   getEquipment: async (id) => {
     const response = await api.get(`/equipments/${id}`);
     return response.data;

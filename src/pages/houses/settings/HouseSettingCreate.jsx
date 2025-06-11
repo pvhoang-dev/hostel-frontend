@@ -3,11 +3,11 @@ import { useNavigate, useParams } from "react-router-dom";
 import { houseSettingService } from "../../../api/houseSettings";
 import { houseService } from "../../../api/houses";
 import HouseSettingForm from "../../../components/forms/HouseSettingForm";
-import Card from "../../../components/common/Card";
+import Card from "../../../components/ui/Card";
 import useAlert from "../../../hooks/useAlert";
 import useApi from "../../../hooks/useApi";
 import { useAuth } from "../../../hooks/useAuth";
-import Loader from "../../../components/common/Loader";
+import Loader from "../../../components/ui/Loader";
 
 const HouseSettingCreate = () => {
   const { houseId } = useParams();

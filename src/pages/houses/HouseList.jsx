@@ -2,12 +2,12 @@ import { useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { houseService } from "../../api/houses";
 import { userService } from "../../api/users";
-import Table from "../../components/common/Table";
-import Card from "../../components/common/Card";
-import Button from "../../components/common/Button";
-import Input from "../../components/common/Input";
-import Select from "../../components/common/Select";
-import Loader from "../../components/common/Loader";
+import Table from "../../components/ui/Table";
+import Card from "../../components/ui/Card";
+import Button from "../../components/ui/Button";
+import Input from "../../components/ui/Input";
+import Select from "../../components/ui/Select";
+import Loader from "../../components/ui/Loader";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 import { useAuth } from "../../hooks/useAuth";
@@ -73,11 +73,7 @@ const FilterSection = ({
     </div>
 
     <div className="mt-3 d-flex justify-content-end">
-      <Button
-        variant="secondary"
-        onClick={onClearFilters}
-        className="me-2 mr-2"
-      >
+      <Button variant="secondary" onClick={onClearFilters} className=" mr-2">
         Xóa bộ lọc
       </Button>
       <Button onClick={onApplyFilters}>Tìm</Button>
@@ -92,7 +88,7 @@ const HouseList = () => {
 
   // Get current filters from URL
   const currentPage = Number(searchParams.get("page")) || 1;
-  const perPage = Number(searchParams.get("per_page")) || 5;
+  const perPage = Number(searchParams.get("per_page")) || 10;
   const sortBy = searchParams.get("sort_by") || "id";
   const sortDir = searchParams.get("sort_dir") || "asc";
   const name = searchParams.get("name") || "";
@@ -128,7 +124,7 @@ const HouseList = () => {
 
   const managers = managersData?.data || [];
 
-  const { isAdmin } = useAuth();
+  const { isAdmin, isTenant, isManager } = useAuth();
 
   // Column definitions for the table
   const columns = [
@@ -179,6 +175,25 @@ const HouseList = () => {
     },
   ];
 
+  // Khởi tạo xử lý nút Hủy trong modal
+  useEffect(() => {
+    // Khởi tạo nút hủy trong modal
+    $("#deleteHouseModal .btn-close, #deleteHouseModal .btn-secondary").on(
+      "click",
+      function () {
+        $("#deleteHouseModal").modal("hide");
+      }
+    );
+
+    // Cleanup khi component unmount
+    return () => {
+      $("#deleteHouseModal .btn-close, #deleteHouseModal .btn-secondary").off(
+        "click"
+      );
+      $("#deleteHouseModal #confirmDeleteBtn").off("click");
+    };
+  }, []);
+
   useEffect(() => {
     loadHouses();
     loadManagers();
@@ -188,7 +203,16 @@ const HouseList = () => {
     if (!loadingManagers && !loadingHouses) {
       loadHouses();
     }
-  }, [currentPage, perPage, sortBy, sortDir, manager_id, status]);
+  }, [
+    currentPage,
+    perPage,
+    sortBy,
+    sortDir,
+    manager_id,
+    status,
+    name,
+    address,
+  ]);
 
   const loadHouses = async () => {
     const params = {
@@ -217,7 +241,18 @@ const HouseList = () => {
   };
 
   const handleDeleteHouse = async (house) => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa nhà này?")) {
+    // Hiển thị modal xác nhận
+    const $deleteModal = $("#deleteHouseModal");
+
+    // Xóa event handlers cũ (nếu có)
+    $deleteModal.find("#confirmDeleteBtn").off("click");
+
+    // Đăng ký event handler mới cho nút xác nhận
+    $deleteModal.find("#confirmDeleteBtn").on("click", async function () {
+      // Ẩn modal
+      $deleteModal.modal("hide");
+
+      // Gọi API xóa nhà
       const response = await deleteHouse(house.id);
 
       if (response.success) {
@@ -226,7 +261,10 @@ const HouseList = () => {
       } else {
         showError(response.message || "Có lỗi xảy ra khi xóa nhà");
       }
-    }
+    });
+
+    // Hiển thị modal
+    $deleteModal.modal("show");
   };
 
   const handlePageChange = (page) => {
@@ -265,7 +303,6 @@ const HouseList = () => {
       page: "1",
       per_page: perPage.toString(),
     });
-    loadHouses();
   };
 
   const isLoading = loadingHouses || loadingManagers;
@@ -281,14 +318,16 @@ const HouseList = () => {
         )}
       </div>
 
-      <FilterSection
-        filters={{ name, address, manager_id, status }}
-        managers={managers}
-        onFilterChange={handleFilterChange}
-        onClearFilters={clearFilters}
-        onApplyFilters={loadHouses}
-        isAdmin={isAdmin}
-      />
+      {!isTenant && (
+        <FilterSection
+          filters={{ name, address, manager_id, status }}
+          managers={managers}
+          onFilterChange={handleFilterChange}
+          onClearFilters={clearFilters}
+          onApplyFilters={loadHouses}
+          isAdmin={isAdmin}
+        />
+      )}
 
       <Card>
         {isLoading ? (
@@ -309,10 +348,15 @@ const HouseList = () => {
                   icon: "mdi-eye",
                   handler: (house) => navigate(`/houses/${house.id}`),
                 },
-                {
-                  icon: "mdi-pencil",
-                  handler: (house) => navigate(`/houses/${house.id}/edit`),
-                },
+                ...(isAdmin || isManager
+                  ? [
+                      {
+                        icon: "mdi-pencil",
+                        handler: (house) =>
+                          navigate(`/houses/${house.id}/edit`),
+                      },
+                    ]
+                  : []),
                 ...(isAdmin
                   ? [
                       {
@@ -326,6 +370,65 @@ const HouseList = () => {
           />
         )}
       </Card>
+
+      {/* Modal xác nhận xóa nhà (HTML cứng, không truyền dữ liệu động) */}
+      <div
+        className="modal fade"
+        id="deleteHouseModal"
+        tabIndex="-1"
+        aria-hidden="true"
+      >
+        <div className="modal-dialog modal-dialog-centered modal-lg">
+          <div className="modal-content">
+            <div className="modal-header bg-danger text-white">
+              <h5 className="modal-title">Xác nhận xóa nhà</h5>
+              <button
+                type="button"
+                className="btn-close"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div className="modal-body">
+              <div className="alert alert-warning">
+                <h5 className="alert-heading fw-bold">Cảnh báo!</h5>
+                <p>Bạn đang xóa nhà này.</p>
+                <p>Hành động này sẽ xóa các dữ liệu liên quan, bao gồm:</p>
+                <ul>
+                  <li>Tất cả các phòng trong nhà</li>
+                  <li>Tất cả hợp đồng thuê liên quan đến các phòng</li>
+                  <li>Tất cả thiết bị của phòng</li>
+                  <li>Tất cả dịch vụ của phòng</li>
+                  <li>Tất cả yêu cầu và phản hồi liên quan</li>
+                  <li>Tất cả cài đặt của nhà</li>
+                  <li>Tất cả thiết bị trong kho của nhà</li>
+                </ul>
+                <div className="alert alert-success">
+                  <p className="mb-0">
+                    <i className="mdi mdi-information-outline me-1"></i> Hóa đơn
+                    và giao dịch thanh toán sẽ được giữ lại để phục vụ mục đích
+                    thống kê doanh thu.
+                  </p>
+                </div>
+                <p className="mt-3 text-danger fw-bold">
+                  Hành động xóa nhà không thể hoàn tác!
+                </p>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button type="button" className="btn btn-secondary">
+                Hủy
+              </button>
+              <button
+                type="button"
+                className="btn btn-danger"
+                id="confirmDeleteBtn"
+              >
+                Xác nhận xóa
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { settingService } from "../../api/settings";
 import SettingForm from "../../components/forms/SettingForm";
-import Card from "../../components/common/Card";
-import Loader from "../../components/common/Loader";
+import Card from "../../components/ui/Card";
+import Loader from "../../components/ui/Loader";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 
@@ -25,9 +25,6 @@ const SettingEdit = () => {
     setLoading(true);
     try {
       const response = await settingService.getSetting(id);
-
-      // Kiểm tra và log dữ liệu để debug
-      console.log("Setting data loaded:", response);
 
       if (response.success) {
         // Đảm bảo settingData có cấu trúc đúng cho form
@@ -59,7 +56,6 @@ const SettingEdit = () => {
 
       if (response.success) {
         showSuccess("Cập nhật cài đặt thành công");
-        navigate("/settings");
       } else {
         if (response.data && typeof response.data === "object") {
           setErrors(response.data);

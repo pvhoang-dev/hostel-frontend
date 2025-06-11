@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { contractService } from "../../api/contracts";
 import ContractForm from "../../components/forms/ContractForm";
-import Card from "../../components/common/Card";
-import Loader from "../../components/common/Loader";
-import Button from "../../components/common/Button";
+import Card from "../../components/ui/Card";
+import Loader from "../../components/ui/Loader";
+import Button from "../../components/ui/Button";
 import { useAuth } from "../../hooks/useAuth";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
@@ -57,7 +57,7 @@ const ContractCreate = () => {
 
       <Card>
         <ContractForm
-          initialData={{ room_id: roomId, status: "pending", payment_day: 1 }}
+          initialData={{ room_id: roomId, status: "pending" }}
           onSubmit={handleSubmit}
           isSubmitting={isSubmitting}
           errors={errors}

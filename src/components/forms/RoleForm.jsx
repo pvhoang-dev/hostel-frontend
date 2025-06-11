@@ -1,6 +1,6 @@
 import { useState } from "react";
-import Input from "../common/Input";
-import Button from "../common/Button";
+import Input from "../ui/Input";
+import Button from "../ui/Button";
 
 const RoleForm = ({
   initialData = {},
@@ -56,7 +56,7 @@ const RoleForm = ({
           type="button"
           variant="secondary"
           onClick={() => window.history.back()}
-          className="me-2 mr-2"
+          className=" mr-2"
         >
           Hủy
         </Button>

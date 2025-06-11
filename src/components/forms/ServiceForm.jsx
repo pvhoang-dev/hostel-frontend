@@ -1,8 +1,8 @@
 import { useState } from "react";
-import Input from "../common/Input";
-import Button from "../common/Button";
-import TextArea from "../common/TextArea";
-import Checkbox from "../common/Checkbox";
+import Input from "../ui/Input";
+import Button from "../ui/Button";
+import TextArea from "../ui/TextArea";
+import Checkbox from "../ui/Checkbox";
 
 const ServiceForm = ({
   initialData = {},
@@ -97,7 +97,7 @@ const ServiceForm = ({
           type="button"
           variant="secondary"
           onClick={() => window.history.back()}
-          className="me-2 mr-2"
+          className=" mr-2"
         >
           Hủy
         </Button>

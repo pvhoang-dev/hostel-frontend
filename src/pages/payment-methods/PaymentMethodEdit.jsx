@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { paymentMethodService } from "../../api/paymentMethods";
 import PaymentMethodForm from "../../components/forms/PaymentMethodForm";
-import Card from "../../components/common/Card";
-import Loader from "../../components/common/Loader";
+import Card from "../../components/ui/Card";
+import Loader from "../../components/ui/Loader";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 
@@ -43,7 +43,6 @@ const PaymentMethodEdit = () => {
 
     if (response.success) {
       showSuccess("Cập nhật phương thức thanh toán thành công");
-      navigate("/payment-methods");
     } else {
       if (response.data && typeof response.data === "object") {
         setErrors(response.data);

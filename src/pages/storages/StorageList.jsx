@@ -2,12 +2,12 @@ import { useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { storageService } from "../../api/storages";
 import { houseService } from "../../api/houses";
-import Table from "../../components/common/Table";
-import Card from "../../components/common/Card";
-import Button from "../../components/common/Button";
-import Input from "../../components/common/Input";
-import Select from "../../components/common/Select";
-import Loader from "../../components/common/Loader";
+import Table from "../../components/ui/Table";
+import Card from "../../components/ui/Card";
+import Button from "../../components/ui/Button";
+import Input from "../../components/ui/Input";
+import Select from "../../components/ui/Select";
+import Loader from "../../components/ui/Loader";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 import { useAuth } from "../../hooks/useAuth";
@@ -33,7 +33,7 @@ const FilterSection = ({
             options={[
               { value: "", label: "Tất cả" },
               ...houses.map((house) => ({
-                value: house.id,
+                value: house.id.toString(),
                 label: house.name,
               })),
             ]}
@@ -96,11 +96,7 @@ const FilterSection = ({
     </div>
 
     <div className="mt-3 d-flex justify-content-end">
-      <Button
-        variant="secondary"
-        onClick={onClearFilters}
-        className="me-2 mr-2"
-      >
+      <Button variant="secondary" onClick={onClearFilters} className=" mr-2">
         Xóa bộ lọc
       </Button>
       <Button onClick={onApplyFilters}>Tìm</Button>
@@ -116,14 +112,11 @@ const StorageList = ({
   const [searchParams, setSearchParams] = useSearchParams();
   const { showSuccess, showError } = useAlert();
   const navigate = useNavigate();
-  const { user } = useAuth();
-
-  const isAdmin = user?.role === "admin";
-  const isManager = user?.role === "manager";
+  const { user, isAdmin, isManager } = useAuth();
 
   // Get current filters from URL
   const currentPage = Number(searchParams.get("page")) || 1;
-  const perPage = Number(searchParams.get("per_page")) || (embedded ? 10 : 5);
+  const perPage = Number(searchParams.get("per_page")) || 10;
   const sortBy = searchParams.get("sort_by") || "id";
   const sortDir = searchParams.get("sort_dir") || "asc";
 
@@ -176,7 +169,13 @@ const StorageList = ({
           {
             accessorKey: "house.name",
             header: "Nhà",
-            cell: ({ row }) => row.original.house?.name || "N/A",
+            cell: ({ row }) => {
+              return (
+                <Link to={`/houses/${row.original.house?.id}`}>
+                  {row.original.house?.name || "N/A"}
+                </Link>
+              );
+            },
           },
         ]
       : []),
@@ -229,7 +228,20 @@ const StorageList = ({
     if (user && (!loadingHouses || embedded) && !loadingStorages) {
       loadStorages();
     }
-  }, [currentPage, perPage, sortBy, sortDir, house_id, user, houseId]);
+  }, [
+    currentPage,
+    perPage,
+    sortBy,
+    sortDir,
+    house_id,
+    user,
+    houseId,
+    description,
+    min_quantity,
+    max_quantity,
+    min_price,
+    max_price,
+  ]);
 
   const loadStorages = async () => {
     const params = {
@@ -363,7 +375,6 @@ const StorageList = ({
         page: "1",
         per_page: perPage.toString(),
       });
-      loadStorages();
     }
   };
 

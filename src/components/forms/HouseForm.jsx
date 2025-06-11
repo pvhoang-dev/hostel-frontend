@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { userService } from "../../api/users";
-import Input from "../common/Input";
-import Select from "../common/Select";
-import Button from "../common/Button";
-import TextArea from "../common/TextArea";
+import Input from "../ui/Input";
+import Select from "../ui/Select";
+import Button from "../ui/Button";
+import TextArea from "../ui/TextArea";
 
 const HouseForm = ({
   initialData = {},
@@ -19,13 +19,25 @@ const HouseForm = ({
     status: "active",
     description: "",
     ...initialData,
+    manager_id: initialData.manager_id || (initialData.manager ? initialData.manager.id : ""),
   });
 
   const [managers, setManagers] = useState([]);
+  const [originalManagerId, setOriginalManagerId] = useState(
+    initialData.manager_id || (initialData.manager ? initialData.manager.id : "")
+  );
 
   useEffect(() => {
     loadManagers();
   }, []);
+
+  useEffect(() => {
+    if (initialData) {
+      setOriginalManagerId(
+        initialData.manager_id || (initialData.manager ? initialData.manager.id : "")
+      );
+    }
+  }, [initialData]);
 
   const loadManagers = async () => {
     try {
@@ -52,7 +64,13 @@ const HouseForm = ({
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(formData);
+    const dataToSubmit = { ...formData };
+    
+    if (mode === "edit" && dataToSubmit.manager_id === "" && originalManagerId) {
+      dataToSubmit.manager_id = originalManagerId;
+    }
+    
+    onSubmit(dataToSubmit);
   };
 
   return (
@@ -84,7 +102,7 @@ const HouseForm = ({
           <Select
             label="Quản lý"
             name="manager_id"
-            value={formData.manager_id || formData.manager?.id || ""}
+            value={formData.manager_id || ""}
             onChange={handleChange}
             error={errors.manager_id}
             options={[{ value: "", label: "Chọn quản lý" }, ...managers]}
@@ -124,7 +142,7 @@ const HouseForm = ({
           type="button"
           variant="secondary"
           onClick={() => window.history.back()}
-          className="me-2 mr-2"
+          className=" mr-2"
         >
           Hủy
         </Button>

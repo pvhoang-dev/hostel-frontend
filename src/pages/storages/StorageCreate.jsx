@@ -3,11 +3,11 @@ import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { storageService } from "../../api/storages";
 import { houseService } from "../../api/houses";
 import StorageForm from "../../components/forms/StorageForm";
-import Card from "../../components/common/Card";
+import Card from "../../components/ui/Card";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 import { useAuth } from "../../hooks/useAuth";
-import Loader from "../../components/common/Loader";
+import Loader from "../../components/ui/Loader";
 
 const StorageCreate = () => {
   const [searchParams] = useSearchParams();
@@ -15,7 +15,7 @@ const StorageCreate = () => {
   const navigate = useNavigate();
   const { showSuccess, showError } = useAlert();
   const [errors, setErrors] = useState({});
-  const { user } = useAuth();
+  const { user, isAdmin, isManager } = useAuth();
   const [loading, setLoading] = useState(true);
   const [canCreate, setCanCreate] = useState(false);
 
@@ -30,9 +30,6 @@ const StorageCreate = () => {
 
   const checkPermission = async () => {
     try {
-      const isAdmin = user?.role === "admin";
-      const isManager = user?.role === "manager";
-
       if (isAdmin) {
         setCanCreate(true);
         setLoading(false);

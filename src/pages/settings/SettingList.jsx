@@ -1,13 +1,14 @@
 import { useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { settingService } from "../../api/settings";
-import Table from "../../components/common/Table";
-import Card from "../../components/common/Card";
-import Button from "../../components/common/Button";
-import Input from "../../components/common/Input";
-import Loader from "../../components/common/Loader";
+import Table from "../../components/ui/Table";
+import Card from "../../components/ui/Card";
+import Button from "../../components/ui/Button";
+import Input from "../../components/ui/Input";
+import Loader from "../../components/ui/Loader";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
+import { useAuth } from "../../hooks/useAuth";
 
 // Filter section component
 const FilterSection = ({
@@ -47,11 +48,7 @@ const FilterSection = ({
     </div>
 
     <div className="mt-3 d-flex justify-content-end">
-      <Button
-        variant="secondary"
-        onClick={onClearFilters}
-        className="me-2 mr-2"
-      >
+      <Button variant="secondary" onClick={onClearFilters} className=" mr-2">
         Xóa bộ lọc
       </Button>
       <Button onClick={onApplyFilters}>Tìm</Button>
@@ -63,6 +60,10 @@ const SettingList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { showSuccess, showError } = useAlert();
   const navigate = useNavigate();
+  const { isTenant, isAdmin } = useAuth();
+
+  // Xác định nếu người dùng là tenant
+  const isInTenantView = isTenant;
 
   // Get current filters from URL
   const currentPage = Number(searchParams.get("page")) || 1;
@@ -122,7 +123,7 @@ const SettingList = () => {
 
   useEffect(() => {
     loadSettings();
-  }, [currentPage, perPage, sortBy, sortDir]);
+  }, [currentPage, perPage, sortBy, sortDir, key, value, description]);
 
   const loadSettings = async () => {
     const params = {
@@ -193,24 +194,27 @@ const SettingList = () => {
       page: "1",
       per_page: perPage.toString(),
     });
-    loadSettings();
   };
 
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center my-2">
-        <h3>Cài đặt hệ thống</h3>
-        <Button as={Link} to="/settings/create">
-          Thêm
-        </Button>
+        <h3>Nội quy chung</h3>
+        {isAdmin && (
+          <Button as={Link} to="/settings/create">
+            Thêm
+          </Button>
+        )}
       </div>
 
-      <FilterSection
-        filters={{ key, value, description }}
-        onFilterChange={handleFilterChange}
-        onClearFilters={clearFilters}
-        onApplyFilters={loadSettings}
-      />
+      {!isInTenantView && (
+        <FilterSection
+          filters={{ key, value, description }}
+          onFilterChange={handleFilterChange}
+          onClearFilters={clearFilters}
+          onApplyFilters={loadSettings}
+        />
+      )}
 
       <Card>
         {loadingSettings ? (
@@ -226,21 +230,28 @@ const SettingList = () => {
             loading={loadingSettings}
             actionColumn={{
               key: "actions",
-              actions: [
-                {
-                  icon: "mdi-eye",
-                  handler: (setting) => navigate(`/settings/${setting.id}`),
-                },
-                {
-                  icon: "mdi-pencil",
-                  handler: (setting) =>
-                    navigate(`/settings/${setting.id}/edit`),
-                },
-                {
-                  icon: "mdi-delete",
-                  handler: handleDeleteSetting,
-                },
-              ],
+              actions: !isAdmin
+                ? [
+                    {
+                      icon: "mdi-eye",
+                      handler: (setting) => navigate(`/settings/${setting.id}`),
+                    },
+                  ]
+                : [
+                    {
+                      icon: "mdi-eye",
+                      handler: (setting) => navigate(`/settings/${setting.id}`),
+                    },
+                    {
+                      icon: "mdi-pencil",
+                      handler: (setting) =>
+                        navigate(`/settings/${setting.id}/edit`),
+                    },
+                    {
+                      icon: "mdi-delete",
+                      handler: handleDeleteSetting,
+                    },
+                  ],
             }}
           />
         )}

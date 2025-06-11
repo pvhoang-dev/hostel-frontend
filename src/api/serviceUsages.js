@@ -1,7 +1,7 @@
 import api from "./axios";
 
 export const serviceUsageService = {
-  getServiceUsages: async (params) => {
+  getServiceUsages: async (params = {}) => {
     const response = await api.get("/room-service-usages", { params });
     return response.data;
   },
@@ -11,13 +11,16 @@ export const serviceUsageService = {
     return response.data;
   },
 
-  createServiceUsage: async (data) => {
-    const response = await api.post("/room-service-usages", data);
+  createServiceUsage: async (serviceUsageData) => {
+    const response = await api.post("/room-service-usages", serviceUsageData);
     return response.data;
   },
 
-  updateServiceUsage: async (id, data) => {
-    const response = await api.put(`/room-service-usages/${id}`, data);
+  updateServiceUsage: async (id, serviceUsageData) => {
+    const response = await api.put(
+      `/room-service-usages/${id}`,
+      serviceUsageData
+    );
     return response.data;
   },
 

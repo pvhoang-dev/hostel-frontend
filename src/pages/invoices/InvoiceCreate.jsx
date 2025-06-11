@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { invoiceService } from "../../api/invoices";
 import InvoiceForm from "../../components/forms/InvoiceForm";
-import Card from "../../components/common/Card";
-import Button from "../../components/common/Button";
-import Loader from "../../components/common/Loader";
+import Card from "../../components/ui/Card";
+import Button from "../../components/ui/Button";
+import Loader from "../../components/ui/Loader";
 import { useAuth } from "../../hooks/useAuth";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
@@ -28,7 +28,21 @@ const InvoiceCreate = () => {
   }, [user, navigate, showError]);
 
   const handleSubmit = async (formData) => {
-    const response = await createInvoice(formData);
+    // Chỉ gửi các trường payment nếu được chọn thanh toán ngay
+    const dataToSubmit = { ...formData };
+    
+    // Nếu payment_method_id trống, có nghĩa là không chọn thanh toán ngay
+    if (!dataToSubmit.payment_method_id) {
+      delete dataToSubmit.payment_method_id;
+      delete dataToSubmit.payment_status;
+      delete dataToSubmit.payment_date;
+      delete dataToSubmit.transaction_code;
+    } else if (dataToSubmit.payment_status !== 'completed') {
+      // Nếu trạng thái không phải là completed, đặt ngày thanh toán thành null
+      dataToSubmit.payment_date = null;
+    }
+    
+    const response = await createInvoice(dataToSubmit);
 
     if (response.success) {
       showSuccess("Tạo hóa đơn thành công");

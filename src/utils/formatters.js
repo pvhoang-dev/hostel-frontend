@@ -14,6 +14,18 @@ export const formatDate = (dateString, options = {}) => {
   return date.toLocaleDateString(undefined, { ...defaultOptions, ...options });
 };
 
+export const formatDateWithoutTime = (dateString, options = {}) => {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  const defaultOptions = {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+  };
+
+  return date.toLocaleDateString(undefined, { ...defaultOptions, ...options });
+};
+
 export const formatCurrency = (amount, currency = "VND") => {
   if (amount === null || amount === undefined) return "";
 
@@ -53,4 +65,15 @@ export const capitalizeFirstLetter = (string) => {
 
 export const formatFullName = (firstName, lastName) => {
   return [firstName, lastName].filter(Boolean).join(" ");
+};
+
+export const formatPaymentDate = (dateString) => {
+  if (!dateString) return "";
+  
+  // Nếu chuỗi ngày đã có định dạng YYYY-MM-DD HH:MM:SS, cắt lấy phần ngày
+  if (dateString.includes(" ")) {
+    return dateString.split(" ")[0];
+  }
+  
+  return dateString;
 };

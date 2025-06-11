@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { houseService } from "../../api/houses";
 import HouseForm from "../../components/forms/HouseForm";
-import Card from "../../components/common/Card";
-import Loader from "../../components/common/Loader";
+import Card from "../../components/ui/Card";
+import Loader from "../../components/ui/Loader";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 import { useAuth } from "../../hooks/useAuth";
@@ -12,7 +12,7 @@ const HouseEdit = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { showSuccess, showError } = useAlert();
-  const { user } = useAuth();
+  const { user, isAdmin, isManager } = useAuth();
 
   const [houseData, setHouseData] = useState(null);
   const [errors, setErrors] = useState({});
@@ -34,12 +34,14 @@ const HouseEdit = () => {
     const response = await fetchHouse(id);
 
     if (response.success) {
-      setHouseData(response.data);
+      const data = response.data;
+      if (data.manager && !data.manager_id) {
+        data.manager_id = data.manager.id;
+      }
+      setHouseData(data);
 
       if (user) {
-        const isAdmin = user?.role === "admin";
-        const isManager = user?.role === "manager";
-        const isHouseManager = response.data.manager?.id === user?.id;
+        const isHouseManager = data.manager?.id === user?.id;
 
         if (!isAdmin && !(isManager && isHouseManager)) {
           showError("Bạn không có quyền chỉnh sửa nhà này");
@@ -56,15 +58,21 @@ const HouseEdit = () => {
 
   const handleSubmit = async (formData) => {
     const dataToSubmit = { ...formData };
-    if (dataToSubmit.manager_id === "") {
-      dataToSubmit.manager_id = null;
+    
+    if (!isAdmin && dataToSubmit.manager_id === "") {
+      if (houseData && houseData.manager_id) {
+        dataToSubmit.manager_id = houseData.manager_id;
+      } else if (houseData && houseData.manager) {
+        dataToSubmit.manager_id = houseData.manager.id;
+      } else {
+        delete dataToSubmit.manager_id;
+      }
     }
 
     const response = await updateHouse(id, dataToSubmit);
 
     if (response.success) {
       showSuccess("Cập nhật nhà thành công");
-      navigate("/houses");
     } else {
       if (response.data && typeof response.data === "object") {
         setErrors(response.data);
@@ -74,7 +82,6 @@ const HouseEdit = () => {
     }
   };
 
-  // Nếu chưa có thông tin user, hiển thị loading
   if (!user) {
     return <Loader />;
   }

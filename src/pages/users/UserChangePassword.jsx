@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import Card from "../../components/common/Card";
+import Card from "../../components/ui/Card";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 import { userService } from "../../api/users";
@@ -10,8 +10,7 @@ const UserChangePassword = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { showSuccess, showError } = useAlert();
-  const { user } = useAuth();
-  const isAdmin = user?.role === "admin";
+  const { user, isAdmin } = useAuth();
   const isOwnAccount = user?.id === parseInt(id);
 
   const [formData, setFormData] = useState({

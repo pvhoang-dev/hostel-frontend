@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from "react";
-import { useAuth } from "../../hooks/useAuth";
+import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
-import { notificationService } from "../../api/notifications";
-import { formatNotificationTime } from "../../utils/validators";
+import { notificationService } from "../api/notifications";
+import { formatNotificationTime } from "../utils/validators";
 
 const Header = () => {
   const { user, logout } = useAuth();
@@ -99,16 +99,6 @@ const Header = () => {
     <>
       <div className="navbar-custom">
         <ul className="list-unstyled topbar-right-menu float-right mb-0">
-          <li className="notification-list">
-            <a
-              className="nav-link right-bar-toggle"
-              href="#"
-              onClick={(e) => e.preventDefault()}
-            >
-              <i className="dripicons-gear noti-icon"></i>
-            </a>
-          </li>
-
           <li className="dropdown notification-list">
             <a
               className="nav-link dropdown-toggle arrow-none"
@@ -231,12 +221,11 @@ const Header = () => {
               aria-haspopup="false"
               aria-expanded="false"
             >
-              <span className="account-user-avatar">
-                <img
-                  src="assets/images/users/avatar-1.jpg"
-                  alt="user-image"
-                  className="rounded-circle"
-                />
+              <span
+                className="account-user-avatar"
+                style={{ top: "22px", left: "22px" }}
+              >
+                <i className="dripicons-user"></i>
               </span>
               <span>
                 <span className="account-user-name">

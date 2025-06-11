@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { contractService } from "../../api/contracts";
 import ContractForm from "../../components/forms/ContractForm";
-import Card from "../../components/common/Card";
-import Button from "../../components/common/Button";
-import Loader from "../../components/common/Loader";
+import Card from "../../components/ui/Card";
+import Button from "../../components/ui/Button";
+import Loader from "../../components/ui/Loader";
 import { useAuth } from "../../hooks/useAuth";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
@@ -14,7 +14,7 @@ const ContractEdit = () => {
   const { id } = useParams();
   const [contract, setContract] = useState(null);
   const [errors, setErrors] = useState({});
-  const { user } = useAuth();
+  const { user, isAdmin, isManager } = useAuth();
   const { showSuccess, showError } = useAlert();
 
   const { execute: updateContract, loading: isSubmitting } = useApi(
@@ -34,12 +34,21 @@ const ContractEdit = () => {
   const loadContract = async () => {
     const response = await fetchContract(id);
     if (response.success) {
-      setContract(response.data);
+      // Chuyển đổi dữ liệu tenants thành users cho ContractForm
+      const contractData = {...response.data};
+      
+      // Kiểm tra nếu có tenants trong response, đưa vào users
+      if (contractData.tenants && contractData.tenants.length > 0) {
+        contractData.users = contractData.tenants;
+        
+        // Chuyển đổi mảng users thành mảng user_ids cho form
+        contractData.user_ids = contractData.tenants.map(tenant => tenant.id);
+      }
+      
+      setContract(contractData);
 
       // Check permissions
       if (user) {
-        const isAdmin = user?.role === "admin";
-        const isManager = user?.role === "manager";
         const isHouseManager =
           response.data.room?.house?.manager_id === user?.id;
 
@@ -60,7 +69,6 @@ const ContractEdit = () => {
 
     if (response.success) {
       showSuccess("Cập nhật hợp đồng thành công");
-      navigate(`/contracts/${id}`);
     } else {
       if (response.data && typeof response.data === "object") {
         setErrors(response.data);

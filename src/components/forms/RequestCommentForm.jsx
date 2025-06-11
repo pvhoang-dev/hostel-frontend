@@ -1,6 +1,6 @@
 import { useState } from "react";
-import Button from "../common/Button";
-import TextArea from "../common/TextArea";
+import Button from "../ui/Button";
+import TextArea from "../ui/TextArea";
 import { useAuth } from "../../hooks/useAuth";
 
 const RequestCommentForm = ({
@@ -56,7 +56,7 @@ const RequestCommentForm = ({
             type="button"
             variant="secondary"
             onClick={() => onCancel && onCancel()}
-            className="me-2 mr-2"
+            className=" mr-2"
           >
             Hủy
           </Button>

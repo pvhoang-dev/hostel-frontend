@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { paymentMethodService } from "../../api/paymentMethods";
-import Card from "../../components/common/Card";
-import Loader from "../../components/common/Loader";
+import Card from "../../components/ui/Card";
+import Loader from "../../components/ui/Loader";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 import { useAuth } from "../../hooks/useAuth";
@@ -64,52 +64,76 @@ const PaymentMethodDetail = () => {
       </div>
 
       <Card>
-        <div className="d-flex flex-column gap-4">
-          <div>
-            <h4 className="fs-5 fw-semibold mb-2">Thông tin cơ bản</h4>
-            <div className="row g-4">
-              <div className="col-12 col-md-6">
-                <span>Name: </span>
-                <span className="ms-2 fw-medium">{paymentMethod.name}</span>
-              </div>
-              <div className="col-12 col-md-6">
-                <span>Status: </span>
-                <span
-                  className={`ms-2 d-inline-block px-2 py-1 rounded small ${
-                    paymentMethod.status === "active"
-                      ? "bg-success bg-opacity-10 text-white"
-                      : "bg-danger bg-opacity-10 text-white"
-                  }`}
-                >
-                  {paymentMethod.status?.charAt(0).toUpperCase() +
-                    paymentMethod.status?.slice(1) || "Unknown"}
-                </span>
-              </div>
+        <div className="row">
+          <div className="col-md-6 mb-4">
+            <h5 className="mb-3">Thông tin cơ bản</h5>
+            <div className="table-responsive">
+              <table className="table table-bordered">
+                <thead style={{ backgroundColor: "rgba(0, 0, 0, .075)" }}>
+                  <tr>
+                    <th style={{ width: "40%" }}>Thông tin</th>
+                    <th>Chi tiết</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Name:</td>
+                    <td>{paymentMethod.name}</td>
+                  </tr>
+                  <tr>
+                    <td>Status:</td>
+                    <td>
+                      <span
+                        className={`d-inline-block px-2 py-1 rounded small ${
+                          paymentMethod.status === "active"
+                            ? "bg-success text-white"
+                            : "bg-danger text-white"
+                        }`}
+                      >
+                        {paymentMethod.status?.charAt(0).toUpperCase() +
+                          paymentMethod.status?.slice(1) || "Unknown"}
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
 
           {paymentMethod.description && (
-            <div>
-              <h2 className="fs-5 fw-semibold mb-2">Description</h2>
-              <p>{paymentMethod.description}</p>
+            <div className="col-md-12 mb-4">
+              <h5 className="mb-3">Mô tả</h5>
+              <div className="p-3 border rounded">
+                <p className="mb-0">{paymentMethod.description}</p>
+              </div>
             </div>
           )}
 
-          <div className="mt-4">
-            <h4 className="fs-5 fw-semibold mb-2">Thông tin hệ thống</h4>
-            <div className="row g-4">
-              <div className="col-12 col-md-6">
-                <span>ID: </span>
-                <span className="ms-2">{paymentMethod.id}</span>
-              </div>
-              <div className="col-12 col-md-6">
-                <span>Tạo: </span>
-                <span className="ms-2">{paymentMethod.created_at}</span>
-              </div>
-              <div className="col-12 col-md-6">
-                <span>Cập nhật lần cuối: </span>
-                <span className="ms-2">{paymentMethod.updated_at}</span>
-              </div>
+          <div className="col-md-12 mb-4">
+            <h5 className="mb-3">Thông tin hệ thống</h5>
+            <div className="table-responsive">
+              <table className="table table-bordered">
+                <thead style={{ backgroundColor: "rgba(0, 0, 0, .075)" }}>
+                  <tr>
+                    <th style={{ width: "200px" }}>Thông tin</th>
+                    <th>Chi tiết</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>ID:</td>
+                    <td>{paymentMethod.id}</td>
+                  </tr>
+                  <tr>
+                    <td>Tạo:</td>
+                    <td>{paymentMethod.created_at}</td>
+                  </tr>
+                  <tr>
+                    <td>Cập nhật lần cuối:</td>
+                    <td>{paymentMethod.updated_at}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
