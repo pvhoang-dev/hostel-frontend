@@ -12,7 +12,6 @@ import {
   Divider,
   Checkbox,
   Alert,
-  message,
 } from "antd";
 import {
   getRoomServices,
@@ -24,6 +23,7 @@ import {
   CalculatorOutlined,
 } from "@ant-design/icons";
 import useAlert from "../../hooks/useAlert";
+import "../../styles/RoomServiceUsageForm.css";
 
 const { Text } = Typography;
 
@@ -36,12 +36,11 @@ const RoomServiceForm = ({ roomId, month, year, onFinish, onCancel }) => {
   const [serviceApplied, setServiceApplied] = useState({});
   const [errors, setErrors] = useState({});
   const { showSuccess, showError, showWarning } = useAlert();
-  const [formattedServices, setFormattedServices] = useState(null);
-  
+
   // Sử dụng useRef để lưu trữ dữ liệu mà không gây re-render
   const apiDataRef = useRef({
     hasInvoice: false,
-    invoiceId: null
+    invoiceId: null,
   });
 
   useEffect(() => {
@@ -62,21 +61,12 @@ const RoomServiceForm = ({ roomId, month, year, onFinish, onCancel }) => {
       // Lưu thông tin về hóa đơn trực tiếp vào ref
       apiDataRef.current.hasInvoice = response.data.has_invoice || false;
       apiDataRef.current.invoiceId = response.data.invoice_id || null;
-      
-      console.log("API response:", response.data);
-      console.log("Có hóa đơn cho phòng này trong tháng này?", response.data.has_invoice ? "Có" : "Không");
-      console.log("Giá trị lưu trong ref:", apiDataRef.current);
-
-      // Kiểm tra xem có hóa đơn tồn tại cho phòng này trong tháng/năm này
-      setTimeout(() => {
-        console.log("hasExistingInvoice sau khi set:", apiDataRef.current.hasInvoice);
-      }, 0);
 
       // Set initial service applied state
       const initialServiceApplied = {};
       servicesData.forEach((service) => {
-        initialServiceApplied[service.room_service_id] =
-          service.has_usage || !service.is_fixed;
+        // Chỉ áp dụng checked cho dịch vụ đã có dữ liệu (has_usage = true)
+        initialServiceApplied[service.room_service_id] = service.has_usage;
       });
       setServiceApplied(initialServiceApplied);
 
@@ -200,37 +190,53 @@ const RoomServiceForm = ({ roomId, month, year, onFinish, onCancel }) => {
       for (const service of services) {
         const serviceId = service.room_service_id;
         const isApplied = serviceApplied[serviceId];
-        
+
         // Nếu dịch vụ được áp dụng và là loại đo đếm
         if (isApplied && service.is_metered) {
           const startMeter = form.getFieldValue(`start_meter_${serviceId}`);
           const endMeter = form.getFieldValue(`end_meter_${serviceId}`);
-          
-          if (startMeter === undefined || startMeter === null || startMeter === '') {
-            validationErrors[`start_meter_${serviceId}`] = "Vui lòng nhập số đầu";
+
+          if (
+            startMeter === undefined ||
+            startMeter === null ||
+            startMeter === ""
+          ) {
+            validationErrors[`start_meter_${serviceId}`] =
+              "Vui lòng nhập số đầu";
             hasValidationError = true;
           }
-          
-          if (endMeter === undefined || endMeter === null || endMeter === '') {
-            validationErrors[`end_meter_${serviceId}`] = "Vui lòng nhập số cuối";
+
+          if (endMeter === undefined || endMeter === null || endMeter === "") {
+            validationErrors[`end_meter_${serviceId}`] =
+              "Vui lòng nhập số cuối";
             hasValidationError = true;
           }
-          
-          if (startMeter !== undefined && endMeter !== undefined && endMeter < startMeter) {
-            validationErrors[`end_meter_${serviceId}`] = "Số cuối phải lớn hơn hoặc bằng số đầu";
+
+          if (
+            startMeter !== undefined &&
+            endMeter !== undefined &&
+            endMeter < startMeter
+          ) {
+            validationErrors[`end_meter_${serviceId}`] =
+              "Số cuối phải lớn hơn hoặc bằng số đầu";
             hasValidationError = true;
           }
-        } 
+        }
         // Nếu dịch vụ được áp dụng và không phải là loại đo đếm
         else if (isApplied && !service.is_metered) {
           const usageValue = form.getFieldValue(`usage_value_${serviceId}`);
-          if (usageValue === undefined || usageValue === null || usageValue === '') {
-            validationErrors[`usage_value_${serviceId}`] = "Vui lòng nhập số lượng";
+          if (
+            usageValue === undefined ||
+            usageValue === null ||
+            usageValue === ""
+          ) {
+            validationErrors[`usage_value_${serviceId}`] =
+              "Vui lòng nhập số lượng";
             hasValidationError = true;
           }
         }
       }
-      
+
       if (hasValidationError) {
         setErrors(validationErrors);
         showError("Vui lòng điền đầy đủ thông tin cho các dịch vụ được chọn");
@@ -245,17 +251,18 @@ const RoomServiceForm = ({ roomId, month, year, onFinish, onCancel }) => {
 
       setSubmitting(true);
       const formValues = form.getFieldsValue();
-      
+
       // Đảm bảo tính toán lại usage_value cho các dịch vụ đo đếm
-      services.forEach(service => {
+      services.forEach((service) => {
         if (service.is_metered && serviceApplied[service.room_service_id]) {
           const serviceId = service.room_service_id;
           const startMeter = formValues[`start_meter_${serviceId}`];
           const endMeter = formValues[`end_meter_${serviceId}`];
-          
+
           if (startMeter !== undefined && endMeter !== undefined) {
             formValues[`usage_value_${serviceId}`] = endMeter - startMeter;
-            formValues[`price_used_${serviceId}`] = service.price * (endMeter - startMeter);
+            formValues[`price_used_${serviceId}`] =
+              service.price * (endMeter - startMeter);
           }
         }
       });
@@ -281,64 +288,82 @@ const RoomServiceForm = ({ roomId, month, year, onFinish, onCancel }) => {
         .filter((service) => !serviceApplied[service.room_service_id])
         .map((service) => service.room_service_id);
 
-      // Lưu dữ liệu để sử dụng trong modal
-      setFormattedServices(formattedServicesData);
-      
-      // Kiểm tra hóa đơn từ ref
-      console.log("Kiểm tra hóa đơn từ ref:", apiDataRef.current);
-      console.log("Danh sách dịch vụ bị bỏ chọn:", uncheckedServices);
-      
       if (apiDataRef.current.hasInvoice) {
         // Sử dụng confirm thông thường thay vì Modal
-        const confirmResult = window.confirm(`Đã tồn tại hóa đơn cho phòng này trong tháng ${month}/${year}. Bạn có muốn cập nhật hóa đơn dựa trên những thay đổi về dịch vụ không?`);
-        
+        const confirmResult = window.confirm(
+          `Đã tồn tại hóa đơn cho phòng này trong tháng ${month}/${year}. Bạn có muốn cập nhật hóa đơn dựa trên những thay đổi về dịch vụ không?`
+        );
+
         if (confirmResult) {
           // Người dùng chọn "OK"
-          await saveServicesAndInvoice(formattedServicesData, true, uncheckedServices);
+          await saveServicesAndInvoice(
+            formattedServicesData,
+            true,
+            uncheckedServices
+          );
         } else {
           // Người dùng chọn "Cancel"
-          await saveServicesAndInvoice(formattedServicesData, false, uncheckedServices);
+          await saveServicesAndInvoice(
+            formattedServicesData,
+            false,
+            uncheckedServices
+          );
         }
       } else {
         // Nếu chưa có hóa đơn, tiến hành lưu bình thường
-        await saveServicesAndInvoice(formattedServicesData, true, uncheckedServices);
+        await saveServicesAndInvoice(
+          formattedServicesData,
+          true,
+          uncheckedServices
+        );
       }
     } catch (error) {
       console.error("Failed to save service usage:", error);
-      const errorMessage = "Lỗi khi lưu dịch vụ: " + (error.response?.data?.message || error.message);
-      
+      const errorMessage =
+        "Lỗi khi lưu dịch vụ: " +
+        (error.response?.data?.message || error.message);
+
       showError(errorMessage);
-      
+
       setSubmitting(false);
     }
   };
 
   // Hàm xử lý việc lưu dịch vụ và hóa đơn
-  const saveServicesAndInvoice = async (services, updateInvoice = true, uncheckedServices = []) => {
+  const saveServicesAndInvoice = async (
+    services,
+    updateInvoice = true,
+    uncheckedServices = []
+  ) => {
     try {
       setSubmitting(true);
-      
-      const response = await saveRoomServiceUsage({
+
+      await saveRoomServiceUsage({
         room_id: roomId,
         month: month,
         year: year,
         services: services,
         unchecked_services: uncheckedServices,
-        update_invoice: updateInvoice // Thêm tham số để API biết có cập nhật hóa đơn hay không
+        update_invoice: updateInvoice, // Thêm tham số để API biết có cập nhật hóa đơn hay không
       });
 
       setSubmitting(false);
-      
+
       // Hiển thị thông báo thành công
-      showSuccess("Đã lưu dịch vụ thành công" + (updateInvoice ? " và cập nhật hóa đơn" : ""));
-      
+      showSuccess(
+        "Đã lưu dịch vụ thành công" +
+          (updateInvoice ? " và cập nhật hóa đơn" : "")
+      );
+
       onFinish();
     } catch (error) {
       console.error("Failed to save service usage:", error);
-      const errorMessage = "Lỗi khi lưu dịch vụ: " + (error.response?.data?.message || error.message);
-      
+      const errorMessage =
+        "Lỗi khi lưu dịch vụ: " +
+        (error.response?.data?.message || error.message);
+
       showError(errorMessage);
-      
+
       setSubmitting(false);
     }
   };
@@ -408,11 +433,12 @@ const RoomServiceForm = ({ roomId, month, year, onFinish, onCancel }) => {
       width: 130,
       render: (_, record) =>
         record.is_metered ? (
-          <Form.Item 
-            name={`start_meter_${record.room_service_id}`} 
+          <Form.Item
+            name={`start_meter_${record.room_service_id}`}
             rules={[
               {
-                required: record.is_metered && serviceApplied[record.room_service_id],
+                required:
+                  record.is_metered && serviceApplied[record.room_service_id],
                 message: "Vui lòng nhập số đầu",
               },
             ]}
@@ -452,7 +478,8 @@ const RoomServiceForm = ({ roomId, month, year, onFinish, onCancel }) => {
               help={errors[`end_meter_${record.room_service_id}`]}
               rules={[
                 {
-                  required: record.is_metered && serviceApplied[record.room_service_id],
+                  required:
+                    record.is_metered && serviceApplied[record.room_service_id],
                   message: "Vui lòng nhập số cuối",
                 },
               ]}
@@ -497,8 +524,12 @@ const RoomServiceForm = ({ roomId, month, year, onFinish, onCancel }) => {
             <InputNumber
               style={{ width: "100%" }}
               min={0}
-              disabled={!serviceApplied[record.room_service_id] || record.is_metered}
-              onChange={(value) => calculatePrice(record.room_service_id, value)}
+              disabled={
+                !serviceApplied[record.room_service_id] || record.is_metered
+              }
+              onChange={(value) =>
+                calculatePrice(record.room_service_id, value)
+              }
               className="dark-input"
             />
           </Form.Item>
@@ -563,19 +594,30 @@ const RoomServiceForm = ({ roomId, month, year, onFinish, onCancel }) => {
 
   return (
     <Spin spinning={loading || submitting} tip="Đang xử lý...">
-      <Form form={form} layout="vertical" onFinish={handleSubmit} style={{ backgroundColor: "#343a40", color: "#f8f9fa" }}>
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={handleSubmit}
+        style={{ backgroundColor: "#343a40", color: "#f8f9fa" }}
+      >
         {roomData && (
           <Row gutter={16} className="mb-3">
             <Col span={8}>
-              <Text strong style={{ color: "#fff" }}>Nhà: </Text>
+              <Text strong style={{ color: "#fff" }}>
+                Nhà:{" "}
+              </Text>
               <Text style={{ color: "#fff" }}>{roomData.house.name}</Text>
             </Col>
             <Col span={8}>
-              <Text strong style={{ color: "#fff" }}>Phòng: </Text>
+              <Text strong style={{ color: "#fff" }}>
+                Phòng:{" "}
+              </Text>
               <Text style={{ color: "#fff" }}>{roomData.room_number}</Text>
             </Col>
             <Col span={8}>
-              <Text strong style={{ color: "#fff" }}>Tháng/Năm: </Text>
+              <Text strong style={{ color: "#fff" }}>
+                Tháng/Năm:{" "}
+              </Text>
               <Text style={{ color: "#fff" }}>
                 {month}/{year}
               </Text>
@@ -637,50 +679,6 @@ const RoomServiceForm = ({ roomId, month, year, onFinish, onCancel }) => {
           </Col>
         </Row>
       </Form>
-
-      <style jsx="true">{`
-        .dark-input {
-          background-color: #212529 !important;
-          color: #fff !important;
-          border-color: #495057 !important;
-        }
-        .dark-input input {
-          background-color: #212529 !important;
-          color: #fff !important;
-        }
-        .dark-input .ant-input-number-handler-wrap {
-          background-color: #212529 !important;
-          border-color: #495057 !important;
-        }
-        .custom-dark-table {
-          color: #fff;
-        }
-        .custom-dark-table .ant-table {
-          background-color: #343a40;
-          color: #fff;
-        }
-        .custom-dark-table .ant-table-thead > tr > th {
-          background-color: #212529;
-          color: #fff;
-          border-bottom: 1px solid #495057;
-        }
-        .custom-dark-table .ant-table-tbody > tr > td {
-          border-bottom: 1px solid #495057;
-          color: #fff;
-        }
-        .custom-dark-table .ant-table-tbody > tr:hover > td {
-          background-color: #2c3034 !important;
-        }
-        .custom-dark-table .ant-table-tbody > tr.ant-table-row:hover > td {
-          background-color: #2c3034 !important;
-        }
-        .custom-dark-table .ant-table-row:hover {
-          background-color: #2c3034 !important;
-        }
-        .ant-checkbox-wrapper {
-          color: #fff !important; 
-        }
-      `}</style>
     </Spin>
   );
 };

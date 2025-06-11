@@ -3,8 +3,8 @@ import { useNavigate, useParams, Link } from "react-router-dom";
 import { userService } from "../../api/users";
 import { useContext } from "react";
 import { AlertContext } from "../../contexts/AlertContext";
-import Card from "../../components/common/Card";
-import Loader from "../../components/common/Loader";
+import Card from "../../components/ui/Card";
+import Loader from "../../components/ui/Loader";
 import { useAuth } from "../../hooks/useAuth";
 
 const UserDetail = () => {

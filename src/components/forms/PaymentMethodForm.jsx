@@ -1,8 +1,8 @@
 import { useState } from "react";
-import Input from "../common/Input";
-import Select from "../common/Select";
-import Button from "../common/Button";
-import TextArea from "../common/TextArea";
+import Input from "../ui/Input";
+import Select from "../ui/Select";
+import Button from "../ui/Button";
+import TextArea from "../ui/TextArea";
 
 const PaymentMethodForm = ({
   initialData = {},

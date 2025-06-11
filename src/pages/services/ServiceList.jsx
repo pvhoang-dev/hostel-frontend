@@ -1,12 +1,12 @@
 import { useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { serviceService } from "../../api/services";
-import Table from "../../components/common/Table";
-import Card from "../../components/common/Card";
-import Button from "../../components/common/Button";
-import Input from "../../components/common/Input";
-import Select from "../../components/common/Select";
-import Loader from "../../components/common/Loader";
+import Table from "../../components/ui/Table";
+import Card from "../../components/ui/Card";
+import Button from "../../components/ui/Button";
+import Input from "../../components/ui/Input";
+import Select from "../../components/ui/Select";
+import Loader from "../../components/ui/Loader";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 import { useAuth } from "../../hooks/useAuth";
@@ -52,11 +52,7 @@ const FilterSection = ({
     </div>
 
     <div className="mt-3 d-flex justify-content-end">
-      <Button
-        variant="secondary"
-        onClick={onClearFilters}
-        className=" mr-2"
-      >
+      <Button variant="secondary" onClick={onClearFilters} className=" mr-2">
         Xóa bộ lọc
       </Button>
       <Button onClick={onApplyFilters}>Tìm</Button>
@@ -68,7 +64,7 @@ const ServiceList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { showSuccess, showError } = useAlert();
   const navigate = useNavigate();
-  const { isAdmin } = useAuth();
+  const { isAdmin, isTenant } = useAuth();
 
   // Get current state from URL params
   const currentPage = Number(searchParams.get("page")) || 1;
@@ -122,8 +118,10 @@ const ServiceList = () => {
 
   // Fetch data on initial load and when params change
   useEffect(() => {
-    loadServices();
-  }, [currentPage, perPage, sortBy, sortDir, isMetered]);
+    if (!loadingServices) {
+      loadServices();
+    }
+  }, [currentPage, perPage, sortBy, sortDir, isMetered, name, unit]);
 
   const loadServices = async () => {
     const params = {
@@ -204,7 +202,6 @@ const ServiceList = () => {
   };
 
   const clearFilters = () => {
-    // Reset only filter params, keep sorting and per_page
     const paramsToKeep = {
       page: "1",
       per_page: perPage.toString(),
@@ -212,14 +209,13 @@ const ServiceList = () => {
       sort_dir: sortDir,
     };
     setSearchParams(paramsToKeep);
-    loadServices();
   };
 
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center my-2">
         <h3>Dịch vụ</h3>
-        {isAdmin && (
+        {!isTenant && (
           <Button as={Link} to="/services/create">
             Thêm
           </Button>

@@ -1,8 +1,8 @@
 import { useState } from "react";
-import Input from "../common/Input";
-import Button from "../common/Button";
-import TextArea from "../common/TextArea";
-import Checkbox from "../common/Checkbox";
+import Input from "../ui/Input";
+import Button from "../ui/Button";
+import TextArea from "../ui/TextArea";
+import Checkbox from "../ui/Checkbox";
 
 const ServiceForm = ({
   initialData = {},

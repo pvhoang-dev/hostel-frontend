@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { roleService } from "../../api/roles";
-import Input from "../common/Input";
-import Select from "../common/Select";
-import Button from "../common/Button";
+import Input from "../ui/Input";
+import Select from "../ui/Select";
+import Button from "../ui/Button";
 
 const UserForm = ({
   initialData = {},

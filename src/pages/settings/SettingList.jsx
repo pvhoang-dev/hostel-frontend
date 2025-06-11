@@ -1,11 +1,11 @@
 import { useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { settingService } from "../../api/settings";
-import Table from "../../components/common/Table";
-import Card from "../../components/common/Card";
-import Button from "../../components/common/Button";
-import Input from "../../components/common/Input";
-import Loader from "../../components/common/Loader";
+import Table from "../../components/ui/Table";
+import Card from "../../components/ui/Card";
+import Button from "../../components/ui/Button";
+import Input from "../../components/ui/Input";
+import Loader from "../../components/ui/Loader";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 import { useAuth } from "../../hooks/useAuth";
@@ -48,11 +48,7 @@ const FilterSection = ({
     </div>
 
     <div className="mt-3 d-flex justify-content-end">
-      <Button
-        variant="secondary"
-        onClick={onClearFilters}
-        className=" mr-2"
-      >
+      <Button variant="secondary" onClick={onClearFilters} className=" mr-2">
         Xóa bộ lọc
       </Button>
       <Button onClick={onApplyFilters}>Tìm</Button>
@@ -64,7 +60,7 @@ const SettingList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { showSuccess, showError } = useAlert();
   const navigate = useNavigate();
-  const { user, isAdmin, isManager, isTenant } = useAuth();
+  const { isTenant, isAdmin } = useAuth();
 
   // Xác định nếu người dùng là tenant
   const isInTenantView = isTenant;
@@ -127,7 +123,7 @@ const SettingList = () => {
 
   useEffect(() => {
     loadSettings();
-  }, [currentPage, perPage, sortBy, sortDir]);
+  }, [currentPage, perPage, sortBy, sortDir, key, value, description]);
 
   const loadSettings = async () => {
     const params = {
@@ -198,14 +194,13 @@ const SettingList = () => {
       page: "1",
       per_page: perPage.toString(),
     });
-    loadSettings();
   };
 
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center my-2">
         <h3>Nội quy chung</h3>
-        {!isInTenantView && (
+        {isAdmin && (
           <Button as={Link} to="/settings/create">
             Thêm
           </Button>
@@ -235,7 +230,7 @@ const SettingList = () => {
             loading={loadingSettings}
             actionColumn={{
               key: "actions",
-              actions: isInTenantView
+              actions: !isAdmin
                 ? [
                     {
                       icon: "mdi-eye",

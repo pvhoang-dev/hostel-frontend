@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { storageService } from "../../api/storages";
-import Loader from "../../components/common/Loader";
-import Card from "../../components/common/Card";
+import Loader from "../../components/ui/Loader";
+import Card from "../../components/ui/Card";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 import { useAuth } from "../../hooks/useAuth";

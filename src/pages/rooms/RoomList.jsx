@@ -2,12 +2,12 @@ import { useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { roomService } from "../../api/rooms";
 import { houseService } from "../../api/houses";
-import Table from "../../components/common/Table";
-import Card from "../../components/common/Card";
-import Button from "../../components/common/Button";
-import Input from "../../components/common/Input";
-import Select from "../../components/common/Select";
-import Loader from "../../components/common/Loader";
+import Table from "../../components/ui/Table";
+import Card from "../../components/ui/Card";
+import Button from "../../components/ui/Button";
+import Input from "../../components/ui/Input";
+import Select from "../../components/ui/Select";
+import Loader from "../../components/ui/Loader";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 import { useAuth } from "../../hooks/useAuth";
@@ -70,9 +70,8 @@ const FilterSection = ({
           options={[
             { value: "", label: "Tất cả" },
             { value: "available", label: "Có sẵn" },
-            { value: "occupied", label: "Đã thuê" },
-            { value: "maintenance", label: "Bảo trì" },
-            { value: "unavailable", label: "Không khả dụng" },
+            { value: "used", label: "Đã thuê" },
+            { value: "maintain", label: "Bảo trì" },
           ]}
         />
       </div>
@@ -101,11 +100,7 @@ const FilterSection = ({
     </div>
 
     <div className="mt-3 d-flex justify-content-end">
-      <Button
-        variant="secondary"
-        onClick={onClearFilters}
-        className=" mr-2"
-      >
+      <Button variant="secondary" onClick={onClearFilters} className=" mr-2">
         Xóa bộ lọc
       </Button>
       <Button onClick={onApplyFilters}>Tìm</Button>
@@ -228,6 +223,26 @@ const RoomList = ({ houseId, embedded = false, fromHouseDetail = false }) => {
         return <span className={statusColor}>{statusText}</span>;
       },
     },
+    {
+      accessorKey: "currentContract",
+      header: "Hợp đồng",
+      cell: ({ row }) => {
+        const currentContract = row.original.currentContract;
+
+        if (currentContract) {
+          return (
+            <Link
+              to={`/contracts/${currentContract.id}`}
+              className="text-primary"
+            >
+              Xem hợp đồng
+            </Link>
+          );
+        } else {
+          return <span className="text-muted">Chưa có hợp đồng</span>;
+        }
+      },
+    },
     // Only show created_at in standalone mode
     ...(!embedded
       ? [
@@ -256,7 +271,20 @@ const RoomList = ({ houseId, embedded = false, fromHouseDetail = false }) => {
     if (user && (!loadingHouses || embedded) && !loadingRooms) {
       loadRooms();
     }
-  }, [currentPage, perPage, sortBy, sortDir, house_id, status, user, houseId]);
+  }, [
+    currentPage,
+    perPage,
+    sortBy,
+    sortDir,
+    house_id,
+    status,
+    user,
+    houseId,
+    room_number,
+    capacity,
+    min_price,
+    max_price,
+  ]);
 
   const loadRooms = async () => {
     const params = {
@@ -264,7 +292,7 @@ const RoomList = ({ houseId, embedded = false, fromHouseDetail = false }) => {
       per_page: perPage,
       sort_by: sortBy,
       sort_dir: sortDir,
-      include: "house",
+      include: "house,currentContract",
     };
 
     // When embedded, always use the provided houseId
@@ -400,7 +428,6 @@ const RoomList = ({ houseId, embedded = false, fromHouseDetail = false }) => {
         page: "1",
         per_page: perPage.toString(),
       });
-      loadRooms();
     }
   };
 

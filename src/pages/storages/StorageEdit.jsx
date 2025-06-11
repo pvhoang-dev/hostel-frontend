@@ -2,11 +2,11 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { storageService } from "../../api/storages";
 import StorageForm from "../../components/forms/StorageForm";
-import Card from "../../components/common/Card";
+import Card from "../../components/ui/Card";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 import { useAuth } from "../../hooks/useAuth";
-import Loader from "../../components/common/Loader";
+import Loader from "../../components/ui/Loader";
 
 const StorageEdit = () => {
   const { id } = useParams();

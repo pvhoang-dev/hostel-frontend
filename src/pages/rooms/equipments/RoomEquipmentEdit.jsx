@@ -4,7 +4,7 @@ import { roomService } from "../../../api/rooms";
 import { roomEquipmentService } from "../../../api/roomEquipments";
 import { storageService } from "../../../api/storages";
 import RoomEquipmentForm from "../../../components/forms/RoomEquipmentForm";
-import Loader from "../../../components/common/Loader";
+import Loader from "../../../components/ui/Loader";
 import useAlert from "../../../hooks/useAlert";
 import useApi from "../../../hooks/useApi";
 import { useAuth } from "../../../hooks/useAuth";
@@ -104,7 +104,6 @@ const RoomEquipmentEdit = () => {
 
   const handleSubmit = async (formData) => {
     try {
-      console.log("Submitting with formData:", formData);
       const currentHouseId = houseId || room?.house?.id;
 
       // Handle storage updates based on quantity changes
@@ -116,13 +115,6 @@ const RoomEquipmentEdit = () => {
           formData.is_quantity_increase && formData.use_storage === true;
         const isDecreasingAndReturningToStorage =
           formData.is_quantity_decrease && formData.update_storage === true;
-
-        console.log("Storage decision flags:", {
-          isIncreasingAndUsingStorage,
-          isDecreasingAndReturningToStorage,
-          use_storage: formData.use_storage,
-          update_storage: formData.update_storage,
-        });
 
         if (isIncreasingAndUsingStorage || isDecreasingAndReturningToStorage) {
           // First check if storage entry exists, create if not

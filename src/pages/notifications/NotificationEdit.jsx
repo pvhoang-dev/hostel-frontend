@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { notificationService } from "../../api/notifications";
-import Card from "../../components/common/Card";
+import Card from "../../components/ui/Card";
 import NotificationForm from "../../components/forms/NotificationForm";
-import Loader from "../../components/common/Loader";
+import Loader from "../../components/ui/Loader";
 import useAlert from "../../hooks/useAlert";
 import { useAuth } from "../../hooks/useAuth";
 import useApi from "../../hooks/useApi";
@@ -63,7 +63,6 @@ const NotificationEdit = () => {
 
       if (response.success) {
         showSuccess("Cập nhật thông báo thành công");
-        navigate(`/notifications/${id}`);
       } else {
         showError(response.message || "Có lỗi xảy ra khi cập nhật thông báo");
         if (response.errors) {

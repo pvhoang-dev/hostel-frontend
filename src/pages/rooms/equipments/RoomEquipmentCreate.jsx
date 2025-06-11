@@ -3,7 +3,7 @@ import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { roomService } from "../../../api/rooms";
 import { roomEquipmentService } from "../../../api/roomEquipments";
 import RoomEquipmentForm from "../../../components/forms/RoomEquipmentForm";
-import Loader from "../../../components/common/Loader";
+import Loader from "../../../components/ui/Loader";
 import useAlert from "../../../hooks/useAlert";
 import useApi from "../../../hooks/useApi";
 import { useAuth } from "../../../hooks/useAuth";

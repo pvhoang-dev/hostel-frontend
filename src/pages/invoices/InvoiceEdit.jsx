@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { invoiceService } from "../../api/invoices";
 import InvoiceForm from "../../components/forms/InvoiceForm";
-import Card from "../../components/common/Card";
-import Button from "../../components/common/Button";
-import Loader from "../../components/common/Loader";
+import Card from "../../components/ui/Card";
+import Button from "../../components/ui/Button";
+import Loader from "../../components/ui/Loader";
 import { useAuth } from "../../hooks/useAuth";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
@@ -36,10 +36,7 @@ const InvoiceEdit = () => {
 
       // Check permissions
       if (user) {
-        const isHouseManager =
-          response.data.room?.house?.manager_id === user?.id;
-
-        if (!isAdmin && !(isManager && isHouseManager)) {
+        if (!isAdmin && !isManager) {
           showError("Bạn không có quyền chỉnh sửa hóa đơn này");
           navigate(`/invoices/${id}`);
           return;
@@ -75,7 +72,6 @@ const InvoiceEdit = () => {
         navigate("/invoices");
       } else {
         showSuccess("Cập nhật hóa đơn thành công");
-        navigate(`/invoices/${id}`);
       }
     } else {
       if (response.data && typeof response.data === "object") {

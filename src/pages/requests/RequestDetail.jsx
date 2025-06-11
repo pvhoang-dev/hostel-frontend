@@ -4,8 +4,8 @@ import { requestService } from "../../api/requests";
 import useAlert from "../../hooks/useAlert";
 import { useAuth } from "../../hooks/useAuth";
 import { userService } from "../../api/users";
-import { notificationService } from "../../api/notifications";
-import Loader from "../../components/common/Loader";
+import Loader from "../../components/ui/Loader";
+import Select from "../../components/ui/Select";
 
 const RequestDetail = () => {
   const { id } = useParams();
@@ -24,7 +24,6 @@ const RequestDetail = () => {
   // State for edit modals
   const [showEditRequest, setShowEditRequest] = useState(false);
   const [showEditComment, setShowEditComment] = useState(false);
-  const [showTransferModal, setShowTransferModal] = useState(false);
   const [editingComment, setEditingComment] = useState(null);
   const [editRequestData, setEditRequestData] = useState({
     description: "",
@@ -33,13 +32,14 @@ const RequestDetail = () => {
   const [editCommentData, setEditCommentData] = useState({
     content: "",
   });
-  const [transferData, setTransferData] = useState({
-    recipient_id: "",
-  });
 
   // For transfer request
   const [potentialRecipients, setPotentialRecipients] = useState([]);
   const [loadingRecipients, setLoadingRecipients] = useState(false);
+  
+  // For change sender
+  const [potentialSenders, setPotentialSenders] = useState([]);
+  const [loadingSenders, setLoadingSenders] = useState(false);
 
   // Status tracking
   const [isCompleted, setIsCompleted] = useState(false);
@@ -59,6 +59,18 @@ const RequestDetail = () => {
     }
   }, [request]);
 
+  // Tự động load danh sách người nhận và người gửi tiềm năng khi request được tải
+  useEffect(() => {
+    if (request && !isTenant && (canTransfer || canChangeSender)) {
+      if (canTransfer) {
+        fetchPotentialRecipients();
+      }
+      if (canChangeSender) {
+        fetchPotentialSenders();
+      }
+    }
+  }, [request, isTenant]);
+
   const fetchRequestAndComments = async () => {
     setLoading(true);
     setLoadingComments(true);
@@ -66,7 +78,6 @@ const RequestDetail = () => {
     try {
       // Tải thông tin yêu cầu
       const requestResponse = await requestService.getRequest(id);
-      console.log("Request response:", requestResponse);
 
       // Tải dữ liệu từ response
       if (requestResponse && requestResponse.data) {
@@ -78,7 +89,6 @@ const RequestDetail = () => {
 
         // Lấy comments từ response của request
         if (requestResponse.data.comments) {
-          console.log("Comments from request:", requestResponse.data.comments);
           setComments(
             Array.isArray(requestResponse.data.comments)
               ? requestResponse.data.comments
@@ -104,47 +114,154 @@ const RequestDetail = () => {
   const fetchPotentialRecipients = async () => {
     setLoadingRecipients(true);
     try {
-      // Nếu user là tenant, chỉ có thể chuyển cho manager hoặc admin
-      // Nếu user là manager, có thể chuyển cho admin hoặc manager khác
-      // Nếu user là admin, có thể chuyển cho bất kỳ ai
+      // Admin và người gửi là manager có thể chọn tenant mà manager đó quản lý 
+      if (isAdmin || (isManager && request.sender?.id === user.id)) {
+        let recipients = [];
+        
+        // Nếu người gửi là manager, lấy danh sách tenant mà manager đó quản lý
+        if (isManager && request.sender?.id === user.id) {
+          const response = await userService.getTenantsForManager(user.id);
+          
+          if (response.success) {
+            recipients = (response.data.tenants || [])
+              .filter(tenant => tenant.id !== user.id && tenant.id !== request.recipient?.id)
+              .map(tenant => ({
+                id: tenant.id,
+                name: tenant.name,
+                role: tenant.role,
+                room: tenant.room || { name: "Không xác định" }
+              }));
+          }
+        } 
+        // Nếu là admin, có thể chọn bất kỳ ai
+        else if (isAdmin) {
+          // Nếu người gửi là manager, chỉ lấy tenant mà manager đó quản lý
+          if (request.sender?.role?.code === 'manager') {
+            const response = await userService.getTenantsForManager(request.sender.id);
+            
+            if (response.success) {
+              recipients = (response.data.tenants || [])
+                .filter(tenant => tenant.id !== user.id && tenant.id !== request.recipient?.id)
+                .map(tenant => ({
+                  id: tenant.id,
+                  name: tenant.name,
+                  role: tenant.role,
+                  room: tenant.room || { name: "Không xác định" }
+                }));
+            }
+          } 
+          // Nếu người gửi không phải manager, lấy tất cả người dùng
+          else {
+            // Lấy danh sách tất cả người dùng
+            const response = await userService.getUsers({
+              role: "admin,manager,tenant",
+              per_page: 100,
+            });
 
-      let roleFilter = [];
-      if (isTenant) {
-        roleFilter = ["manager", "admin"];
-      } else if (isManager) {
-        roleFilter = ["admin", "manager"];
-      } else {
-        roleFilter = ["admin", "manager", "tenant"];
+            // Lọc bỏ người dùng hiện tại và người nhận hiện tại
+            recipients = (response.data.data || [])
+              .filter(u => u.id !== user.id && u.id !== request.recipient?.id)
+              .map(u => ({
+                id: u.id,
+                name: u.name,
+                role: u.role,
+              }));
+          }
+        }
+
+        setPotentialRecipients(recipients);
       }
+      // Manager là người nhận chỉ có thể chuyển cho admin
+      else if (isManager && request.recipient?.id === user.id) {
+        // Lấy danh sách admin
+        const response = await userService.getUsers({
+          role: "admin",
+          per_page: 100,
+        });
 
-      const response = await userService.getUsers({
-        role: roleFilter,
-        per_page: 100,
-      });
+        // Lọc bỏ người dùng hiện tại và người nhận hiện tại
+        const recipients = (response.data.data || [])
+          .filter(u => u.id !== user.id && u.id !== request.recipient?.id)
+          .map(u => ({
+            id: u.id,
+            name: u.name,
+            role: u.role,
+          }));
 
-      // Lọc bỏ người dùng hiện tại và người nhận hiện tại
-      const recipients = (response.data.data || [])
-        .filter((u) => u.id !== user.id && u.id !== request.recipient?.id)
-        .map((u) => ({
-          id: u.id,
-          name: u.name,
-          role: u.role,
-        }));
-
-      setPotentialRecipients(recipients);
-      if (recipients.length > 0) {
-        setTransferData({ recipient_id: recipients[0].id });
+        setPotentialRecipients(recipients);
       }
     } catch (error) {
-      showError("Đã xảy ra lỗi khi tải danh sách người dùng");
+      showError("Đã xảy ra lỗi khi tải danh sách người nhận");
       console.error("Error fetching potential recipients:", error);
     } finally {
       setLoadingRecipients(false);
     }
   };
 
-  const handleTransferRequest = async () => {
-    if (!transferData.recipient_id) {
+  const fetchPotentialSenders = async () => {
+    setLoadingSenders(true);
+    try {
+      // Chỉ lấy manager đang quản lý nhà của tenant (recipient)
+      if (!request.recipient || request.recipient.role?.code !== 'tenant') {
+        setLoadingSenders(false);
+        return;
+      }
+
+      // Admin lấy tất cả managers của tenant
+      if (isAdmin) {
+        // Gọi API để lấy danh sách managers của tenant từ backend
+        const response = await userService.getManagersForTenant(request.recipient.id);
+        
+        if (!response.success) {
+          showError(response.message || "Không thể lấy danh sách quản lý");
+          setLoadingSenders(false);
+          return;
+        }
+        
+        // Lọc bỏ người dùng hiện tại và người gửi hiện tại
+        const senders = (response.data.managers || [])
+          .map(manager => ({
+            id: manager.id,
+            name: manager.name,
+            role: manager.role,
+            house: manager.house || { name: "Không xác định" }
+          }));
+
+        setPotentialSenders(senders);
+      } 
+      // Manager chỉ có thể đổi thành admin hoặc manager của tenant
+      else if (isManager) {
+        // Gọi API để lấy danh sách managers của tenant từ backend
+        const response = await userService.getManagersForTenant(request.recipient.id);
+        
+        if (!response.success) {
+          showError(response.message || "Không thể lấy danh sách quản lý");
+          setLoadingSenders(false);
+          return;
+        }
+        
+        // Lọc bỏ người dùng hiện tại và người gửi hiện tại
+        const senders = (response.data.managers || [])
+          .filter(manager => manager.id !== user.id && manager.id !== request.sender?.id)
+          .map(manager => ({
+            id: manager.id,
+            name: manager.name,
+            role: manager.role,
+            house: manager.house || { name: "Không xác định" }
+          }));
+
+        setPotentialSenders(senders);
+      }
+    } catch (error) {
+      showError("Đã xảy ra lỗi khi tải danh sách quản lý");
+      console.error("Error fetching potential senders:", error);
+    } finally {
+      setLoadingSenders(false);
+    }
+  };
+
+  const handleTransferRequest = async (newRecipientId) => {
+    if (!newRecipientId) {
       showWarning("Vui lòng chọn người nhận");
       return;
     }
@@ -153,12 +270,12 @@ const RequestDetail = () => {
       // Sử dụng updateRequest thay vì transferRequest
       await requestService.updateRequest(id, {
         ...request,
-        recipient_id: transferData.recipient_id,
+        recipient_id: newRecipientId,
       });
 
       // Cập nhật người nhận trong UI
       const newRecipient = potentialRecipients.find(
-        (r) => r.id === transferData.recipient_id
+        (r) => r.id === newRecipientId
       );
 
       // Thêm bình luận tự động về việc chuyển yêu cầu
@@ -170,24 +287,49 @@ const RequestDetail = () => {
         content: `Đã chuyển yêu cầu cho ${recipientName}`,
       });
 
-      // Gửi thông báo cho người nhận mới
-      if (newRecipient) {
-        await notificationService.createNotification({
-          user_id: newRecipient.id,
-          type: "request_transferred",
-          content: `${user.name} đã chuyển yêu cầu #${request.id} cho bạn`,
-          url: `/requests/${request.id}`,
-        });
-      }
+      // Tải lại dữ liệu request và comments
+      fetchRequestAndComments();
+      window.location.reload();
+
+      showSuccess("Yêu cầu đã được chuyển thành công!");
+    } catch (error) {
+      showError("Đã xảy ra lỗi khi chuyển yêu cầu");
+      console.error("Error transferring request:", error);
+    }
+  };
+
+  const handleChangeSender = async (newSenderId) => {
+    if (!newSenderId) {
+      showWarning("Vui lòng chọn người gửi mới");
+      return;
+    }
+
+    try {
+      // Sử dụng updateRequest để cập nhật người gửi
+      await requestService.updateRequest(id, {
+        ...request,
+        sender_id: newSenderId,
+      });
+
+      // Cập nhật người gửi trong UI
+      const newSender = potentialSenders.find(
+        (s) => s.id === newSenderId
+      );
+
+      // Thêm bình luận tự động về việc thay đổi người gửi
+      const senderName = newSender ? newSender.name : "quản lý khác";
+      await requestService.createRequestComment({
+        request_id: id,
+        content: `Đã thay đổi người gửi yêu cầu thành ${senderName}`,
+      });
 
       // Tải lại dữ liệu request và comments
       fetchRequestAndComments();
 
-      showSuccess("Yêu cầu đã được chuyển thành công!");
-      setShowTransferModal(false);
+      showSuccess("Người gửi yêu cầu đã được thay đổi thành công!");
     } catch (error) {
-      showError("Đã xảy ra lỗi khi chuyển yêu cầu");
-      console.error("Error transferring request:", error);
+      showError("Đã xảy ra lỗi khi thay đổi người gửi");
+      console.error("Error changing sender:", error);
     }
   };
 
@@ -207,25 +349,6 @@ const RequestDetail = () => {
 
       // Cập nhật lại toàn bộ request để lấy comments mới nhất
       fetchRequestAndComments();
-
-      // Gửi thông báo cho người liên quan
-      if (!autoContent && request) {
-        // Xác định người nhận thông báo (người còn lại)
-        const notificationRecipientId =
-          user.id === request.sender?.id
-            ? request.recipient?.id
-            : request.sender?.id;
-
-        if (notificationRecipientId) {
-          // Tạo thông báo
-          await notificationService.createNotification({
-            user_id: notificationRecipientId,
-            type: "info",
-            content: `${user.name} đã thêm một bình luận vào yêu cầu #${request.id}`,
-            url: `/requests/${request.id}`,
-          });
-        }
-      }
 
       if (!autoContent) {
         showSuccess("Bình luận đã được thêm thành công!");
@@ -265,7 +388,10 @@ const RequestDetail = () => {
 
   const handleTransferClick = () => {
     fetchPotentialRecipients();
-    setShowTransferModal(true);
+  };
+
+  const handleChangeSenderClick = () => {
+    fetchPotentialSenders();
   };
 
   const saveEditedComment = async () => {
@@ -331,48 +457,7 @@ const RequestDetail = () => {
       // Tải lại dữ liệu request và comments
       fetchRequestAndComments();
 
-      // Nếu yêu cầu được đánh dấu là hoàn thành, gửi thông báo
       if (isChecked) {
-        // Xác định người cần nhận thông báo
-        const notificationRecipients = [];
-
-        // Trường hợp 1: Nếu manager xử lý request, gửi thông báo cho cả 2 bên
-        if (
-          isManager &&
-          user.id !== request.sender?.id &&
-          user.id !== request.recipient?.id
-        ) {
-          if (request.sender?.id)
-            notificationRecipients.push(request.sender.id);
-          if (request.recipient?.id)
-            notificationRecipients.push(request.recipient.id);
-        }
-        // Trường hợp 2: Nếu người xử lý là sender, gửi thông báo cho recipient
-        else if (user.id === request.sender?.id && request.recipient?.id) {
-          notificationRecipients.push(request.recipient.id);
-        }
-        // Trường hợp 3: Nếu người xử lý là recipient, gửi thông báo cho sender
-        else if (user.id === request.recipient?.id && request.sender?.id) {
-          notificationRecipients.push(request.sender.id);
-        }
-        // Trường hợp 4: Người xử lý là admin hoặc vai trò khác, gửi thông báo cho cả 2 bên
-        else {
-          if (request.sender?.id && user.id !== request.sender.id)
-            notificationRecipients.push(request.sender.id);
-          if (request.recipient?.id && user.id !== request.recipient.id)
-            notificationRecipients.push(request.recipient.id);
-        }
-
-        // Gửi thông báo cho tất cả người nhận trong danh sách
-        for (const recipientId of notificationRecipients) {
-          await notificationService.createNotification({
-            user_id: recipientId,
-            type: "success",
-            content: `Yêu cầu #${request.id} đã được đánh dấu là hoàn thành bởi ${user.name}`,
-            url: `/requests/${request.id}`,
-          });
-        }
-
         // Tự động thêm comment
         await handleCommentSubmit(
           null,
@@ -465,8 +550,27 @@ const RequestDetail = () => {
         request.sender?.id === user.id &&
         request.status === "pending"));
 
+  // Quyền chuyển yêu cầu
   const canTransfer =
-    request && (isAdmin || (isManager && request.recipient?.id === user.id));
+    request && 
+    // Admin luôn có thể thay đổi người nhận
+    (isAdmin || 
+     // Manager có thể thay đổi người nhận khi họ là người gửi
+     (isManager && request.sender?.id === user.id) ||
+     // Manager có thể thay đổi người nhận khi họ là người nhận và người gửi là tenant
+     (isManager && 
+      request.recipient?.id === user.id && 
+      request.sender?.role?.code === 'tenant'));
+
+  // Kiểm tra quyền thay đổi người gửi - chỉ Admin và khi người nhận là tenant
+  const canChangeSender =
+    request && 
+    // Admin luôn có thể thay đổi người gửi
+    (isAdmin || 
+     // Manager có thể thay đổi người gửi khi họ là người nhận và người gửi là tenant
+     (isManager && 
+      request.recipient?.id === user.id && 
+      request.sender?.role?.code === 'tenant'));
 
   const canDeleteComment = (comment) => {
     // Admin có thể xóa bất kỳ comment nào, nhưng không thể xóa comment của tenant
@@ -560,23 +664,22 @@ const RequestDetail = () => {
                   <i className="mdi mdi-dots-vertical"></i>
                 </a>
                 <div className="dropdown-menu dropdown-menu-right">
-                  {canEdit && (
-                    <a
-                      href="javascript:void(0);"
-                      className="dropdown-item"
-                      onClick={() => setShowEditRequest(true)}
-                    >
-                      <i className="mdi mdi-pencil mr-1"></i>Chỉnh sửa
-                    </a>
-                  )}
                   {canTransfer && (
                     <a
                       href="javascript:void(0);"
                       className="dropdown-item"
                       onClick={handleTransferClick}
                     >
-                      <i className="mdi mdi-account-switch mr-1"></i>Chuyển cho
-                      người khác
+                      <i className="mdi mdi-account-switch mr-1"></i>Thay đổi người nhận
+                    </a>
+                  )}
+                  {canChangeSender && (
+                    <a
+                      href="javascript:void(0);"
+                      className="dropdown-item"
+                      onClick={handleChangeSenderClick}
+                    >
+                      <i className="mdi mdi-account-convert mr-1"></i>Thay đổi người gửi
                     </a>
                   )}
                   {canDelete && (
@@ -630,14 +733,42 @@ const RequestDetail = () => {
                   </p>
                   <div className="media">
                     <div className="media-body">
-                      <h5 className="mt-1 font-14">
-                        <a
-                          href={`/users/${request.sender?.id}`}
-                          target="_blank"
-                        >
-                          {request.sender?.name || "N/A"}
-                        </a>
-                      </h5>
+                      {canChangeSender ? (
+                        loadingSenders ? (
+                          <div className="d-flex align-items-center">
+                            <div className="spinner-border spinner-border-sm text-primary mr-2" role="status">
+                              <span className="sr-only">Đang tải...</span>
+                            </div>
+                            <span>Đang tải danh sách quản lý...</span>
+                          </div>
+                        ) : (
+                          <Select
+                            value={request.sender?.id}
+                            onChange={(e) => handleChangeSender(e.target.value)}
+                            options={[
+                              {
+                                value: request.sender?.id,
+                                label: request.sender?.name + " - " + request.sender?.role?.name || "N/A",
+                              },
+                              ...potentialSenders
+                                .filter(sender => sender.id !== request.sender?.id)
+                                .map(sender => ({
+                                  value: sender.id,
+                                  label: `${sender.name} - ${sender.house?.name || "Admin"}`,
+                                })),
+                            ]}
+                          />
+                        )
+                      ) : (
+                        <h5 className="mt-1 font-14">
+                          <a
+                            href={`/users/${request.sender?.id}`}
+                            target="_blank"
+                          >
+                            {request.sender?.name || "N/A"}
+                          </a>
+                        </h5>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -648,14 +779,42 @@ const RequestDetail = () => {
                   </p>
                   <div className="media">
                     <div className="media-body">
-                      <h5 className="mt-1 font-14">
-                        <a
-                          href={`/users/${request.sender?.id}`}
-                          target="_blank"
-                        >
-                          {request.recipient?.name || "N/A"}
-                        </a>
-                      </h5>
+                      {canTransfer ? (
+                        loadingRecipients ? (
+                          <div className="d-flex align-items-center">
+                            <div className="spinner-border spinner-border-sm text-primary mr-2" role="status">
+                              <span className="sr-only">Đang tải...</span>
+                            </div>
+                            <span>Đang tải danh sách người nhận...</span>
+                          </div>
+                        ) : (
+                          <Select
+                            value={request.recipient?.id}
+                            onChange={(e) => handleTransferRequest(e.target.value)}
+                            options={[
+                              {
+                                value: request.recipient?.id,
+                                label: request.recipient?.name + " - " + request.recipient?.role?.name || "N/A",
+                              },
+                              ...potentialRecipients
+                                .filter(recipient => recipient.id !== request.recipient?.id)
+                                .map(recipient => ({
+                                  value: recipient.id,
+                                  label: `${recipient.name} - ${recipient.role?.name || ""}`,
+                                })),
+                            ]}
+                          />
+                        )
+                      ) : (
+                        <h5 className="mt-1 font-14">
+                          <a
+                            href={`/users/${request.recipient?.id}`}
+                            target="_blank"
+                          >
+                            {request.recipient?.name || "N/A"}
+                          </a>
+                        </h5>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -992,97 +1151,6 @@ const RequestDetail = () => {
         </div>
       </div>
       {showEditComment && <div className="modal-backdrop fade show"></div>}
-
-      {/* Transfer Request Modal */}
-      <div
-        className={`modal fade ${showTransferModal ? "show" : ""}`}
-        id="transfer-request-modal"
-        tabIndex="-1"
-        role="dialog"
-        aria-hidden="true"
-        style={{
-          display: showTransferModal ? "block" : "none",
-          paddingRight: "15px",
-        }}
-      >
-        <div className="modal-dialog">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title">Chuyển yêu cầu cho người khác</h5>
-              <button
-                type="button"
-                className="close"
-                onClick={() => setShowTransferModal(false)}
-              >
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div className="modal-body">
-              {loadingRecipients ? (
-                <div className="text-center py-3">
-                  <div className="spinner-border text-primary" role="status">
-                    <span className="sr-only">Đang tải...</span>
-                  </div>
-                  <p className="mt-2">Đang tải danh sách người dùng...</p>
-                </div>
-              ) : (
-                <form>
-                  {potentialRecipients.length === 0 ? (
-                    <div className="alert alert-info">
-                      Không tìm thấy người dùng phù hợp để chuyển yêu cầu.
-                    </div>
-                  ) : (
-                    <div className="form-group">
-                      <label htmlFor="transfer-recipient">
-                        Chọn người nhận mới
-                      </label>
-                      <select
-                        className="form-control"
-                        id="transfer-recipient"
-                        value={transferData.recipient_id}
-                        onChange={(e) =>
-                          setTransferData({
-                            ...transferData,
-                            recipient_id: e.target.value,
-                          })
-                        }
-                      >
-                        {potentialRecipients.map((recipient) => (
-                          <option key={recipient.id} value={recipient.id}>
-                            {recipient.name} ({recipient?.role?.code})
-                          </option>
-                        ))}
-                      </select>
-                      <small className="form-text text-muted">
-                        Khi chuyển yêu cầu, người nhận mới sẽ được thông báo về
-                        yêu cầu này.
-                      </small>
-                    </div>
-                  )}
-                </form>
-              )}
-            </div>
-            <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={() => setShowTransferModal(false)}
-              >
-                Hủy
-              </button>
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={handleTransferRequest}
-                disabled={loadingRecipients || potentialRecipients.length === 0}
-              >
-                Chuyển yêu cầu
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-      {showTransferModal && <div className="modal-backdrop fade show"></div>}
     </div>
   );
 };

@@ -2,14 +2,14 @@ import { useState, useEffect } from "react";
 import { roomService } from "../../api/rooms";
 import { paymentMethodService } from "../../api/paymentMethods";
 import { formatCurrency } from "../../utils/formatters";
-import Input from "../common/Input";
-import Select from "../common/Select";
-import TextArea from "../common/TextArea.jsx";
-import Button from "../common/Button";
-import Loader from "../common/Loader";
+import Input from "../ui/Input.jsx";
+import Select from "../ui/Select.jsx";
+import TextArea from "../ui/TextArea.jsx";
+import Button from "../ui/Button.jsx";
+import Loader from "../ui/Loader.jsx";
 import useApi from "../../hooks/useApi";
-import Checkbox from "../common/Checkbox";
-
+import Checkbox from "../ui/Checkbox.jsx";
+import { formatPaymentDate } from "../../utils/formatters";
 const InvoiceForm = ({
   initialData = {},
   onSubmit,
@@ -21,7 +21,8 @@ const InvoiceForm = ({
 }) => {
   const [formData, setFormData] = useState({
     room_id: initialData.room_id || "",
-    invoice_type: mode === "create" ? "custom" : (initialData.invoice_type || "custom"),
+    invoice_type:
+      mode === "create" ? "custom" : initialData.invoice_type || "custom",
     month: initialData.month || new Date().getMonth() + 1,
     year: initialData.year || new Date().getFullYear(),
     description: initialData.description || "",
@@ -30,9 +31,9 @@ const InvoiceForm = ({
     ],
     deleted_service_usage_ids: [], // Để lưu danh sách service_usage_id cần xóa
     // Thêm các trường liên quan đến thanh toán
-    payment_method_id: initialData.payment_method_id || 1,
+    payment_method_id: initialData?.payment_method?.id || 1,
     payment_status: initialData.payment_status || "pending",
-    payment_date: initialData.payment_date || "",
+    payment_date: formatPaymentDate(initialData.payment_date) || "",
     transaction_code: initialData.transaction_code || "",
   });
 
@@ -42,9 +43,7 @@ const InvoiceForm = ({
   const [loadingPaymentMethods, setLoadingPaymentMethods] = useState(false);
   const [showPaymentSection, setShowPaymentSection] = useState(false);
 
-  const { execute: fetchRooms } = useApi(
-    roomService.getRooms
-  );
+  const { execute: fetchRooms } = useApi(roomService.getRooms);
 
   const { execute: fetchPaymentMethods } = useApi(
     paymentMethodService.getPaymentMethods
@@ -57,7 +56,7 @@ const InvoiceForm = ({
     }
     // Luôn tải danh sách phương thức thanh toán
     loadPaymentMethods();
-    
+
     // Nếu là mode edit và có payment_method_id, hiển thị phần thanh toán
     if (mode === "edit" && initialData.payment_method_id) {
       setShowPaymentSection(true);
@@ -72,6 +71,7 @@ const InvoiceForm = ({
     try {
       const response = await fetchRooms({
         ...params,
+        per_page: 10000,
         include: "currentContract",
       });
       if (response.success) {
@@ -100,25 +100,26 @@ const InvoiceForm = ({
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    
+
     // Nếu đổi trạng thái thanh toán, xử lý ngày thanh toán tương ứng
-    if (name === 'payment_status') {
-      if (value !== 'completed') {
+    if (name === "payment_status") {
+      if (value !== "completed") {
         // Nếu không phải trạng thái đã thanh toán, xóa ngày thanh toán
-        setFormData((prev) => ({ 
-          ...prev, 
-          [name]: value,
-          payment_date: ""
-        }));
-        return;
-      } else if (value === 'completed') {
         setFormData((prev) => ({
           ...prev,
-          payment_date: new Date().toISOString().split('T')[0]
+          [name]: value,
+          payment_date: "",
+          transaction_code: "",
+        }));
+        return;
+      } else if (value === "completed") {
+        setFormData((prev) => ({
+          ...prev,
+          payment_date: new Date().toISOString().split("T")[0],
         }));
       }
     }
-    
+
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -145,17 +146,24 @@ const InvoiceForm = ({
   const removeItem = (index) => {
     const updatedItems = [...formData.items];
     const itemToRemove = updatedItems[index];
-    
-    if (mode === "edit" && itemToRemove.source_type === "service_usage" && itemToRemove.service_usage_id) {
+
+    if (
+      mode === "edit" &&
+      itemToRemove.source_type === "service_usage" &&
+      itemToRemove.service_usage_id
+    ) {
       // Lưu service_usage_id để xóa
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        deleted_service_usage_ids: [...prev.deleted_service_usage_ids, itemToRemove.service_usage_id]
+        deleted_service_usage_ids: [
+          ...prev.deleted_service_usage_ids,
+          itemToRemove.service_usage_id,
+        ],
       }));
     }
-    
+
     updatedItems.splice(index, 1);
-    
+
     setFormData((prev) => ({ ...prev, items: updatedItems }));
   };
 
@@ -168,7 +176,7 @@ const InvoiceForm = ({
 
   const togglePaymentSection = () => {
     setShowPaymentSection(!showPaymentSection);
-    
+
     // Nếu ẩn phần thanh toán, xóa dữ liệu thanh toán
     if (showPaymentSection) {
       setFormData((prev) => ({
@@ -182,7 +190,9 @@ const InvoiceForm = ({
       // Nếu hiện phần thanh toán, thiết lập giá trị mặc định
       setFormData((prev) => ({
         ...prev,
-        payment_method_id: prev.payment_method_id || (paymentMethods.length > 0 ? paymentMethods[0].id : ""),
+        payment_method_id:
+          prev.payment_method_id ||
+          (paymentMethods.length > 0 ? paymentMethods[0].id : ""),
         payment_status: prev.payment_status || "pending",
         payment_date: prev.payment_date || "",
         transaction_code: prev.transaction_code || "",
@@ -195,13 +205,15 @@ const InvoiceForm = ({
     onSubmit(formData);
   };
 
-  if (loadingRooms || loadingPaymentMethods && mode === "create") {
+  if (loadingRooms || (loadingPaymentMethods && mode === "create")) {
     return <Loader />;
   }
 
   const selectedRoom = rooms.find(
     (room) => room.id === parseInt(formData.room_id)
   );
+
+  console.log(formData.payment_date);
 
   return (
     <form onSubmit={handleSubmit}>
@@ -232,7 +244,11 @@ const InvoiceForm = ({
           <div className="col-md-6">
             <Input
               label="Loại hóa đơn"
-              value={formData.invoice_type === "custom" ? "Tùy chỉnh" : "Dịch vụ / Tháng"}
+              value={
+                formData.invoice_type === "custom"
+                  ? "Tùy chỉnh"
+                  : "Dịch vụ / Tháng"
+              }
               disabled={true}
             />
           </div>
@@ -311,17 +327,9 @@ const InvoiceForm = ({
                     <tr key={index}>
                       <td>
                         {item.source_type === "service_usage" ? (
-                          <Input
-                            value="Dịch vụ"
-                            disabled={true}
-                            inline
-                          />
+                          <Input value="Dịch vụ" disabled={true} inline />
                         ) : (
-                          <Input
-                            value="Nhập tay"
-                            disabled={true}
-                            inline
-                          />
+                          <Input value="Nhập tay" disabled={true} inline />
                         )}
                       </td>
                       <td>
@@ -329,7 +337,11 @@ const InvoiceForm = ({
                           name={`description-${index}`}
                           value={item.description || ""}
                           onChange={(e) =>
-                            handleItemChange(index, "description", e.target.value)
+                            handleItemChange(
+                              index,
+                              "description",
+                              e.target.value
+                            )
                           }
                           disabled={item.source_type === "service_usage"}
                           error={
@@ -438,8 +450,7 @@ const InvoiceForm = ({
                       options={[
                         { value: "pending", label: "Chờ thanh toán" },
                         { value: "completed", label: "Đã thanh toán" },
-                        { value: "failed", label: "Thanh toán thất bại" },
-                        { value: "refunded", label: "Đã hoàn tiền" },
+                        { value: "waiting", label: "Chờ xác nhận" },
                       ]}
                     />
                   </div>
@@ -451,7 +462,10 @@ const InvoiceForm = ({
                       value={formData.payment_date}
                       onChange={handleInputChange}
                       error={errors.payment_date}
-                      required={showPaymentSection && formData.payment_status === "completed"}
+                      required={
+                        showPaymentSection &&
+                        formData.payment_status === "completed"
+                      }
                     />
                   </div>
                   <div className="col-md-6">
@@ -472,7 +486,11 @@ const InvoiceForm = ({
 
         <div className="col-12 d-flex justify-content-end">
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Đang xử lý..." : mode === "create" ? "Tạo" : "Cập nhật"}
+            {isSubmitting
+              ? "Đang xử lý..."
+              : mode === "create"
+              ? "Tạo"
+              : "Cập nhật"}
           </Button>
         </div>
       </div>

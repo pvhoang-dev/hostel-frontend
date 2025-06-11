@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
-import Card from "../../../components/common/Card";
-import Loader from "../../../components/common/Loader";
+import Card from "../../../components/ui/Card";
+import Loader from "../../../components/ui/Loader";
 import useAlert from "../../../hooks/useAlert";
 import useApi from "../../../hooks/useApi";
 import { roomServiceService } from "../../../api/roomServices";
@@ -11,7 +11,7 @@ const RoomServiceDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { showError } = useAlert();
-  const { user, isAdmin, isManager } = useAuth();
+  const { user, isAdmin, isManager, isTenant } = useAuth();
 
   const {
     data: roomService,
@@ -174,33 +174,35 @@ const RoomServiceDetail = () => {
             </div>
           )}
 
-          <div className="col-md-12">
-            <h5 className="mb-3">Thông tin hệ thống</h5>
-            <div className="table-responsive">
-              <table className="table table-bordered">
-                <thead style={{ backgroundColor: "rgba(0, 0, 0, .075)" }}>
-                  <tr>
-                    <th style={{ width: "200px" }}>Thông tin</th>
-                    <th>Chi tiết</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>ID:</td>
-                    <td>{roomService.id}</td>
-                  </tr>
-                  <tr>
-                    <td>Tạo lúc:</td>
-                    <td>{roomService.created_at}</td>
-                  </tr>
-                  <tr>
-                    <td>Cập nhật lúc:</td>
-                    <td>{roomService.updated_at}</td>
-                  </tr>
-                </tbody>
-              </table>
+          {!isTenant && (
+            <div className="col-md-12">
+              <h5 className="mb-3">Thông tin hệ thống</h5>
+              <div className="table-responsive">
+                <table className="table table-bordered">
+                  <thead style={{ backgroundColor: "rgba(0, 0, 0, .075)" }}>
+                    <tr>
+                      <th style={{ width: "200px" }}>Thông tin</th>
+                      <th>Chi tiết</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>ID:</td>
+                      <td>{roomService.id}</td>
+                    </tr>
+                    <tr>
+                      <td>Tạo lúc:</td>
+                      <td>{roomService.created_at}</td>
+                    </tr>
+                    <tr>
+                      <td>Cập nhật lúc:</td>
+                      <td>{roomService.updated_at}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </Card>
     </div>

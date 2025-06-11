@@ -3,16 +3,16 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { contractService } from "../../api/contracts";
 import { houseService } from "../../api/houses";
 import { roomService } from "../../api/rooms";
-import Table from "../../components/common/Table";
-import Card from "../../components/common/Card";
-import Button from "../../components/common/Button";
-import Input from "../../components/common/Input";
-import Select from "../../components/common/Select";
-import Loader from "../../components/common/Loader";
+import Table from "../../components/ui/Table";
+import Card from "../../components/ui/Card";
+import Button from "../../components/ui/Button";
+import Input from "../../components/ui/Input";
+import Select from "../../components/ui/Select";
+import Loader from "../../components/ui/Loader";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 import { useAuth } from "../../hooks/useAuth";
-import DatePicker from "../../components/common/DatePicker";
+import DatePicker from "../../components/ui/DatePicker";
 import { formatCurrency, formatDateWithoutTime } from "../../utils/formatters";
 
 // Component con hiển thị phần filter
@@ -34,9 +34,7 @@ const FilterSection = ({
             name="house_id"
             value={filters.house_id}
             onChange={(e) => {
-              // Xử lý filter thay đổi và thông báo cho component cha
               onFilterChange(e);
-              onHouseChange(e.target.value);
             }}
             options={[
               { value: "", label: "Tất cả" },
@@ -140,11 +138,7 @@ const FilterSection = ({
       </div>
 
       <div className="mt-3 d-flex justify-content-end">
-        <Button
-          variant="secondary"
-          onClick={onClearFilters}
-          className=" mr-2"
-        >
+        <Button variant="secondary" onClick={onClearFilters} className=" mr-2">
           Xóa bộ lọc
         </Button>
         <Button onClick={onApplyFilters}>Tìm</Button>
@@ -275,10 +269,10 @@ const ContractList = () => {
             statusClass = "text-danger";
             return <span className={statusClass}>Đã chấm dứt</span>;
           case "expired":
-            statusClass = "text-secondary";
+            statusClass = "text-warning";
             return <span className={statusClass}>Đã hết hạn</span>;
           default:
-            statusClass = "text-secondary";
+            statusClass = "text-warning";
             return <span className={statusClass}>{status}</span>;
         }
       },
@@ -315,7 +309,21 @@ const ContractList = () => {
     if (user) {
       loadContracts();
     }
-  }, [currentPage, perPage, sortBy, sortDir, house_id, room_id, status]);
+  }, [
+    currentPage,
+    perPage,
+    sortBy,
+    sortDir,
+    house_id,
+    room_id,
+    status,
+    start_date_from,
+    start_date_to,
+    end_date_from,
+    end_date_to,
+    min_rent,
+    max_rent,
+  ]);
 
   // Tải phòng khi house_id thay đổi
   useEffect(() => {
@@ -326,7 +334,7 @@ const ContractList = () => {
       setFilteredRooms([]);
       if (room_id) {
         // Xóa room_id nếu house_id không còn
-        setSearchParams(prev => {
+        setSearchParams((prev) => {
           const newParams = new URLSearchParams(prev);
           newParams.delete("room_id");
           return newParams;
@@ -338,11 +346,6 @@ const ContractList = () => {
   // Hàm tải contracts
   const loadContracts = async () => {
     try {
-      console.log("Tải contracts với filters:", {
-        house_id, room_id, status, start_date_from, start_date_to,
-        end_date_from, end_date_to, min_rent, max_rent
-      });
-      
       const params = {
         page: currentPage,
         per_page: perPage,
@@ -379,7 +382,7 @@ const ContractList = () => {
 
     try {
       const response = await fetchRooms({ house_id: houseId });
-      
+
       if (response.success) {
         setFilteredRooms(response.data.data || []);
       } else {
@@ -413,7 +416,7 @@ const ContractList = () => {
 
   // Xử lý chuyển trang
   const handlePageChange = (page) => {
-    setSearchParams(prev => {
+    setSearchParams((prev) => {
       const newParams = new URLSearchParams(prev);
       newParams.set("page", page.toString());
       return newParams;
@@ -423,7 +426,7 @@ const ContractList = () => {
   // Xử lý thay đổi sắp xếp
   const handleSortingChange = (sorting) => {
     if (sorting.length > 0) {
-      setSearchParams(prev => {
+      setSearchParams((prev) => {
         const newParams = new URLSearchParams(prev);
         newParams.set("sort_by", sorting[0].id);
         newParams.set("sort_dir", sorting[0].desc ? "desc" : "asc");
@@ -435,19 +438,19 @@ const ContractList = () => {
   // Xử lý thay đổi filter
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
-    
-    setSearchParams(prev => {
+
+    setSearchParams((prev) => {
       const newParams = new URLSearchParams(prev);
-      
+
       if (value) {
         newParams.set(name, value);
       } else {
         newParams.delete(name);
       }
-      
+
       // Reset về trang 1 khi filter thay đổi
       newParams.set("page", "1");
-      
+
       return newParams;
     });
   };
@@ -492,19 +495,15 @@ const ContractList = () => {
             room_id,
             status,
             start_date_from,
-          start_date_to,
-          end_date_from,
-          end_date_to,
-          min_rent,
-          max_rent,
-        }}
-        houses={houses}
-        rooms={filteredRooms.length > 0 ? filteredRooms : rooms}
-        onFilterChange={handleFilterChange}
-        onHouseChange={(value) => {
-          // House filter được xử lý riêng vì liên quan đến việc load rooms
-          console.log("Đã chọn house:", value);
-        }}
+            start_date_to,
+            end_date_from,
+            end_date_to,
+            min_rent,
+            max_rent,
+          }}
+          houses={houses}
+          rooms={filteredRooms.length > 0 ? filteredRooms : rooms}
+          onFilterChange={handleFilterChange}
           onClearFilters={clearFilters}
           onApplyFilters={applyFilters}
         />

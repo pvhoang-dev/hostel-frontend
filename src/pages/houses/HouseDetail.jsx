@@ -7,8 +7,8 @@ import { useAuth } from "../../hooks/useAuth";
 import RoomList from "../rooms/RoomList";
 import HouseSettingList from "./settings/HouseSettingList";
 import StorageList from "../storages/StorageList";
-import Card from "../../components/common/Card";
-import Loader from "../../components/common/Loader";
+import Card from "../../components/ui/Card";
+import Loader from "../../components/ui/Loader";
 
 const HouseDetail = ({ tenantView = false }) => {
   const { id } = useParams();
@@ -187,33 +187,35 @@ const HouseDetail = ({ tenantView = false }) => {
             </div>
           </div>
 
-          <div className="col-md-12 mb-4">
-            <h5 className="mb-3">Thông tin hệ thống</h5>
-            <div className="table-responsive">
-              <table className="table table-bordered">
-                <thead style={{ backgroundColor: "rgba(0, 0, 0, .075)" }}>
-                  <tr>
-                    <th style={{ width: "200px" }}>Thông tin</th>
-                    <th>Chi tiết</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>ID nhà:</td>
-                    <td>{house.id}</td>
-                  </tr>
-                  <tr>
-                    <td>Tạo:</td>
-                    <td>{house.created_at}</td>
-                  </tr>
-                  <tr>
-                    <td>Lần cuối cập nhật:</td>
-                    <td>{house.updated_at}</td>
-                  </tr>
-                </tbody>
-              </table>
+          {!isInTenantView && (
+            <div className="col-md-12 mb-4">
+              <h5 className="mb-3">Thông tin hệ thống</h5>
+              <div className="table-responsive">
+                <table className="table table-bordered">
+                  <thead style={{ backgroundColor: "rgba(0, 0, 0, .075)" }}>
+                    <tr>
+                      <th style={{ width: "200px" }}>Thông tin</th>
+                      <th>Chi tiết</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>ID nhà:</td>
+                      <td>{house.id}</td>
+                    </tr>
+                    <tr>
+                      <td>Tạo:</td>
+                      <td>{house.created_at}</td>
+                    </tr>
+                    <tr>
+                      <td>Lần cuối cập nhật:</td>
+                      <td>{house.updated_at}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </Card>
 

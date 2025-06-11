@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../hooks/useAuth";
-import Card from "../../components/common/Card";
-import Loader from "../../components/common/Loader";
+import Card from "../../components/ui/Card";
+import Loader from "../../components/ui/Loader";
 import { dashboardService } from "../../api/dashboard";
 
 const Dashboard = () => {
@@ -41,8 +41,7 @@ const Dashboard = () => {
     fetchDashboardData();
   }, []);
 
-  if (loading)
-    return <Loader fullScreen color="primary" showText text="Đang tải..." />;
+  if (loading) return <Loader />;
 
   return (
     <div className="container-fluid py-3">
@@ -65,18 +64,12 @@ const Dashboard = () => {
             <div className="card widget-flat">
               <div className="card-body">
                 <div className="float-right">
-                  <i className="mdi mdi-account-multiple"></i>
+                  <i className="dripicons dripicons-information"></i>
                 </div>
                 <h5 className="text-muted fw-normal mt-0" title="Tổng số nhà">
                   Tổng số nhà
                 </h5>
                 <h3 className="mt-3 mb-3">{stats.houses}</h3>
-                <p className="mb-0 text-muted">
-                  <span className="text-success mr-2">
-                    <i className="mdi mdi-arrow-up-bold"></i> 4.75%
-                  </span>
-                  <span className="text-nowrap">So với tháng trước</span>
-                </p>
               </div>
             </div>
           </div>
@@ -85,18 +78,12 @@ const Dashboard = () => {
             <div className="card widget-flat">
               <div className="card-body">
                 <div className="float-right">
-                  <i className="mdi mdi-account-multiple"></i>
+                  <i className="dripicons dripicons-information"></i>
                 </div>
                 <h5 className="text-muted fw-normal mt-0" title="Tổng số phòng">
                   Tổng số phòng
                 </h5>
                 <h3 className="mt-3 mb-3">{stats.rooms}</h3>
-                <p className="mb-0 text-muted">
-                  <span className="text-success mr-2">
-                    <i className="mdi mdi-arrow-up-bold"></i> 2.5%
-                  </span>
-                  <span className="text-nowrap">So với tháng trước</span>
-                </p>
               </div>
             </div>
           </div>
@@ -105,7 +92,7 @@ const Dashboard = () => {
             <div className="card widget-flat">
               <div className="card-body">
                 <div className="float-right">
-                  <i className="mdi mdi-account-multiple"></i>
+                  <i className="dripicons dripicons-information"></i>
                 </div>
                 <h5
                   className="text-muted fw-normal mt-0"
@@ -114,12 +101,6 @@ const Dashboard = () => {
                   Tổng số người thuê
                 </h5>
                 <h3 className="mt-3 mb-3">{stats.tenants}</h3>
-                <p className="mb-0 text-muted">
-                  <span className="text-danger mr-2">
-                    <i className="mdi mdi-arrow-down-bold"></i> 1.08%
-                  </span>
-                  <span className="text-nowrap">So với tháng trước</span>
-                </p>
               </div>
             </div>
           </div>
@@ -128,7 +109,7 @@ const Dashboard = () => {
             <div className="card widget-flat">
               <div className="card-body">
                 <div className="float-right">
-                  <i className="mdi mdi-account-multiple"></i>
+                  <i className="dripicons dripicons-information"></i>
                 </div>
                 <h5
                   className="text-muted fw-normal mt-0"
@@ -137,12 +118,6 @@ const Dashboard = () => {
                   Tổng số hợp đồng
                 </h5>
                 <h3 className="mt-3 mb-3">{stats.contracts}</h3>
-                <p className="mb-0 text-muted">
-                  <span className="text-success mr-2">
-                    <i className="mdi mdi-arrow-up-bold"></i> 3.25%
-                  </span>
-                  <span className="text-nowrap">So với tháng trước</span>
-                </p>
               </div>
             </div>
           </div>

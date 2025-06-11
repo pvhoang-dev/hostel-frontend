@@ -2,12 +2,12 @@ import { useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { houseService } from "../../api/houses";
 import { userService } from "../../api/users";
-import Table from "../../components/common/Table";
-import Card from "../../components/common/Card";
-import Button from "../../components/common/Button";
-import Input from "../../components/common/Input";
-import Select from "../../components/common/Select";
-import Loader from "../../components/common/Loader";
+import Table from "../../components/ui/Table";
+import Card from "../../components/ui/Card";
+import Button from "../../components/ui/Button";
+import Input from "../../components/ui/Input";
+import Select from "../../components/ui/Select";
+import Loader from "../../components/ui/Loader";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 import { useAuth } from "../../hooks/useAuth";
@@ -73,11 +73,7 @@ const FilterSection = ({
     </div>
 
     <div className="mt-3 d-flex justify-content-end">
-      <Button
-        variant="secondary"
-        onClick={onClearFilters}
-        className=" mr-2"
-      >
+      <Button variant="secondary" onClick={onClearFilters} className=" mr-2">
         Xóa bộ lọc
       </Button>
       <Button onClick={onApplyFilters}>Tìm</Button>
@@ -182,14 +178,19 @@ const HouseList = () => {
   // Khởi tạo xử lý nút Hủy trong modal
   useEffect(() => {
     // Khởi tạo nút hủy trong modal
-    $('#deleteHouseModal .btn-close, #deleteHouseModal .btn-secondary').on('click', function() {
-      $('#deleteHouseModal').modal('hide');
-    });
-    
+    $("#deleteHouseModal .btn-close, #deleteHouseModal .btn-secondary").on(
+      "click",
+      function () {
+        $("#deleteHouseModal").modal("hide");
+      }
+    );
+
     // Cleanup khi component unmount
     return () => {
-      $('#deleteHouseModal .btn-close, #deleteHouseModal .btn-secondary').off('click');
-      $('#deleteHouseModal #confirmDeleteBtn').off('click');
+      $("#deleteHouseModal .btn-close, #deleteHouseModal .btn-secondary").off(
+        "click"
+      );
+      $("#deleteHouseModal #confirmDeleteBtn").off("click");
     };
   }, []);
 
@@ -202,7 +203,16 @@ const HouseList = () => {
     if (!loadingManagers && !loadingHouses) {
       loadHouses();
     }
-  }, [currentPage, perPage, sortBy, sortDir, manager_id, status]);
+  }, [
+    currentPage,
+    perPage,
+    sortBy,
+    sortDir,
+    manager_id,
+    status,
+    name,
+    address,
+  ]);
 
   const loadHouses = async () => {
     const params = {
@@ -232,19 +242,19 @@ const HouseList = () => {
 
   const handleDeleteHouse = async (house) => {
     // Hiển thị modal xác nhận
-    const $deleteModal = $('#deleteHouseModal');
-    
+    const $deleteModal = $("#deleteHouseModal");
+
     // Xóa event handlers cũ (nếu có)
-    $deleteModal.find('#confirmDeleteBtn').off('click');
-    
+    $deleteModal.find("#confirmDeleteBtn").off("click");
+
     // Đăng ký event handler mới cho nút xác nhận
-    $deleteModal.find('#confirmDeleteBtn').on('click', async function() {
+    $deleteModal.find("#confirmDeleteBtn").on("click", async function () {
       // Ẩn modal
-      $deleteModal.modal('hide');
-      
+      $deleteModal.modal("hide");
+
       // Gọi API xóa nhà
       const response = await deleteHouse(house.id);
-      
+
       if (response.success) {
         showSuccess("Xóa nhà thành công");
         loadHouses();
@@ -252,9 +262,9 @@ const HouseList = () => {
         showError(response.message || "Có lỗi xảy ra khi xóa nhà");
       }
     });
-    
+
     // Hiển thị modal
-    $deleteModal.modal('show');
+    $deleteModal.modal("show");
   };
 
   const handlePageChange = (page) => {
@@ -293,7 +303,6 @@ const HouseList = () => {
       page: "1",
       per_page: perPage.toString(),
     });
-    loadHouses();
   };
 
   const isLoading = loadingHouses || loadingManagers;
@@ -339,11 +348,12 @@ const HouseList = () => {
                   icon: "mdi-eye",
                   handler: (house) => navigate(`/houses/${house.id}`),
                 },
-                ...(isAdmin && isManager
+                ...(isAdmin || isManager
                   ? [
                       {
                         icon: "mdi-pencil",
-                        handler: (house) => navigate(`/houses/${house.id}/edit`),
+                        handler: (house) =>
+                          navigate(`/houses/${house.id}/edit`),
                       },
                     ]
                   : []),
@@ -362,7 +372,12 @@ const HouseList = () => {
       </Card>
 
       {/* Modal xác nhận xóa nhà (HTML cứng, không truyền dữ liệu động) */}
-      <div className="modal fade" id="deleteHouseModal" tabIndex="-1" aria-hidden="true">
+      <div
+        className="modal fade"
+        id="deleteHouseModal"
+        tabIndex="-1"
+        aria-hidden="true"
+      >
         <div className="modal-dialog modal-dialog-centered modal-lg">
           <div className="modal-content">
             <div className="modal-header bg-danger text-white">
@@ -388,16 +403,19 @@ const HouseList = () => {
                   <li>Tất cả thiết bị trong kho của nhà</li>
                 </ul>
                 <div className="alert alert-success">
-                  <p className="mb-0"><i className="mdi mdi-information-outline me-1"></i> Hóa đơn và giao dịch thanh toán sẽ được giữ lại để phục vụ mục đích thống kê doanh thu.</p>
+                  <p className="mb-0">
+                    <i className="mdi mdi-information-outline me-1"></i> Hóa đơn
+                    và giao dịch thanh toán sẽ được giữ lại để phục vụ mục đích
+                    thống kê doanh thu.
+                  </p>
                 </div>
-                <p className="mt-3 text-danger fw-bold">Hành động xóa nhà không thể hoàn tác!</p>
+                <p className="mt-3 text-danger fw-bold">
+                  Hành động xóa nhà không thể hoàn tác!
+                </p>
               </div>
             </div>
             <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-secondary"
-              >
+              <button type="button" className="btn btn-secondary">
                 Hủy
               </button>
               <button

@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { houseService } from "../../api/houses";
 import HouseForm from "../../components/forms/HouseForm";
-import Card from "../../components/common/Card";
-import Loader from "../../components/common/Loader";
+import Card from "../../components/ui/Card";
+import Loader from "../../components/ui/Loader";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 import { useAuth } from "../../hooks/useAuth";
@@ -73,7 +73,6 @@ const HouseEdit = () => {
 
     if (response.success) {
       showSuccess("Cập nhật nhà thành công");
-      navigate("/houses");
     } else {
       if (response.data && typeof response.data === "object") {
         setErrors(response.data);

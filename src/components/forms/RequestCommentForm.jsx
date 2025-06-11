@@ -1,6 +1,6 @@
 import { useState } from "react";
-import Button from "../common/Button";
-import TextArea from "../common/TextArea";
+import Button from "../ui/Button";
+import TextArea from "../ui/TextArea";
 import { useAuth } from "../../hooks/useAuth";
 
 const RequestCommentForm = ({

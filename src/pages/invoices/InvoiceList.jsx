@@ -4,12 +4,12 @@ import { invoiceService } from "../../api/invoices";
 import { houseService } from "../../api/houses";
 import { roomService } from "../../api/rooms";
 import { paymentMethodService } from "../../api/paymentMethods";
-import Table from "../../components/common/Table";
-import Card from "../../components/common/Card";
-import Button from "../../components/common/Button";
-import Input from "../../components/common/Input";
-import Select from "../../components/common/Select";
-import Loader from "../../components/common/Loader";
+import Table from "../../components/ui/Table";
+import Card from "../../components/ui/Card";
+import Button from "../../components/ui/Button";
+import Input from "../../components/ui/Input";
+import Select from "../../components/ui/Select";
+import Loader from "../../components/ui/Loader";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 import { useAuth } from "../../hooks/useAuth";
@@ -114,8 +114,7 @@ const FilterSection = ({
               { value: "", label: "Tất cả" },
               { value: "pending", label: "Chờ thanh toán" },
               { value: "completed", label: "Đã thanh toán" },
-              { value: "failed", label: "Thanh toán thất bại" },
-              { value: "refunded", label: "Đã hoàn tiền" },
+              { value: "waiting", label: "Chờ xác nhận" },
             ]}
           />
         </div>
@@ -160,11 +159,7 @@ const FilterSection = ({
       </div>
 
       <div className="mt-3 d-flex justify-content-end">
-        <Button
-          variant="secondary"
-          onClick={onClearFilters}
-          className=" mr-2"
-        >
+        <Button variant="secondary" onClick={onClearFilters} className=" mr-2">
           Xóa bộ lọc
         </Button>
         <Button onClick={onApplyFilters}>Tìm</Button>
@@ -213,7 +208,7 @@ const InvoiceList = () => {
     loading: loadingRooms,
     execute: fetchRooms,
   } = useApi(roomService.getRooms);
-  
+
   const {
     data: paymentMethodsData,
     loading: loadingPaymentMethods,
@@ -240,21 +235,21 @@ const InvoiceList = () => {
   // Function to render payment status badge
   const getPaymentStatusBadge = (status) => {
     if (!status) return "Chưa thanh toán";
-    
+
     const badgeColors = {
       pending: "warning",
       completed: "success",
       failed: "danger",
-      refunded: "info"
+      refunded: "info",
     };
-    
+
     const statusText = {
       pending: "Chờ thanh toán",
       completed: "Đã thanh toán",
       failed: "Thanh toán thất bại",
-      refunded: "Đã hoàn tiền"
+      refunded: "Đã hoàn tiền",
     };
-    
+
     return (
       <span className={`badge bg-${badgeColors[status]} text-white`}>
         {statusText[status] || status}
@@ -265,36 +260,37 @@ const InvoiceList = () => {
   // Render the actions cell for each row
   const ActionsCell = ({ row }) => {
     const invoice = row.original;
-    const canEdit = isAdmin || (isManager && invoice.room?.house?.manager_id === user?.id);
+    const canEdit =
+      isAdmin || isManager;
 
     return (
       <div className="d-flex gap-2">
         <button
           type="button"
           className="btn btn-link p-0 mx-1 action-icon"
-          style={{ border: 'none', background: 'none', cursor: 'pointer' }}
+          style={{ border: "none", background: "none", cursor: "pointer" }}
           onClick={() => navigate(`/invoices/${invoice.id}`)}
           title="Chi tiết"
         >
           <i className="mdi mdi-eye"></i>
         </button>
-        
+
         {canEdit && (
           <>
             <button
               type="button"
               className="btn btn-link p-0 mx-1 action-icon"
-              style={{ border: 'none', background: 'none', cursor: 'pointer' }}
+              style={{ border: "none", background: "none", cursor: "pointer" }}
               onClick={() => navigate(`/invoices/${invoice.id}/edit`)}
               title="Sửa"
             >
               <i className="mdi mdi-pencil"></i>
             </button>
-            
+
             <button
               type="button"
               className="btn btn-link p-0 mx-1 action-icon"
-              style={{ border: 'none', background: 'none', cursor: 'pointer' }}
+              style={{ border: "none", background: "none", cursor: "pointer" }}
               onClick={() => handleDeleteInvoice(invoice)}
               title="Xóa"
             >
@@ -302,7 +298,7 @@ const InvoiceList = () => {
             </button>
           </>
         )}
-        
+
         {canEdit && invoice.payment_status !== "completed" && (
           <button
             onClick={() => handleMarkAsPaid(invoice)}
@@ -315,7 +311,7 @@ const InvoiceList = () => {
       </div>
     );
   };
-  
+
   // Column definitions for the table
   const columns = [
     {
@@ -325,12 +321,20 @@ const InvoiceList = () => {
     {
       accessorKey: "room.house.name",
       header: "Nhà",
-      cell: ({ row }) => <Link to={`/houses/${row.original.room.house.id}`}>{row.original.room.house.name}</Link>,
+      cell: ({ row }) => (
+        <Link to={`/houses/${row.original.room.house.id}`}>
+          {row.original.room.house.name}
+        </Link>
+      ),
     },
     {
       accessorKey: "room.room_number",
       header: "Phòng",
-      cell: ({ row }) => <Link to={`/rooms/${row.original.room.id}`}>{row.original.room.room_number}</Link>,
+      cell: ({ row }) => (
+        <Link to={`/rooms/${row.original.room.id}`}>
+          {row.original.room.room_number}
+        </Link>
+      ),
     },
     {
       accessorKey: "month",
@@ -368,7 +372,10 @@ const InvoiceList = () => {
     {
       accessorKey: "payment_date",
       header: "Ngày thanh toán",
-      cell: ({ row }) => row.original.payment_date ? new Date(row.original.payment_date).toLocaleDateString('vi-VN') : "Chưa thanh toán",
+      cell: ({ row }) =>
+        row.original.payment_date
+          ? new Date(row.original.payment_date).toLocaleDateString("vi-VN")
+          : "Chưa thanh toán",
     },
     {
       accessorKey: "actions",
@@ -395,6 +402,12 @@ const InvoiceList = () => {
     room_id,
     invoice_type,
     user,
+    month,
+    year,
+    min_amount,
+    max_amount,
+    payment_status,
+    payment_method_id,
   ]);
 
   useEffect(() => {
@@ -525,7 +538,8 @@ const InvoiceList = () => {
     });
   };
 
-  const isLoading = loadingInvoices || loadingHouses || loadingRooms || loadingPaymentMethods;
+  const isLoading =
+    loadingInvoices || loadingHouses || loadingRooms || loadingPaymentMethods;
 
   // Nếu chưa có thông tin user, hiển thị loading
   if (!user) {
@@ -536,18 +550,25 @@ const InvoiceList = () => {
 
   // Handle marking an invoice as paid
   const handleMarkAsPaid = async (invoice) => {
-    if (!window.confirm("Bạn có chắc chắn muốn đánh dấu hóa đơn này là đã thanh toán?")) {
+    if (
+      !window.confirm(
+        "Bạn có chắc chắn muốn đánh dấu hóa đơn này là đã thanh toán?"
+      )
+    ) {
       return;
     }
-    
+
     const paymentData = {
       payment_method_id: invoice.payment_method?.id || 1, // Mặc định phương thức thanh toán tiền mặt
       payment_status: "completed",
-      payment_date: new Date().toISOString().split("T")[0]
+      payment_date: new Date().toISOString().split("T")[0],
     };
-    
+
     try {
-      const response = await invoiceService.updatePaymentStatus(invoice.id, paymentData);
+      const response = await invoiceService.updatePaymentStatus(
+        invoice.id,
+        paymentData
+      );
       if (response.success) {
         showSuccess("Đã cập nhật trạng thái thanh toán thành công");
         loadInvoices(); // Tải lại danh sách

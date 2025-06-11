@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { contractService } from "../../api/contracts";
 import ContractForm from "../../components/forms/ContractForm";
-import Card from "../../components/common/Card";
-import Button from "../../components/common/Button";
-import Loader from "../../components/common/Loader";
+import Card from "../../components/ui/Card";
+import Button from "../../components/ui/Button";
+import Loader from "../../components/ui/Loader";
 import { useAuth } from "../../hooks/useAuth";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
@@ -45,7 +45,6 @@ const ContractEdit = () => {
         contractData.user_ids = contractData.tenants.map(tenant => tenant.id);
       }
       
-      console.log("Contract data after transformation:", contractData);
       setContract(contractData);
 
       // Check permissions
@@ -70,7 +69,6 @@ const ContractEdit = () => {
 
     if (response.success) {
       showSuccess("Cập nhật hợp đồng thành công");
-      navigate(`/contracts/${id}`);
     } else {
       if (response.data && typeof response.data === "object") {
         setErrors(response.data);

@@ -1,16 +1,16 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
-import Input from "../common/Input";
-import Button from "../common/Button";
-import Card from "../common/Card";
-import Select from "../common/Select";
-import TextArea from "../common/TextArea";
+import Input from "../ui/Input";
+import Button from "../ui/Button";
+import Card from "../ui/Card";
+import Select from "../ui/Select";
+import TextArea from "../ui/TextArea";
 import useApi from "../../hooks/useApi";
 import useAlert from "../../hooks/useAlert";
 import { equipmentService } from "../../api/equipments";
 import { storageService } from "../../api/storages";
-import Loader from "../common/Loader";
+import Loader from "../ui/Loader";
 
 const RoomEquipmentForm = ({
   roomId,
@@ -240,17 +240,6 @@ const RoomEquipmentForm = ({
       // If no quantity changes, proceed with normal update
       handleUpdateWithStorageLogic(submitData);
     } else {
-      // Check if equipment is from storage and quantity exceeds available
-      if (
-        !isCustomEquipment &&
-        parseInt(formData.quantity) > availableQuantity
-      ) {
-        setAdditionalQuantity(parseInt(formData.quantity) - availableQuantity);
-        // Show modal to ask if user wants to take from storage or custom source
-        setShowSourceModal(true);
-        return; // Stop here and wait for modal response
-      }
-
       // Create mode logic
       if (isCustomEquipment) {
         try {
@@ -264,17 +253,9 @@ const RoomEquipmentForm = ({
             equipmentsResponse.data.data.length > 0
           ) {
             // If equipment with the same name exists, use its ID
-            console.log(
-              "Found existing equipment with same name:",
-              equipmentsResponse.data.data[0]
-            );
             submitData.equipment_id = equipmentsResponse.data.data[0].id;
           } else {
             // Create new equipment
-            console.log(
-              "Creating new equipment:",
-              formData.custom_equipment_name
-            );
             const equipmentResponse = await createEquipment({
               name: formData.custom_equipment_name.trim(),
             });
@@ -295,26 +276,34 @@ const RoomEquipmentForm = ({
         }
       }
 
-      // Check if equipment is from storage and update quantity
-      if (!isCustomEquipment) {
-        const selectedStorage = storageData?.data?.find(
-          (storage) => storage.equipment.id === parseInt(formData.equipment_id)
-        );
-
-        if (selectedStorage) {
-          const newQuantity = Math.max(
-            0,
-            selectedStorage.quantity - formData.quantity
+      // Kiểm tra nếu thiết bị từ kho và số lượng vượt quá số lượng có sẵn
+      if (!isCustomEquipment && formData.equipment_id && formData.equipment_id !== "custom" && formData.equipment_id !== "other") {
+        if (parseInt(formData.quantity) > availableQuantity) {
+          setAdditionalQuantity(parseInt(formData.quantity));
+          // Hiển thị modal để hỏi nguồn thiết bị
+          setShowSourceModal(true);
+          return; // Dừng ở đây và chờ phản hồi từ modal
+        } else {
+          // Số lượng đủ trong kho, trực tiếp cập nhật kho
+          const selectedStorage = storageData?.data?.find(
+            (storage) => storage.equipment.id === parseInt(formData.equipment_id)
           );
 
-          // Update storage quantity
-          const updateResponse = await updateStorage(selectedStorage.id, {
-            quantity: newQuantity,
-          });
+          if (selectedStorage) {
+            const newQuantity = Math.max(
+              0,
+              selectedStorage.quantity - parseInt(formData.quantity)
+            );
 
-          if (!updateResponse.success) {
-            showError("Có lỗi xảy ra khi cập nhật kho");
-            return;
+            // Update storage quantity
+            const updateResponse = await updateStorage(selectedStorage.id, {
+              quantity: newQuantity,
+            });
+
+            if (!updateResponse.success) {
+              showError("Có lỗi xảy ra khi cập nhật kho");
+              return;
+            }
           }
         }
       }
@@ -411,23 +400,34 @@ const RoomEquipmentForm = ({
   const handleSourceSelection = (useStorage) => {
     setShowSourceModal(false);
 
-    const submitData = { ...formData };
-    submitData.use_storage = useStorage;
-    submitData.additional_quantity = additionalQuantity;
-
-    // If using storage, check if enough is available
+    // Nếu sử dụng nguồn từ kho, kiểm tra xem có đủ số lượng không
     if (useStorage) {
       const selectedStorage = storageData?.data?.find(
         (storage) => storage.equipment.id === parseInt(formData.equipment_id)
       );
 
-      if (!selectedStorage || selectedStorage.quantity < additionalQuantity) {
+      // Kiểm tra xem có đủ thiết bị trong kho không
+      if (
+        !selectedStorage || 
+        selectedStorage.quantity < additionalQuantity
+      ) {
+        // Hiển thị thông báo không đủ thiết bị trong kho
         setShowStorageInsufficientModal(true);
         return;
       }
+    }
 
-      // In create mode, update storage quantity immediately
-      if (mode === "create") {
+    const submitData = { ...formData };
+    submitData.use_storage = useStorage;
+    submitData.additional_quantity = additionalQuantity;
+
+    // Trong chế độ tạo mới, cập nhật số lượng kho ngay lập tức nếu sử dụng kho
+    if (mode === "create") {
+      if (useStorage) {
+        const selectedStorage = storageData?.data?.find(
+          (storage) => storage.equipment.id === parseInt(formData.equipment_id)
+        );
+
         updateStorage(selectedStorage.id, {
           quantity: selectedStorage.quantity - formData.quantity,
         }).then((response) => {
@@ -436,20 +436,17 @@ const RoomEquipmentForm = ({
             return;
           }
 
-          // Continue with submission
+          // Tiếp tục với việc gửi form
           delete submitData.custom_equipment_name;
           onSubmit(submitData);
         });
-        return;
+      } else {
+        // Không lấy từ kho, chỉ cần gửi form
+        delete submitData.custom_equipment_name;
+        onSubmit(submitData);
       }
-    }
-
-    if (mode === "create") {
-      // Don't need to do anything with storage in custom source mode for creation
-      delete submitData.custom_equipment_name;
-      onSubmit(submitData);
     } else {
-      // Edit mode - proceed with update
+      // Chế độ chỉnh sửa - xử lý cập nhật
       handleUpdateWithStorageLogic(submitData);
     }
   };
@@ -683,10 +680,12 @@ const RoomEquipmentForm = ({
               ></button>
             </div>
             <div className="modal-body">
-              <p>
+              <p className="text-danger fw-bold">
                 Không đủ thiết bị trong kho để thêm {additionalQuantity} cái.
               </p>
-              <p>Số lượng có sẵn: {availableQuantity || 0}</p>
+              <p>Số lượng có sẵn trong kho: {availableQuantity || 0}</p>
+              <p>Số lượng cần thêm: {additionalQuantity}</p>
+              <p>Vui lòng giảm số lượng hoặc chọn nguồn thiết bị khác.</p>
             </div>
             <div className="modal-footer">
               <button
@@ -724,6 +723,14 @@ const RoomEquipmentForm = ({
             </div>
             <div className="modal-body">
               <p>Bạn muốn lấy thêm {additionalQuantity} thiết bị từ đâu?</p>
+              {availableQuantity > 0 && (
+                <p className="text-info">
+                  Hiện có {availableQuantity} thiết bị trong kho. 
+                  {availableQuantity < additionalQuantity && 
+                    ` (Không đủ để đáp ứng nhu cầu ${additionalQuantity} thiết bị)`
+                  }
+                </p>
+              )}
             </div>
             <div className="modal-footer">
               <button
@@ -732,7 +739,7 @@ const RoomEquipmentForm = ({
                 data-dismiss="modal"
                 onClick={() => handleSourceSelection(false)}
               >
-                Tùy chỉnh (không lấy từ kho)
+                Nguồn khác (không lấy từ kho)
               </button>
               <button
                 type="button"

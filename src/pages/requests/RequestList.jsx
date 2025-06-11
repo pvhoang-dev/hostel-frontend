@@ -2,12 +2,12 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { requestService } from "../../api/requests";
 import { houseService } from "../../api/houses";
-import Table from "../../components/common/Table";
-import Card from "../../components/common/Card";
-import Button from "../../components/common/Button";
-import Input from "../../components/common/Input";
-import Select from "../../components/common/Select";
-import Loader from "../../components/common/Loader";
+import Table from "../../components/ui/Table";
+import Card from "../../components/ui/Card";
+import Button from "../../components/ui/Button";
+import Input from "../../components/ui/Input";
+import Select from "../../components/ui/Select";
+import Loader from "../../components/ui/Loader";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 import { useAuth } from "../../hooks/useAuth";
@@ -76,11 +76,7 @@ const FilterSection = ({
     </div>
 
     <div className="mt-3 d-flex justify-content-end">
-      <Button
-        variant="secondary"
-        onClick={onClearFilters}
-        className=" mr-2"
-      >
+      <Button variant="secondary" onClick={onClearFilters} className=" mr-2">
         Xóa bộ lọc
       </Button>
       <Button onClick={onApplyFilters}>Tìm</Button>
@@ -346,7 +342,6 @@ const RequestList = () => {
     };
 
     setSearchParams(baseParams);
-    loadRequests();
   };
 
   // Helper functions
@@ -471,20 +466,15 @@ const RequestList = () => {
             loading={isLoading}
             actionColumn={{
               key: "actions",
-              actions: [
+              actions: isTenant ? [
                 {
                   icon: "mdi-eye",
                   handler: (request) => navigate(`/requests/${request.id}`),
                 },
+              ] : [
                 {
-                  icon: "mdi-pencil",
-                  handler: (request) => {
-                    if (canEdit(request)) {
-                      navigate(`/requests/${request.id}`);
-                    } else {
-                      showError("Bạn không có quyền sửa yêu cầu này");
-                    }
-                  },
+                  icon: "mdi-eye",
+                  handler: (request) => navigate(`/requests/${request.id}`),
                 },
                 {
                   icon: "mdi-delete",

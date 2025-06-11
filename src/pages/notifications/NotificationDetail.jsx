@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { notificationService } from "../../api/notifications";
-import Card from "../../components/common/Card";
-import Button from "../../components/common/Button";
-import Loader from "../../components/common/Loader";
+import Card from "../../components/ui/Card";
+import Button from "../../components/ui/Button";
+import Loader from "../../components/ui/Loader";
 import useAlert from "../../hooks/useAlert";
 import { useAuth } from "../../hooks/useAuth";
 import useApi from "../../hooks/useApi";
@@ -42,7 +42,7 @@ const NotificationDetail = () => {
   const handleDelete = async () => {
     // Admin can delete any, Managers can delete notifications they can view,
     // Other users can only delete their own
-    if (!(isAdmin || isManager || notification?.user_id === user?.id)) {
+    if (!(isAdmin || isManager || notification?.user.id === user?.id)) {
       showError("Bạn không có quyền xóa thông báo này");
       return;
     }

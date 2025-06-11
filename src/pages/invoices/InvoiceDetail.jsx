@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { invoiceService } from "../../api/invoices";
 import { useAuth } from "../../hooks/useAuth";
-import Loader from "../../components/common/Loader";
-import Button from "../../components/common/Button";
-import Card from "../../components/common/Card";
+import Loader from "../../components/ui/Loader";
+import Button from "../../components/ui/Button";
+import Card from "../../components/ui/Card";
 import useAlert from "../../hooks/useAlert";
 import useApi from "../../hooks/useApi";
 import { formatDate, formatCurrency } from "../../utils/formatters";
@@ -12,7 +12,7 @@ import { formatDate, formatCurrency } from "../../utils/formatters";
 const InvoiceDetail = () => {
   const { id } = useParams();
   const [invoice, setInvoice] = useState(null);
-  const { user, isAdmin, isManager } = useAuth();
+  const { user, isAdmin, isManager, isTenant } = useAuth();
   const { showError, showSuccess } = useAlert();
   const navigate = useNavigate();
 
@@ -90,8 +90,7 @@ const InvoiceDetail = () => {
   }
 
   // Check if user is manager of this house
-  const canManage = isManager && invoice.room?.house?.manager_id === user?.id;
-  const canEdit = isAdmin || canManage;
+  const canEdit = isAdmin || isManager;
 
   const getInvoiceTypeText = (type) => {
     switch (type) {
@@ -293,37 +292,39 @@ const InvoiceDetail = () => {
             </div>
           </div>
 
-          <div className="col-md-12 mb-4">
-            <h5 className="mb-3">Thông tin hệ thống</h5>
-            <div className="table-responsive">
-              <table className="table table-bordered">
-                <thead style={{ backgroundColor: "rgba(0, 0, 0, .075)" }}>
-                  <tr>
-                    <th style={{ width: "200px" }}>Thông tin</th>
-                    <th>Chi tiết</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Người tạo:</td>
-                    <td>{invoice.creator?.username || "N/A"}</td>
-                  </tr>
-                  <tr>
-                    <td>Ngày tạo:</td>
-                    <td>{invoice.created_at}</td>
-                  </tr>
-                  <tr>
-                    <td>Người cập nhật:</td>
-                    <td>{invoice.updater?.username || "N/A"}</td>
-                  </tr>
-                  <tr>
-                    <td>Ngày cập nhật:</td>
-                    <td>{invoice.updated_at}</td>
-                  </tr>
-                </tbody>
-              </table>
+          {!isTenant && (
+            <div className="col-md-12 mb-4">
+              <h5 className="mb-3">Thông tin hệ thống</h5>
+              <div className="table-responsive">
+                <table className="table table-bordered">
+                  <thead style={{ backgroundColor: "rgba(0, 0, 0, .075)" }}>
+                    <tr>
+                      <th style={{ width: "200px" }}>Thông tin</th>
+                      <th>Chi tiết</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Người tạo:</td>
+                      <td>{invoice.creator?.username || "N/A"}</td>
+                    </tr>
+                    <tr>
+                      <td>Ngày tạo:</td>
+                      <td>{invoice.created_at}</td>
+                    </tr>
+                    <tr>
+                      <td>Người cập nhật:</td>
+                      <td>{invoice.updater?.username || "N/A"}</td>
+                    </tr>
+                    <tr>
+                      <td>Ngày cập nhật:</td>
+                      <td>{invoice.updated_at}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </Card>
     </div>
