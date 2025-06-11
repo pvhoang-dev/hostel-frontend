@@ -1,5 +1,5 @@
-import { useEffect, useContext } from "react";
-import { useNavigate, useParams, Link, useLocation } from "react-router-dom";
+import { useEffect } from "react";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import { roomService } from "../../api/rooms";
 import Loader from "../../components/ui/Loader";
 import Card from "../../components/ui/Card";
@@ -12,7 +12,6 @@ import RoomServiceList from "./services/RoomServiceList";
 const RoomDetail = ({ tenantView = false }) => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const location = useLocation();
   const { showError } = useAlert();
   const { user, isAdmin, isManager, isTenant } = useAuth();
 
@@ -168,6 +167,52 @@ const RoomDetail = ({ tenantView = false }) => {
                       </Link>
                     </td>
                   </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Thông tin người thuê */}
+          <div className="col-12 mb-4">
+            <h5 className="mb-3">Thông tin người thuê</h5>
+            <div className="table-responsive">
+              <table className="table table-bordered">
+                <thead style={{ backgroundColor: "rgba(0, 0, 0, .075)" }}>
+                  <tr>
+                    <th style={{ width: "5%" }}>STT</th>
+                    <th style={{ width: "20%" }}>Tên</th>
+                    <th style={{ width: "15%" }}>Username</th>
+                    <th style={{ width: "20%" }}>Email</th>
+                    <th style={{ width: "15%" }}>Số điện thoại</th>
+                    <th style={{ width: "25%" }}>CCCD/CMND</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {room.currentContract?.tenants && room.currentContract.tenants.length > 0 ? (
+                    room.currentContract.tenants.map((tenant, index) => (
+                      <tr key={tenant.id}>
+                        <td>{index + 1}</td>
+                        <td>
+                          <Link
+                            to={`/users/${tenant.id}`}
+                            className="text-primary"
+                          >
+                            {tenant.name}
+                          </Link>
+                        </td>
+                        <td>{tenant.username}</td>
+                        <td>{tenant.email}</td>
+                        <td>{tenant.phone_number}</td>
+                        <td>{tenant.identity_card}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="6" className="text-center">
+                        Không có thông tin người thuê
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
