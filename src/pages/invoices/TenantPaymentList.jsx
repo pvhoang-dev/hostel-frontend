@@ -541,7 +541,7 @@ const TenantPaymentList = () => {
         // Kiểm tra xem có invoiceIds không
         const invoiceIdsArray = invoiceIds ? invoiceIds.split(',') : [];
         if (invoiceIdsArray.length === 0) {
-          showError("Thiếu thông tin hóa đơn cần thanh toán");
+          showError("Thanh toán thất bại");
           
           // Xóa query params
           const newSearchParams = new URLSearchParams(searchParams);
