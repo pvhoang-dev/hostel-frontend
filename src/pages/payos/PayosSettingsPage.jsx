@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Form, Button, Row, Col, Spinner } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { toast } from 'react-toastify';
 import configService from '../../api/configs';
 import useApi from '../../hooks/useApi';
 import useAlert from '../../hooks/useAlert';
@@ -195,7 +194,7 @@ const PayosSettingsPage = () => {
                 Để tăng cường bảo mật giao dịch, vui lòng thiết lập webhook URL trong tài khoản PayOS của bạn:
               </p>
               <div className="alert alert-info">
-                <strong>URL Webhook:</strong> <code>{window.location.origin}/api/payment/webhook</code>
+                <strong>URL Webhook:</strong> <code>https://your-url/api/payment/webhook</code>
                 <p className="mt-2 mb-0 small">Thiết lập webhook giúp xác thực trạng thái thanh toán trực tiếp từ PayOS, ngăn chặn việc giả mạo thanh toán thành công.</p>
               </div>
             </div>

@@ -90,8 +90,8 @@ const InvoiceEdit = () => {
     <div>
       <div className="d-flex justify-content-between align-items-center my-2">
         <h3>Sửa hóa đơn</h3>
-        <Button variant="secondary" onClick={() => navigate(`/invoices/${id}`)}>
-          Hủy
+        <Button variant="secondary" onClick={() => navigate(-1)}>
+          Back
         </Button>
       </div>
 

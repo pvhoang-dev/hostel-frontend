@@ -327,7 +327,7 @@ const MonthlyServiceManagement = () => {
                 />
               )}
               <Alert
-                message="Lưu ý: Khi tạo dịch vụ tháng cho một phòng, hệ thống sẽ tự động tạo hóa đơn tương ứng. Khi cập nhật dịch vụ tháng, bạn sẽ được hỏi xem có muốn cập nhật hóa đơn tương ứng không."
+                message="Lưu ý: Khi tạo dịch vụ tháng cho một phòng, hệ thống sẽ tự động tạo hóa đơn tương ứng."
                 type="info"
                 showIcon
                 style={{
