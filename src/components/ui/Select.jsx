@@ -134,6 +134,7 @@ const Select = forwardRef(
             })
           }}
           {...props}
+          isDisabled={props.disabled}
         />
         
         {error && <div className="invalid-feedback" style={{ display: 'block' }}>{error}</div>}

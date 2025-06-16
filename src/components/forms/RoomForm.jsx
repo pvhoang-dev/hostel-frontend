@@ -14,10 +14,10 @@ const RoomForm = ({
   houseId = null,
 }) => {
   // Use initialData.house_id if available, otherwise fall back to houseId
-  const preselectedHouseId = initialData.house_id || houseId || "";
+  const preselectedHouseId = initialData.house_id || initialData?.house?.id || houseId || "";
 
   const [formData, setFormData] = useState({
-    house_id: preselectedHouseId,
+    house_id: preselectedHouseId.toString(),
     room_number: "",
     capacity: 1,
     base_price: 0,
@@ -41,12 +41,21 @@ const RoomForm = ({
         status: "active",
       });
       if (response.success) {
-        setHouses(
-          response.data.data.map((house) => ({
-            value: house.id,
-            label: `${house.name} (${house.address})`,
-          }))
-        );
+        if (mode === "edit") {
+          setHouses(
+            response.data.data.map((house) => ({
+              value: house.id,
+              label: `${house.name} (${house.address})`,
+            }))
+          );
+        } else {
+          setHouses(
+            response.data.data.map((house) => ({
+              value: house.id.toString(),
+              label: `${house.name} (${house.address})`,
+            }))
+          );
+        }
       }
     } catch (error) {
       console.error("Error loading houses:", error);
@@ -118,7 +127,7 @@ const RoomForm = ({
             name="base_price"
             type="number"
             min="0"
-            value={formData.base_price}
+            value={formData.base_price || ""}
             onChange={handleChange}
             error={errors.base_price}
             required

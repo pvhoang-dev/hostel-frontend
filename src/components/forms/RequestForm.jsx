@@ -55,7 +55,8 @@ const RequestForm = ({
       } else if (user.role === "tenant") {
         const response = await userService.getUsers({
           for_requests: "true",
-          include: "house,room,role",
+          include: "managedHouse,house,room,role",
+          per_page: 1000
         });
         recipients = response.data.data || [];
       }

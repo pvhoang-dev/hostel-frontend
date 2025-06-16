@@ -206,7 +206,7 @@ const UserForm = ({
           />
         </div>
 
-        <div className="col-md-6">
+        {/* <div className="col-md-6">
           <Input
             label="Avatar URL"
             name="avatar_url"
@@ -214,7 +214,7 @@ const UserForm = ({
             onChange={handleChange}
             error={errors.avatar_url}
           />
-        </div>
+        </div> */}
       </div>
 
       <div className="mt-4 d-flex justify-content-end">

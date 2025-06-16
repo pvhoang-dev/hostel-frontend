@@ -239,15 +239,13 @@ const InvoiceList = () => {
     const badgeColors = {
       pending: "warning",
       completed: "success",
-      failed: "danger",
-      refunded: "info",
+      waiting: "info",
     };
 
     const statusText = {
       pending: "Chờ thanh toán",
       completed: "Đã thanh toán",
-      failed: "Thanh toán thất bại",
-      refunded: "Đã hoàn tiền",
+      waiting: "Chờ xác nhận",
     };
 
     return (
@@ -360,22 +358,9 @@ const InvoiceList = () => {
       cell: ({ row }) => getPaymentStatusBadge(row.original.payment_status),
     },
     {
-      accessorKey: "created_at",
-      header: "Ngày tạo",
-      cell: ({ row }) => row.original.created_at,
-    },
-    {
       accessorKey: "payment_method.name",
-      header: "Phương thức thanh toán",
+      header: "PTTT",
       cell: ({ row }) => row.original.payment_method?.name || "N/A",
-    },
-    {
-      accessorKey: "payment_date",
-      header: "Ngày thanh toán",
-      cell: ({ row }) =>
-        row.original.payment_date
-          ? new Date(row.original.payment_date).toLocaleDateString("vi-VN")
-          : "Chưa thanh toán",
     },
     {
       accessorKey: "actions",

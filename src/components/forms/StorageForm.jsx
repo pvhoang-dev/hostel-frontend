@@ -16,11 +16,11 @@ const StorageForm = ({
   houseId = null,
 }) => {
   // Use initialData.house_id if available, otherwise fall back to houseId
-  const preselectedHouseId = initialData.house?.id || houseId || "";
+  const preselectedHouseId = initialData?.house?.id || initialData.house_id || houseId || "";
 
   const [formData, setFormData] = useState({
-    house_id: preselectedHouseId,
-    equipment_id: initialData.equipment?.id || "",
+    house_id: preselectedHouseId.toString(),
+    equipment_id: initialData?.equipment_id || "",
     quantity: initialData.quantity || 1,
     price: initialData.price || 0,
     description: initialData.description || "",
@@ -44,7 +44,7 @@ const StorageForm = ({
       if (response.success) {
         setHouses(
           response.data.data.map((house) => ({
-            value: house.id,
+            value: house.id.toString(),
             label: `${house.name} (${house.address})`,
           }))
         );
@@ -105,7 +105,7 @@ const StorageForm = ({
             options={[{ value: "", label: "Chọn nhà" }, ...houses]}
             placeholder="Chọn nhà"
             required
-            disabled={!!houseId || loading}
+            disabled={!!houseId || !!initialData.house_id || loading}
           />
         </div>
 
@@ -128,7 +128,7 @@ const StorageForm = ({
             name="quantity"
             type="number"
             min="0"
-            value={formData.quantity}
+            value={formData.quantity || ""}
             onChange={handleChange}
             error={errors.quantity}
             required
@@ -141,7 +141,7 @@ const StorageForm = ({
             name="price"
             type="number"
             min="0"
-            value={formData.price}
+            value={formData.price || ""}
             onChange={handleChange}
             error={errors.price}
           />

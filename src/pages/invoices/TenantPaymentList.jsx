@@ -213,15 +213,13 @@ const TenantPaymentList = () => {
     const badgeColors = {
       pending: "warning",
       completed: "success",
-      failed: "danger",
-      refunded: "info",
+      waiting: "info",
     };
 
     const statusText = {
       pending: "Chờ thanh toán",
       completed: "Đã thanh toán",
-      failed: "Thanh toán thất bại",
-      refunded: "Đã hoàn tiền",
+      waiting: "Chờ xác nhận"
     };
 
     return (

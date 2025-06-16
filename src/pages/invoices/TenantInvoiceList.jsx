@@ -71,8 +71,7 @@ const FilterSection = ({
               { value: "", label: "Tất cả" },
               { value: "pending", label: "Chờ thanh toán" },
               { value: "completed", label: "Đã thanh toán" },
-              { value: "failed", label: "Thanh toán thất bại" },
-              { value: "refunded", label: "Đã hoàn tiền" },
+              { value: "waiting", label: "Chờ xác nhận" },
             ]}
           />
         </div>
@@ -178,15 +177,13 @@ const TenantInvoiceList = () => {
     const badgeColors = {
       pending: "warning",
       completed: "success",
-      failed: "danger",
-      refunded: "info",
+      waiting: "info"
     };
 
     const statusText = {
       pending: "Chờ thanh toán",
       completed: "Đã thanh toán",
-      failed: "Thanh toán thất bại",
-      refunded: "Đã hoàn tiền",
+      waiting: "Chờ xác nhận",
     };
 
     return (
