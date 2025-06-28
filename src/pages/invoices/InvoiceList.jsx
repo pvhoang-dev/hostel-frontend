@@ -366,7 +366,7 @@ const InvoiceList = () => {
     },
     {
       accessorKey: "payment_method.name",
-      header: "Phương thức thanh toán",
+      header: "PTTT",
       cell: ({ row }) => row.original.payment_method?.name || "N/A",
     },
     {

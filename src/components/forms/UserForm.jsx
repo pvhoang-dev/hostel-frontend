@@ -24,7 +24,6 @@ const UserForm = ({
       vehicle_plate: "",
       status: "active",
       role_id: "",
-      avatar_url: "",
       ...initialData,
     };
 
@@ -203,16 +202,6 @@ const UserForm = ({
             error={errors.role_id}
             options={[{ value: "", label: "No role" }, ...roles]}
             placeholder="Select a Role"
-          />
-        </div>
-
-        <div className="col-md-6">
-          <Input
-            label="Avatar URL"
-            name="avatar_url"
-            value={formData.avatar_url}
-            onChange={handleChange}
-            error={errors.avatar_url}
           />
         </div>
       </div>

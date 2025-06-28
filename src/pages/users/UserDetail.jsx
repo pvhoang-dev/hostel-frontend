@@ -70,22 +70,12 @@ const UserDetail = () => {
 
       <Card>
         <div className="d-flex align-items-start mb-4">
-          {user.avatar_url ? (
-            <img
-              src={user.avatar_url}
-              alt={user.name}
-              className="rounded-circle object-fit-cover me-4"
-              style={{ width: "4rem", height: "4rem" }}
-            />
-          ) : (
-            <div
-              className="rounded-circle d-flex align-items-center justify-content-center text-white fs-1 me-4 bg-light mr-3"
-              style={{ width: "4rem", height: "4rem" }}
-            >
-              {user.name.charAt(0).toUpperCase()}
-            </div>
-          )}
-
+          <div
+            className="rounded-circle d-flex align-items-center justify-content-center text-white fs-1 me-4 bg-light mr-3"
+            style={{ width: "4rem", height: "4rem" }}
+          >
+            {user.name.charAt(0).toUpperCase()}
+          </div>
           <div className="flex-grow-1">
             <h4 className="fs-4 fw-semibold">{user.name}</h4>
             <p>@{user.username}</p>
